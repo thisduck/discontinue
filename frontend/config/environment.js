@@ -22,12 +22,17 @@ module.exports = function(environment) {
       providers: {
         'github-oauth2': {
           apiKey: '4bc231037495c4ee40b6',
-          redirectUri: 'http://localhost:3000',
-          scope: 'read:repo read:user'
+          scope: 'read:repo read:user read:org'
         }
       }
     },
 
+    'ember-simple-auth-token': {
+      serverTokenEndpoint: '/session',
+      refreshAccessTokens: false,
+      authorizationHeaderName: 'Authorization', // Header name added to each API request
+      authorizationPrefix: 'Bearer ', // Prefix added to each API request
+    },
 
     APP: {
       // Here you can pass flags/options to your application instance

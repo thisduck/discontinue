@@ -64,4 +64,5 @@ gem 'rest-client', require: false
 gem 'octokit', "~> 4.0"
 gem 'figaro'
 
+gem 'jwt'
 gem 'jsonapi-resources'

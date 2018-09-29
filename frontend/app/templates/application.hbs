@@ -1,9 +1,6 @@
-API Key: {{config.apiKey}} <br />
-Authorization Code: {{session.data.authenticated.authorizationCode}} <br />
-
 {{#if session.isAuthenticated}}
-    Authenticated
-    <button onclick={{action "logout"}}>Log Out</button>
+  Logged in as [{{currentUser.user.email}}]
+  <button onclick={{action "logout"}}>Log Out</button>
 {{else}}
     Unauthenticated
 {{/if}}
