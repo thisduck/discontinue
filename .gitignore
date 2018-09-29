@@ -31,3 +31,6 @@
 /config/master.key
 
 tags
+
+# Ignore application configuration
+/config/application.yml
