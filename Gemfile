@@ -55,3 +55,5 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem "ember-cli-rails"
+gem 'mongoid', '~> 7.0'
+

@@ -29,5 +29,9 @@ module Discontinue
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.generators do |g|
+      g.orm :mongoid
+    end
   end
 end
