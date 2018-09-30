@@ -65,3 +65,15 @@ gem 'jwt'
 gem 'jsonapi-resources'
 
 gem 'aasm'
+
+gem 'delayed_job_active_record'
+gem 'paperclip'
+gem 'terrapin'
+gem 'spawnling'
+
+gem 'redis'
+
+gem 'aws-sdk', '~> 3'
+gem 'aws-sdk-s3', '~> 1'
+gem 'aws-sdk-ec2', '~> 1'
+

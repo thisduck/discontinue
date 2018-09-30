@@ -45,8 +45,10 @@
     </span>
     &middot;
 
-    {{#if last_build}}
-      Last Build #{{last_build.id}}
+    {{#if lastBuild}}
+      {{#link-to 'authenticated.builds.show' lastBuild.id}}
+        Last Build #{{lastBuild.id}}
+      {{/link-to}}
     {{/if}}
 
   </div>

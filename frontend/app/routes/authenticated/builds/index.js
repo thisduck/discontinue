@@ -5,6 +5,6 @@ export default Route.extend({
   store: service(),
 
   model() {
-    return this.store.findAll('build', { include: "repository,build-request" })
+    return this.store.findAll('build')
   },
 });

@@ -12,7 +12,9 @@ Router.map(function() {
   this.route('authenticated', { path: '' }, function() {
     this.route('builds', function() { 
       this.route('index', { path: '/' });
-      this.route('show', { path: '/:build_id' });
+      this.route('show', { path: '/:build_id' }, function() {
+        this.route('stream', { path: '/stream/:stream_id' });
+      });
     });
     this.route('build_requests', function() { });
     this.route('repositories', function() {

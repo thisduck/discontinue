@@ -1,8 +1,9 @@
 class BuildRequest < ApplicationRecord
   belongs_to :repository
   has_many :builds
+  has_one :last_build, -> { order(created_at: :desc) }, class_name: 'Build'
 
-  validates_presence_of :branch, :sha, :repository, :aasm_state
+  validates_presence_of :branch, :repository, :aasm_state
 
   include AASM
 

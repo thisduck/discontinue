@@ -1,2 +1,17 @@
-{{dis-build build=model }}
+{{dis-build build=model}}
 <br >
+
+<div class="ui top attached tabular menu">
+  {{#each model.streams as |stream|}}
+    {{#link-to 'authenticated.builds.show.stream' model.id stream.id class="item"}}
+      {{#if (eq stream.state "running")}}
+        <div class="ui tiny active inline loader"></div>
+      {{/if}}
+      &nbsp;
+      {{stream.name}}
+    {{/link-to}}
+  {{/each}}
+</div>
+
+{{outlet}}
+

@@ -4,6 +4,8 @@ class Api::BuildResource < JSONAPI::Resource
   belongs_to :build_request
   belongs_to :repository
 
+  has_many :streams
+
   def state
     @model.aasm_state
   end

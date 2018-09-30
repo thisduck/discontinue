@@ -1,6 +1,7 @@
 class Api::BuildRequestResource < JSONAPI::Resource
   attributes :branch, :sha, :repository_id, :state, :hook_hash, :events, :last_build_id
-  belongs_to :repository
+  has_one :repository
+  has_one :last_build, class_name: "Build", always_include_linkage_data: true
 
   def last_build_id
     @model.builds.last.try :id

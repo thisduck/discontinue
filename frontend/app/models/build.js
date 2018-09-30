@@ -6,9 +6,10 @@ export default DS.Model.extend({
   branch: DS.attr(),
   sha: DS.attr(),
   repository: DS.belongsTo('repository'),
-  buildRequest: DS.belongsTo('build-request', {async: true}),
+  buildRequest: DS.belongsTo('build-request'),
   state: DS.attr(),
   hook_hash: DS.attr(),
   events: DS.attr('array'),
   triggerEvent: memberAction({ path: 'trigger_event' }),
+  streams: DS.hasMany('streams'),
 });

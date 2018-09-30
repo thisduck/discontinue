@@ -6,7 +6,13 @@ class GithubPushHook
     @hash = GithubPushHook.clean_push_hook(@original_hash)
   end
 
+  def initial_web_hook?
+    original_hash[:zen].present?
+  end
+
   def branch
+    return original_hash[:repository][:default_branch] if initial_web_hook?
+
     hash[:ref].gsub(/^refs\/heads\//, "")
   end
 

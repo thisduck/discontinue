@@ -9,7 +9,7 @@ class GithubController < ApplicationController
     hook = GithubPushHook.new(params)
     repo = Repository.where(github_id: hook.repository_id).first
 
-    if hook.branch.present? && hook.sha.present?
+    if hook.branch.present?
       BuildRequest.add_request(
         branch: hook.branch,
         sha: hook.sha,
