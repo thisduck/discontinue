@@ -1,3 +1,3 @@
 class UserResource < JSONAPI::Resource
-  attributes :email
+  attributes :email, :github_login, :github_avatar_url
 end

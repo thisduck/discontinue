@@ -6,31 +6,9 @@ class SessionController < ApplicationController
   before_action :authenticate, only: [:current]
 
   def create
-    access_token = GithubAuth.new(params[:code]).access_token!
-    client = Octokit::Client.new(access_token: access_token)
-
     begin
-      user = User.where(github_auth_id: client.user.id).first
-      if user.blank?
-        user = User.where(email: client.user.email).first
-        user.update_attributes(github_auth_id: client.user.id) if user.present?
-      end
-
-      if user.blank?
-        user = User.create(email: client.user.email, github_auth_id: client.user.id, password: 'SomeRandomPass123')
-      end
-      user.update_attributes(access_token: access_token)
-
-      payload = {
-        data: {
-          id: user.id.to_s,
-          email: user.email,
-        },
-        sub: user.id.to_s,
-        exp: 2.weeks.from_now.to_i
-      }
-
-      token = JWT.encode payload, ENV['JWT_SECRET'], 'HS512'
+      user = find_user(params[:code])
+      token = make_token(user)
 
       render json: { token: token }
     rescue StandardError
@@ -41,5 +19,39 @@ class SessionController < ApplicationController
   def current
     serializer = JSONAPI::ResourceSerializer.new(UserResource)
     render json: serializer.serialize_to_hash(UserResource.new(@user, nil))
+  end
+
+  protected
+
+  def find_user(code)
+    access_token = GithubAuth.new(code).access_token!
+    client = Octokit::Client.new(access_token: access_token)
+
+    github_user = client.user
+    user = User.where(github_auth_id: github_user.id).first
+    user = User.where(email: github_user.email).first if user.blank?
+    user = User.create!(email: github_user.email, password: 'SomeRandomPass123') if user.blank?
+
+    user.update_attributes({
+      access_token: access_token,
+      github_auth_id: github_user.id,
+      github_login: github_user.login,
+      github_avatar_url: github_user.avatar_url
+    })
+
+    user
+  end
+
+  def make_token(user)
+    payload = {
+      data: {
+        id: user.id.to_s,
+        email: user.email,
+      },
+      sub: user.id.to_s,
+      exp: 2.weeks.from_now.to_i
+    }
+
+    JWT.encode payload, ENV['JWT_SECRET'], 'HS512'
   end
 end

@@ -3,13 +3,18 @@
     Discontinue
   </a>
   <a href="#" class="item">Home</a>
-  <a href="#" class="item">Projects</a>
-  <a href="#" class="item">Builds</a>
+  {{#if session.isAuthenticated}}
+    <a href="#" class="item">Repositories</a>
+    <a href="#" class="item">Builds</a>
+  {{/if}}
 
   <div class="right menu">
     {{#if session.isAuthenticated}}
       <div class="item">
-        [{{currentUser.user.email}}]
+        <img src="{{currentUser.user.github_avatar_url}}" class="ui avatar image" />
+        <span>
+          {{currentUser.user.github_login}}
+        </span>
       </div>
       <a class="item" href="#" onclick={{action "logout"}}>Log Out</a>
     {{else}}

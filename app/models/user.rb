@@ -19,6 +19,8 @@ class User
   field :remember_created_at, type: Time
 
   field :github_auth_id, type: String
+  field :github_login, type: String
+  field :github_avatar_url, type: String
   field :access_token, type: String
 
   ## Trackable
@@ -41,6 +43,10 @@ class User
 
   def will_save_change_to_email?
     false
+  end
+
+  def github
+    client = Octokit::Client.new(access_token: access_token)
   end
 
 end
