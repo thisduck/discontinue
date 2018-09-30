@@ -79,6 +79,10 @@ class Box < ApplicationRecord
     output_content_without_encoding.force_encoding("utf-8")
   end
 
+  def active?
+    aasm_state.end_with?("ing")
+  end
+
   def output_content_split
     return [] if output_content.blank?
 
@@ -102,7 +106,7 @@ class Box < ApplicationRecord
     commands.each_with_index do |command, index|
       state = "passed"
       if command == commands.last
-        state = running? ? "active" : aasm_state
+        state = active? ? "active" : aasm_state
       end
       command[:state] = state
       if commands[index + 1].present?
