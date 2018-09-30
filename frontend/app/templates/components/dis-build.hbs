@@ -1,7 +1,13 @@
 <div class="ui segments">
   <div class="ui top attached secondary menu">
     <h4 class="ui item">
-      #{{build.id}} {{build.state}}
+      {{#if showLink}}
+        {{#link-to 'authenticated.builds.show' build.id}}
+          #{{build.id}} {{build.state}}
+        {{/link-to}}
+      {{else}}
+        #{{build.id}} {{build.state}}
+      {{/if}}
     </h4>
     <div class="right menu">
       {{#ui-dropdown class="item" onChange=(action (mut gender))}}
@@ -16,11 +22,8 @@
         </div>
       {{/ui-dropdown}}
     </div>
-
-
-
-
   </div>
+
   <div class="ui bottom attached segment">
     <span>
       {{fa-icon 'code'}} {{build.repository.name}}
@@ -28,7 +31,7 @@
     &middot;
 
     <strong>
-      {{fa-icon 'code-branch'}} {{build.branch}}
+      {{fa-icon 'code-merge'}} {{build.branch}}
     </strong>
     &middot;
 
@@ -41,6 +44,10 @@
       {{fa-icon 'user'}} {{build.hook_hash.head_commit.author.username}}
     </span>
     &middot;
+
+    {{#if last_build}}
+      Last Build #{{last_build.id}}
+    {{/if}}
 
   </div>
 </div>

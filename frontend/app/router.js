@@ -10,6 +10,10 @@ Router.map(function() {
   this.route('index', { path: '/' });
   this.route('login');
   this.route('authenticated', { path: '' }, function() {
+    this.route('builds', function() { 
+      this.route('index', { path: '/' });
+      this.route('show', { path: '/:build_id' });
+    });
     this.route('build_requests', function() { });
     this.route('repositories', function() {
       this.route('new');

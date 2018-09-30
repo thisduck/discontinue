@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 export default Route.extend({
   store: service(),
 
-  model() {
-    return this.store.findAll('build-request', { include: "repository" })
+  model(params) {
+    return this.store.findRecord('build', params.build_id, { include: "repository,build-request" })
   },
 });

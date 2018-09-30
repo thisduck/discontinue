@@ -1,6 +1,10 @@
 class Api::BuildRequestResource < JSONAPI::Resource
-  attributes :branch, :sha, :repository_id, :state, :hook_hash, :events
+  attributes :branch, :sha, :repository_id, :state, :hook_hash, :events, :last_build_id
   belongs_to :repository
+
+  def last_build_id
+    @model.builds.last.try :id
+  end
 
   def state
     @model.aasm_state

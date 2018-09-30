@@ -1,5 +1,6 @@
 class BuildRequest < ApplicationRecord
   belongs_to :repository
+  has_many :builds
 
   validates_presence_of :branch, :sha, :repository, :aasm_state
 
@@ -35,7 +36,13 @@ class BuildRequest < ApplicationRecord
 
   private
   def queue_request
-
+    Build.queue(
+      branch: branch,
+      sha: sha,
+      hook_hash: hook_hash,
+      repository: repository,
+      build_request: self
+    )
   end
 
   def skip_ci_message?

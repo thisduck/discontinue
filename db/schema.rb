@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_30_070936) do
+ActiveRecord::Schema.define(version: 2018_09_30_090302) do
 
   create_table "build_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "branch"
@@ -21,6 +21,23 @@ ActiveRecord::Schema.define(version: 2018_09_30_070936) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["repository_id"], name: "index_build_requests_on_repository_id"
+  end
+
+  create_table "builds", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "branch"
+    t.string "sha"
+    t.json "hook_hash"
+    t.bigint "build_request_id"
+    t.bigint "repository_id"
+    t.string "aasm_state"
+    t.text "setup_commands"
+    t.datetime "started_at"
+    t.datetime "finished_at"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["build_request_id"], name: "index_builds_on_build_request_id"
+    t.index ["repository_id"], name: "index_builds_on_repository_id"
   end
 
   create_table "repositories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -44,4 +61,6 @@ ActiveRecord::Schema.define(version: 2018_09_30_070936) do
   end
 
   add_foreign_key "build_requests", "repositories"
+  add_foreign_key "builds", "build_requests"
+  add_foreign_key "builds", "repositories"
 end
