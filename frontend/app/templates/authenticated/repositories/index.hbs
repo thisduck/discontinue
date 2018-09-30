@@ -1,0 +1,17 @@
+<h2>Repositories</h2>
+{{#link-to 'authenticated.repositories.new' class="ui mini button"}} {{fa-icon 'plus'}} Add {{/link-to}}
+
+<div class="ui middle aligned divided list">
+  {{#each model as |repo|}}
+    <div class="item">
+      <div class="right floated content">
+        {{#link-to 'authenticated.repositories.show' repo class="ui mini button"}} Settings {{/link-to}}
+      </div>
+      <div class="content">
+        {{fa-icon 'code' size='lg'}}
+        {{repo.name}}
+      </div>
+    </div>
+  {{/each}}
+</div>
+

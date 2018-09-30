@@ -3,7 +3,7 @@
 require 'github_auth'
 
 class SessionController < ApplicationController
-  before_action :authenticate, only: [:current]
+  skip_before_action :authenticate, only: [:create]
 
   def create
     begin
@@ -17,8 +17,8 @@ class SessionController < ApplicationController
   end
 
   def current
-    serializer = JSONAPI::ResourceSerializer.new(UserResource)
-    render json: serializer.serialize_to_hash(UserResource.new(@user, nil))
+    serializer = JSONAPI::ResourceSerializer.new(Api::UserResource)
+    render json: serializer.serialize_to_hash(Api::UserResource.new(@user, nil))
   end
 
   protected
@@ -30,7 +30,7 @@ class SessionController < ApplicationController
     github_user = client.user
     user = User.where(github_auth_id: github_user.id).first
     user = User.where(email: github_user.email).first if user.blank?
-    user = User.create!(email: github_user.email, password: 'SomeRandomPass123') if user.blank?
+    user = User.create!(email: github_user.email) if user.blank?
 
     user.update_attributes({
       access_token: access_token,

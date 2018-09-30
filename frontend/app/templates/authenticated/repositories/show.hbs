@@ -1,0 +1,10 @@
+<h2>{{model.name}}</h2>
+
+<div class="ui form">
+  <div class="field">
+    <label for="">Setup Commands</label>
+    {{textarea value=model.setup_commands}}
+  </div>
+
+  <button class="ui button primary" {{action "save"}}>Save</button>
+</div>

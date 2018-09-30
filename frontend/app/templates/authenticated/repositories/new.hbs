@@ -1,0 +1,16 @@
+<h2>Add Repository</h2>
+
+<div class="ui middle aligned divided list">
+  {{#each model as |repo|}}
+    <div class="item">
+      <div class="right floated content">
+        <div class="ui button mini" {{action 'create' repo}}>Add</div>
+      </div>
+      <div class="content">
+        {{fa-icon 'code' size='lg'}}
+        {{repo.name}}
+      </div>
+    </div>
+  {{/each}}
+</div>
+
