@@ -14,6 +14,7 @@ Router.map(function() {
       this.route('index', { path: '/' });
       this.route('show', { path: '/:build_id' }, function() {
         this.route('stream', { path: '/stream/:stream_id' });
+        this.route('box', { path: '/box/:box_id' });
       });
     });
     this.route('build_requests', function() { });

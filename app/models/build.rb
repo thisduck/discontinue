@@ -12,6 +12,8 @@ class Build < ApplicationRecord
     state :waiting, initial: true
     state :running, before_enter: :start_build
     state :stopped, before_enter: :stop_build
+    state :passed
+    state :failed
 
     event :start do
       transitions from: :waiting, to: :running
@@ -24,17 +26,39 @@ class Build < ApplicationRecord
     event :stop do
       transitions from: :running, to: :stopped
     end
+
+    event :pass_build do
+      transitions to: :passed
+    end
+
+    event :fail_build do
+      transitions to: :failed
+    end
+  end
+
+  def sync!
+    self.reload
+    if self.streams.all?(&:finished?)
+      self.update_attributes(finished_at: Time.now)
+      if self.streams.collect(&:passed?).all?
+        pass_build!
+      else
+        fail_build!
+      end
+    end
   end
 
   def self.queue(options = {})
-    options[:started_at] = Time.now
-    options[:finished_at] = nil 
-    options[:setup_commands] = options[:build_request].repository.setup_commands
-    build = Build.create! options
+    Build.transaction do
+      options[:started_at] = Time.now
+      options[:finished_at] = nil 
+      options[:setup_commands] = options[:build_request].repository.setup_commands
+      build = Build.create! options
 
-    build.start!
+      build.start!
 
-    build
+      build
+    end
   end
 
   private

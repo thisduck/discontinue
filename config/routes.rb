@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       end
     end
     jsonapi_resources :streams
+    jsonapi_resources :boxes
   end
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

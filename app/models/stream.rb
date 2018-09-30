@@ -8,9 +8,19 @@ class Stream < ApplicationRecord
     state :running, before_enter: :start_stream
     state :stopped, before_enter: :stop_stream
     state :errored
+    state :passed
+    state :failed
 
     event :start do
       transitions from: :waiting, to: :running
+    end
+
+    event :pass_stream, after: :after_pass do
+      transitions to: :passed
+    end
+
+    event :fail_stream, after: :after_fail do
+      transitions to: :failed
     end
 
     event :stop do
@@ -20,6 +30,30 @@ class Stream < ApplicationRecord
 
   def box_count
     1
+  end
+
+  def after_pass
+    build.sync!
+  end
+
+  def after_fail
+    build.sync!
+  end
+
+  def finished?
+    finished_at.present?
+  end
+
+  def sync!
+    self.reload
+    if self.boxes.all?(&:finished?)
+      self.update_attributes(finished_at: Time.now)
+      if self.boxes.collect(&:passed?).all?
+        pass_stream!
+      else
+        fail_stream!
+      end
+    end
   end
 
   private

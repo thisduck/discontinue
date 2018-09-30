@@ -3,13 +3,15 @@
 
 <div class="ui top attached tabular menu">
   {{#each model.streams as |stream|}}
-    {{#link-to 'authenticated.builds.show.stream' model.id stream.id class="item"}}
-      {{#if (eq stream.state "running")}}
-        <div class="ui tiny active inline loader"></div>
-      {{/if}}
-      &nbsp;
-      {{stream.name}}
-    {{/link-to}}
+    {{#each stream.boxes as |box index|}}
+      {{#link-to 'authenticated.builds.show.box' model.id box.id class="item"}}
+        {{#if (eq box.state "running")}}
+          <div class="ui tiny active inline loader"></div>
+        {{/if}}
+        &nbsp;
+        {{stream.name}} {{index}}
+      {{/link-to}}
+    {{/each}}
   {{/each}}
 </div>
 

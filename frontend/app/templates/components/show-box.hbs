@@ -1,0 +1,7 @@
+<div class="ui bottom attached tab active segment" data-tab="hello">
+  {{#ui-accordion class="fluid segments"}}
+    {{#each box.output as |command|}}
+      {{dis-command command=command}}
+    {{/each}}
+  {{/ui-accordion}}
+</div>

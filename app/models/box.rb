@@ -1,6 +1,12 @@
 require 'string_file'
+require 'runner'
+require 'redis'
+require 'humanize_seconds'
 
 class Box < ApplicationRecord
+  SPAWNLING_PREFIX = '-build-stream-box'
+  BUILD_SCRIPT_PREFIX = "build_discontinue"
+
   belongs_to :stream
   before_destroy :destroy_machine!
 
@@ -10,44 +16,50 @@ class Box < ApplicationRecord
   include AASM
   aasm do 
     state :waiting, initial: true
-    state :running, before_enter: :start_box
-    state :stopped, before_enter: :stop_box
-    state :errored, before_enter: :stop_box
+    state :starting
+    state :running
+    state :stopped
+    state :errored
+    state :crashed
+    state :passed
+    state :failed
 
-    event :error do
+    event :pass_box, after: :clear_box do
+      transitions to: :passed
+    end
+
+    event :fail_box, after: :clear_box do
+      transitions to: :failed
+    end
+
+    event :crash, after: :clear_box do
+      transitions to: :crashed
+    end
+
+    event :error, after: :clear_box do
       transitions to: :errored
     end
 
-    event :start do
-      transitions from: :waiting, to: :running
+    event :start, after_commit: :start_box do
+      transitions from: :waiting, to: :starting
     end
 
-    event :stop do
+    event :run, after_commit: :execute_build_script! do
+      transitions from: :starting, to: :running
+    end
+
+    event :stop, after: :clear_box do
       transitions from: :running, to: :stopped
     end
   end
 
   def self.start(box_id)
-    box = Box.find box_id
-    box.start!
-  end
-
-  private
-
-  def spawnling_prefix
-    '-build-stream-box'
-  end
-
-  def start_box
-    Spawnling.new(:argv => "spawn #{spawnling_prefix}-#{self.id}-") do
+    puts "going into spawnling for #{box_id}"
+    Spawnling.new(:argv => "spawn #{SPAWNLING_PREFIX}-#{box_id}-") do
       begin
-        self.update_attributes(
-          started_at: Time.now,
-          finished_at: nil,
-          output: StringFile.create(body: 'hello there.', name: "output.txt"),
-        )
-
-        start_machine!
+        puts "in spawnling for #{box_id}"
+        box = Box.find box_id
+        box.start!
       rescue => e
         message = "#{e.message}\n#{e.backtrace.join("\n")}"
         self.error_message = message
@@ -56,7 +68,140 @@ class Box < ApplicationRecord
         raise e
       end
     end
+  end
 
+  def output_content_without_encoding
+    Paperclip.io_adapters.for(output).read
+  end
+
+  def output_content
+    return '' if output_content_without_encoding.blank?
+    output_content_without_encoding.force_encoding("utf-8")
+  end
+
+  def output_content_split
+    return [] if output_content.blank?
+
+    commands = output_content.split("DISCONTINUE[").map do |split|
+      lines = split.split("\n")
+      lines.first =~ /(.*?)\](.*)/
+      time = $1
+
+      if time.present?
+        command = $2
+        lines.shift
+
+        {
+          command: command,
+          started_at: Time.parse(time),
+          lines: lines.join("\n")
+        }
+      end
+    end.compact
+
+    commands.each_with_index do |command, index|
+      state = "passed"
+      if command == commands.last
+        state = running? ? "active" : aasm_state
+      end
+      command[:state] = state
+      if commands[index + 1].present?
+        command[:finished_at] = commands[index + 1][:started_at]
+      else
+        command[:finished_at] = (finished_at || Time.now)
+      end
+      command[:humanized_time] = HumanizeSeconds.humanize(command[:finished_at] - command[:started_at])
+    end
+
+    commands
+  end
+
+  def update_sync_and_state
+    return unless running?
+
+    sync_log_file if machine.can_ssh?
+    unless machine.build_running?
+      update_status_from_output
+    end
+  end
+
+  def sync_to_log_file
+    runner = Runner.new
+    runner.run "rsync #{output.path} #{machine.at_login}:log_continue_#{id}.log"
+  end
+
+  def sync_log_file
+    runner = Runner.new
+    runner.run "rsync #{machine.at_login}:log_continue_#{id}.log #{output.path}"
+  end
+
+  def finished?
+    finished_at.present?
+  end
+
+  private
+
+  def update_status_from_output
+    runner = Runner.new
+    runner.run "cat #{output.path} | grep '#{build_finished_text}'"
+
+    if runner.success?
+      pass_box!
+    else
+      fail_box!
+    end
+  end
+
+  def clear_box
+    m = machine if instance_id
+    self.update_attributes(finished_at: Time.now, instance_id: nil)
+    stream.sync!
+  ensure
+    m.destroy
+  end
+
+  def build_box
+    puts "build box for #{id}"
+
+    [
+      :setup_redis!,
+      :setup_cache_yml!,
+      :setup_scripts!,
+      :setup_build_script!,
+    ].each do |command|
+      puts "Running #{command} on Box #{id}"
+      write_to_log_file command.to_s.humanize
+      send(command)
+      puts "Done #{command} on Box #{id}"
+    end
+  end
+
+
+  def start_box
+    puts "start box for #{id}"
+    self.update_attributes(
+      started_at: Time.now,
+      finished_at: nil,
+      output: StringFile.create(body: 'hello', name: "output.txt"),
+    )
+
+    [
+      :start_machine!,
+      :wait_until_ssh!,
+    ].each do |command|
+      puts "Running #{command} on Box #{id}"
+      write_to_log_file command.to_s.humanize
+      send(command)
+      puts "Done #{command} on Box #{id}"
+    end
+
+    run!
+  end
+
+  def write_to_log_file(message)
+    File.open(output.path, "a") do |f|
+      f.puts "DISCONTINUE[#{Time.now}] #{message}"
+    end
   end
 
   def stop_box
@@ -67,12 +212,145 @@ class Box < ApplicationRecord
     @machine ||= Machine.new(instance_id)
   end
 
+  def build
+    stream.build
+  end
+
+  def execute_build_script!
+    build_box
+
+    puts "RUNNING BUILD SCRIPT ON BOX #{id}"
+    self.reload
+
+    sync_to_log_file
+
+    runner = Runner.new
+    # this should return immediately and run the script in the background on the remote machine.
+    runner.run "ssh -n -f #{machine.at_login} 'export CREDIS_HOST=172.16.1.37:6379 S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
+
+    unless runner.success?
+      crash!
+    end
+  end
+
+  def build_finished_text
+    'DISCONTINUE BUILD FINISHED.'
+  end
+
+  def setup_build_script!
+    pre_commands = [
+      "gem install aws-sdk-s3 parallel mixlib-shellout",
+      "export TERM=xterm CI=1 CI_BUILD_NUMBER=#{build.id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_BRANCH=#{build.branch} CI_REPO=#{build.repository.github_url} CI_COMMIT_ID=#{build.sha}",
+      "export CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l`",
+      "git clone --branch '#{build.branch}' --depth 20 #{build.repository.github_url} ~/clone",
+      "cd ~/clone",
+      "git checkout -qf #{build.sha}",
+      "ruby ~/scripts/continue_cache.rb fetch",
+      "cp ~/scripts/*.rb ~/clone/.",
+    ].join("\n")
+
+    post_commands = [
+      "ruby ~/scripts/continue_cache.rb cache",
+      "echo '#{build_finished_text}'",
+    ].join("\n")
+
+    # write build command to tmp file.
+    build_file = File.join(Rails.root, "tmp", "#{BUILD_SCRIPT_PREFIX}_#{id}.sh")
+    File.open(build_file, "wb") do |f|
+      f.puts "#!/bin/bash -l"
+      f.puts "source ~/.bashrc"
+      f.puts 'tstamp() { date "+[%Y-%m-%d %T %z]"; }'
+      # f.puts %/exe() { echo "CONTINUE$(tstamp)\$ $@" ; "$@" ; }/
+      f.puts %#exe() { echo "DISCONTINUE$(tstamp)\$ ${@/eval/}" ; "$@" ; rc=$?; if [[ $rc != 0  ]]; then exit $rc; fi }#
+
+      f.puts "if ! mkdir /tmp/#{BUILD_SCRIPT_PREFIX}_#{id}.lock 2>/dev/null; then"
+      f.puts '  echo "Myscript is already running." >&2'
+      f.puts '  exit 1'
+      f.puts 'fi'
+
+      pre_commands.encode(universal_newline: true).split("\n").each do |line|
+        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
+      end
+
+      build.setup_commands.encode(universal_newline: true).split("\n").each do |line|
+        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
+      end
+
+      stream.build_commands.encode(universal_newline: true).split("\n").each do |line|
+        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
+      end
+
+      post_commands.encode(universal_newline: true).split("\n").each do |line|
+        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
+      end
+    end
+
+    # move ssh keys to ssh location
+    runner = Runner.new
+    runner.run "scp ~/.ssh/config ~/.ssh/id_rsa ~/.ssh/id_rsa.pub #{machine.at_login}:~/.ssh/. "
+
+    # move file to ssh location
+    runner = Runner.new
+    runner.run "scp #{build_file} #{machine.at_login}:. "
+
+    File.unlink build_file
+  end
+
+  def setup_scripts!
+    runner = Runner.new
+    runner.run "scp -r scripts #{machine.at_login}:."
+  end
+
+  def setup_cache_yml!
+    cache_dirs = [
+      'direct/bower_components',
+      'partner/bower_components',
+      'direct/node_modules',
+      'partner/node_modules',
+      'public/assets',
+      'tmp/cache/assets',
+      'bundled_gems',
+    ]
+
+    cache_file = File.join(Rails.root, "tmp", "cache_file_#{id}")
+    File.open(cache_file, "wb") do |f|
+      f.write cache_dirs.to_yaml
+    end
+
+    # move ssh keys to ssh location
+    runner = Runner.new
+    runner.run "scp #{cache_file} #{machine.at_login}:~/cache_file.yml"
+
+    File.unlink cache_file
+  end
+
+  def setup_redis!
+    redis_sets = [
+      'cucumber',
+      'rspec',
+    ]
+
+    redis = Redis.new
+    redis_sets.each do |set|
+      redis.set("#{set}_#{stream.build.id}", stream.build.id)
+    end
+  end
+
+  def wait_until_ssh!
+    puts "gonna ssh"
+    until machine.can_ssh?
+      puts "can't ssh [#{machine.ip_address}]"
+      sleep 5
+    end
+
+    puts "did ssh [#{machine.ip_address}]"
+  end
+
   def start_machine!
     puts "creating aws instance [#{self.stream.build.repository.name}][#{self.stream.name}]"
     instance = Machine.start
     puts "created aws instance [#{self.stream.build.repository.name}][#{self.stream.name}]"
-    self.instance_id = instance.first.id
-    self.save!
+    self.update_attributes(instance_id: instance.first.id)
   end
 
   def destroy_machine!
@@ -102,6 +380,7 @@ class Box < ApplicationRecord
     end
 
     def can_ssh?
+      return false if ip_address.blank?
       begin
         runner = Runner.new
         runner.run "ssh #{at_login} 'ls' "
@@ -114,8 +393,10 @@ class Box < ApplicationRecord
     end
 
     def build_running?
+      return false unless can_ssh?
+
       runner = Runner.new
-      runner.run "ssh -t #{at_login} 'ps aux | grep -v grep | grep build_continue_'"
+      runner.run "ssh -t #{at_login} 'ps aux | grep -v grep | grep #{Box::BUILD_SCRIPT_PREFIX}_'"
 
       runner.success?
     end
@@ -165,5 +446,22 @@ class Box < ApplicationRecord
         raise e
       end
     end
+  end
+
+  class UpdateBoxes
+    def perform(number: 4)
+      number.times do 
+        Box.running.each do |box|
+          begin
+            box.update_sync_and_state
+          rescue =>e 
+            puts e.message
+            puts e.backtrace.join("\n")
+          end
+        end
+        sleep 10
+      end
+    end
+
   end
 end
