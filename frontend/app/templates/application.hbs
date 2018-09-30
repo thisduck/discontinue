@@ -1,11 +1,23 @@
-{{#if session.isAuthenticated}}
-  Logged in as [{{currentUser.user.email}}]
-  <button onclick={{action "logout"}}>Log Out</button>
-{{else}}
-    Unauthenticated
-{{/if}}
+<div class="ui fixed inverted menu" style="padding: 0px 15px;">
+  <a href="#" class="header item">
+    Discontinue
+  </a>
+  <a href="#" class="item">Home</a>
+  <a href="#" class="item">Projects</a>
+  <a href="#" class="item">Builds</a>
 
-<hr />
+  <div class="right menu">
+    {{#if session.isAuthenticated}}
+      <div class="item">
+        [{{currentUser.user.email}}]
+      </div>
+      <a class="item" href="#" onclick={{action "logout"}}>Log Out</a>
+    {{else}}
+      <a class="item" href="#" onclick={{action "login"}}>Github Login</a>
+    {{/if}}
+  </div>
+</div>
 
-{{outlet}}
-
+<div class="ui main text" style="margin-top: 40px; padding: 20px 30px;">
+  {{outlet}}
+</div>
