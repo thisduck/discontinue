@@ -1,8 +1,5 @@
 <div class="ui fixed inverted menu" style="padding: 0px 15px;">
-  <a href="#" class="header item">
-    Discontinue
-  </a>
-  <a href="#" class="item">Home</a>
+  {{#link-to 'index' class='header item'}}Discontinue{{/link-to}}
   {{#if session.isAuthenticated}}
     {{#link-to 'authenticated.repositories' class='item'}}Repositories{{/link-to}}
     <a href="#" class="item">Builds</a>

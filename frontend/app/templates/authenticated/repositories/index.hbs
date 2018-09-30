@@ -5,7 +5,7 @@
   {{#each model as |repo|}}
     <div class="item">
       <div class="right floated content">
-        {{#link-to 'authenticated.repositories.show' repo class="ui mini button"}} Settings {{/link-to}}
+        {{#link-to 'authenticated.repositories.show' repo.id class="ui mini button"}} Settings {{/link-to}}
       </div>
       <div class="content">
         {{fa-icon 'code' size='lg'}}

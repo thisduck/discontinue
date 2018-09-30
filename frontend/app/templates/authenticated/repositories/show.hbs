@@ -6,5 +6,26 @@
     {{textarea value=model.setup_commands}}
   </div>
 
+  <h3>Stream Configurations</h3>
+  {{#each model.streamConfigs as |config|}}
+    <div class="field">
+      <label for="">Stream Name</label>
+      {{input value=config.name}}
+    </div>
+
+    <div class="field">
+      <label for="">Stream Build Commands</label>
+      {{textarea value=config.build_commands}}
+    </div>
+
+    <div class="field">
+      <button class="ui basic red button" {{action "removeStreamConfig" config}}>{{fa-icon "minus"}} Remove Stream {{config.name}}</button>
+    </div>
+  {{/each}}
+
+  <div class="field">
+    <button class="ui basic secondary button" {{action "addStreamConfig"}}>{{fa-icon "plus"}} Add Stream Configuration</button>
+  </div>
+
   <button class="ui button primary" {{action "save"}}>Save</button>
 </div>
