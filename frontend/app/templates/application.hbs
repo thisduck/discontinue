@@ -3,6 +3,7 @@
   {{#if session.isAuthenticated}}
     {{#link-to 'authenticated.repositories' class='item'}}Repositories{{/link-to}}
     <a href="#" class="item">Builds</a>
+    {{#link-to 'authenticated.build_requests' class='item'}}Build Requests{{/link-to}}
   {{/if}}
 
   <div class="right menu">

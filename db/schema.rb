@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_30_053900) do
+ActiveRecord::Schema.define(version: 2018_09_30_070936) do
+
+  create_table "build_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "branch"
+    t.string "sha"
+    t.json "hook_hash"
+    t.bigint "repository_id"
+    t.string "aasm_state"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository_id"], name: "index_build_requests_on_repository_id"
+  end
 
   create_table "repositories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
@@ -32,4 +43,5 @@ ActiveRecord::Schema.define(version: 2018_09_30_053900) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "build_requests", "repositories"
 end

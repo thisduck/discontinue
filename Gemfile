@@ -63,3 +63,5 @@ gem 'figaro'
 
 gem 'jwt'
 gem 'jsonapi-resources'
+
+gem 'aasm'

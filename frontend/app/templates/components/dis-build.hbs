@@ -1,0 +1,46 @@
+<div class="ui segments">
+  <div class="ui top attached secondary menu">
+    <h4 class="ui item">
+      #{{build.id}} {{build.state}}
+    </h4>
+    <div class="right menu">
+      {{#ui-dropdown class="item" onChange=(action (mut gender))}}
+        <div class="default text">Options</div>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          {{#each build.events as |event|}}
+            <div class="item" {{action "triggerEvent" event}}>
+              {{event}}
+            </div>
+          {{/each}}
+        </div>
+      {{/ui-dropdown}}
+    </div>
+
+
+
+
+  </div>
+  <div class="ui bottom attached segment">
+    <span>
+      {{fa-icon 'code'}} {{build.repository.name}}
+    </span>
+    &middot;
+
+    <strong>
+      {{fa-icon 'code-branch'}} {{build.branch}}
+    </strong>
+    &middot;
+
+    <a href="{{build.hook_hash.head_commit.url}}" target="_blank">
+      {{fa-icon 'code-commit'}} {{build.sha}}
+    </a>
+    &middot;
+
+    <span>
+      {{fa-icon 'user'}} {{build.hook_hash.head_commit.author.username}}
+    </span>
+    &middot;
+
+  </div>
+</div>
