@@ -5,6 +5,7 @@ class CreateStreams < ActiveRecord::Migration[5.2]
       t.string :build_stream_id
       t.string :name
       t.string :aasm_state
+      t.string :box_count
       t.text :build_commands
       t.datetime :started_at
       t.datetime :finished_at

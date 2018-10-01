@@ -3,7 +3,11 @@ import { task, timeout } from 'ember-concurrency';
 
 export default Component.extend({
   tagName: '',
-  toggles: [],
+
+  didReceiveAttrs () {
+    this._super(...arguments);
+    this.set("toggles", []);
+  },
 
   pollBox: task(function * () {
     while (true) {

@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
+import AnsiUp from 'ansi_up';
 
 export default Component.extend({
   tagName: '',
@@ -8,6 +9,12 @@ export default Component.extend({
     let t = this.get('toggles')[this.get('index')];
     this.set("toggle", t);
   },
+  ansi_lines: computed('command.lines', function() {
+    var ansi_up = new AnsiUp;
+    var html = ansi_up.ansi_to_html(this.get('command.lines'));
+    return html;
+    // return this.get('command.lines')
+  }),
   color: computed('command.state', function() {
 
     if (this.get('command.state') == "passed") {

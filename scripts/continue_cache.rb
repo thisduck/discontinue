@@ -28,7 +28,7 @@ def object_key(file, branch: ENV["CI_BRANCH"])
   else
     version = "other"
   end
-  "#{version}/#{branch}/#{ENV['CI_BUILD_STREAM_CONFIG']}/#{file}"
+  "#{ENV['CI_REPO_NAME']}/#{version}/#{branch}/#{ENV['CI_BUILD_STREAM_CONFIG']}/#{file}"
 end
 
 def tar_file_name(directory)

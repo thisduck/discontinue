@@ -19,6 +19,11 @@
     </div>
 
     <div class="field">
+      <label for="">Box Count</label>
+      {{input value=config.box_count}}
+    </div>
+
+    <div class="field">
       <button class="ui basic red button" {{action "removeStreamConfig" config}}>{{fa-icon "minus"}} Remove Stream {{config.name}}</button>
     </div>
   {{/each}}

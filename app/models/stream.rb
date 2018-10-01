@@ -5,13 +5,13 @@ class Stream < ApplicationRecord
   include AASM
   aasm do 
     state :waiting, initial: true
-    state :running, before_enter: :start_stream
+    state :running
     state :stopped, before_enter: :stop_stream
     state :errored
     state :passed
     state :failed
 
-    event :start do
+    event :start, after_commit: :start_stream do
       transitions from: :waiting, to: :running
     end
 
@@ -26,10 +26,6 @@ class Stream < ApplicationRecord
     event :stop do
       transitions from: :running, to: :stopped
     end
-  end
-
-  def box_count
-    1
   end
 
   def after_pass
@@ -58,8 +54,9 @@ class Stream < ApplicationRecord
 
   private
   def start_stream
-    self.box_count.times do |index|
+    self.box_count.to_i.times do |index|
       box = self.boxes.create(
+        box_number: index,
         instance_type: 'c4.xlarge',
         started_at: Time.now,
         finished_at: nil

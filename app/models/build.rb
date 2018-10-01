@@ -72,6 +72,7 @@ class Build < ApplicationRecord
       stream = self.streams.create!(
         build_stream_id: "#{self.id}-#{index}",
         build_commands: config['build_commands'],
+        box_count: config['box_count'],
         name: config['name']
       )
 

@@ -243,8 +243,9 @@ class Box < ApplicationRecord
 
   def setup_build_script!
     pre_commands = [
+      "rvm use 2.3.7",
       "gem install aws-sdk-s3 parallel mixlib-shellout",
-      "export TERM=xterm CI=1 CI_BUILD_NUMBER=#{build.id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id.split('-').last} CI_BRANCH=#{build.branch} CI_REPO=#{build.repository.github_url} CI_COMMIT_ID=#{build.sha}",
+      "export TERM=xterm CI=1 CI_BUILD_NUMBER=#{build.id} CI_REPO_NAME='#{build.repository.name}' CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last} CI_BRANCH=#{build.branch} CI_REPO=#{build.repository.github_url} CI_COMMIT_ID=#{build.sha} CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}",
       "export CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l`",
       "git clone --branch '#{build.branch}' --depth 20 #{build.repository.github_url} ~/clone",
       "cd ~/clone",
@@ -254,6 +255,7 @@ class Box < ApplicationRecord
     ].join("\n")
 
     post_commands = [
+      "rvm use 2.3.7",
       "ruby ~/scripts/continue_cache.rb cache",
       "echo '#{build_finished_text}'",
     ].join("\n")

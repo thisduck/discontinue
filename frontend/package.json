@@ -20,6 +20,8 @@
   "devDependencies": {
     "@ember/jquery": "^0.5.2",
     "@ember/optional-features": "^0.6.3",
+    "@mdi/svg": "^2.6.95",
+    "ansi_up": "^3.0.0",
     "broccoli-asset-rev": "^2.7.0",
     "ember": "^1.0.3",
     "ember-ajax": "^3.1.0",
@@ -34,6 +36,7 @@
     "ember-cli-inject-live-reload": "^1.8.2",
     "ember-cli-qunit": "^4.3.2",
     "ember-cli-rails-addon": "^0.10.0",
+    "ember-cli-sass": "^8.0.1",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-template-lint": "^1.0.0-beta.1",
     "ember-cli-uglify": "^2.1.0",
@@ -53,6 +56,7 @@
     "install": "^0.12.1",
     "loader.js": "^4.7.0",
     "qunit-dom": "^0.7.1",
+    "sass": "^1.14.1",
     "semantic-ui-ember": "^3.0.3",
     "torii": "^0.10.1"
   },

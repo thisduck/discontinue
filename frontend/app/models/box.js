@@ -16,4 +16,12 @@ export default DS.Model.extend({
     return false;
   }),
 
+  passed: computed('state', function() {
+    if (this.get('state') == 'passed') {
+      return true;
+    }
+
+    return false;
+  }),
+
 });
