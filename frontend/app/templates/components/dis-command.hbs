@@ -1,8 +1,8 @@
-<div class="ui segment {{color}}">
-  <div class="title">
+<div class="ui segment {{color}} {{activeClass}}">
+  <div class="title" {{action 'toggleCommand'}}>
     [{{command.humanized_time}}] {{ command.command }}
   </div>
-  <div class="content">
+  <div class="content {{activeClass}}">
     <pre class="output_contents">{{command.lines}}</pre>
   </div>
 </div>

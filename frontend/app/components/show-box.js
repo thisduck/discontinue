@@ -3,6 +3,7 @@ import { task, timeout } from 'ember-concurrency';
 
 export default Component.extend({
   tagName: '',
+  toggles: [],
 
   pollBox: task(function * () {
     while (true) {
@@ -11,6 +12,14 @@ export default Component.extend({
       }
       yield timeout(3000);
     }
-  }).on('init').enqueue()
+  }).on('init').enqueue(),
+  actions: {
+    onToggle(index, f) {
+      let t = this.get('toggles');
+      t[index] = !t[index];
+      this.set('toggles', t)
+      f(t[index]);
+    }
+  }
 
 });

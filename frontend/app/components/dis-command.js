@@ -3,6 +3,11 @@ import { computed } from '@ember/object';
 
 export default Component.extend({
   tagName: '',
+  didReceiveAttrs () {
+    this._super(...arguments);
+    let t = this.get('toggles')[this.get('index')];
+    this.set("toggle", t);
+  },
   color: computed('command.state', function() {
 
     if (this.get('command.state') == "passed") {
@@ -12,6 +17,20 @@ export default Component.extend({
     }
 
     return 'red';
-  })
+  }),
+  activeClass: computed('toggle', function () {
+    if (this.get('toggle')) {
+      return 'active';
+    }
+
+    return '';
+  }),
+  actions: {
+    toggleCommand() {
+      this.onToggle(this.get('index'), (toggle) => {
+        this.set('toggle', toggle);
+      });
+    }
+  }
 
 });
