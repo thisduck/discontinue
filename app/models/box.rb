@@ -106,6 +106,7 @@ class Box < ApplicationRecord
     end.compact
 
     commands.each_with_index do |command, index|
+      command[:id] = "#{stream.build.id}-#{stream.id}-#{id}-#{index}"
       state = "passed"
       if command == commands.last
         state = active? ? "active" : aasm_state
@@ -143,6 +144,10 @@ class Box < ApplicationRecord
 
   def finished?
     finished_at.present?
+  end
+
+  def commands
+    Command::Relation.new(self)
   end
 
   private

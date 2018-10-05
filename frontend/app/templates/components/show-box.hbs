@@ -1,6 +1,6 @@
 <div class="ui bottom attached tab active segment" data-tab="hello">
   <div class="ui accordion fluid segments">
-    {{#each box.output as |command index|}}
+    {{#each box.commands as |command index|}}
       {{dis-command command=command index=index toggles=toggles onToggle=(action 'onToggle')}}
     {{/each}}
   </div>

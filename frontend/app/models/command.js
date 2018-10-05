@@ -2,10 +2,10 @@ import DS from 'ember-data';
 import { computed } from '@ember/object';
 
 export default DS.Model.extend({
-  // output: DS.attr(),
+  command: DS.attr(),
+  lines: DS.attr(),
   state: DS.attr(),
-  stream: DS.belongsTo('stream'),
-  commands: DS.hasMany('command'),
+  box: DS.belongsTo('box'),
   started_at: DS.attr('date'),
   finished_at: DS.attr('date'),
   humanized_time: DS.attr(),
