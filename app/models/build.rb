@@ -70,6 +70,7 @@ class Build < ApplicationRecord
 
     self.repository.stream_configs.each_with_index do |config, index|
       stream = self.streams.create!(
+        started_at: Time.now,
         build_stream_id: "#{self.id}-#{index}",
         build_commands: config['build_commands'],
         box_count: config['box_count'],

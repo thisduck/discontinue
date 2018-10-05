@@ -4,7 +4,23 @@ import { inject as service } from '@ember/service';
 export default Route.extend({
   store: service(),
 
-  model() {
-    return this.store.findAll('build')
+  queryParams: {
+    branch: { refreshModel: true }
+  },
+
+  model({ branch }) {
+    let filter = {};
+    if (branch) {
+      filter['branch'] = branch
+    }
+
+    return this.store.query('build', {
+      sort: '-created-at', 
+      filter: filter,
+      page: {
+        size: 10,
+        number: 1
+      }
+    })
   },
 });

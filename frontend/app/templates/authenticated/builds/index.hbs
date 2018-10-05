@@ -1,5 +1,13 @@
 <h2>Builds</h2>
 
+<div class="ui form">
+  <div class="field">
+    {{input name="branch" value=branch}}
+  </div>
+</div>
+
+<br>
+
 {{#each model as |build|}}
   {{dis-build build=build showLink='1'}}
   <br >

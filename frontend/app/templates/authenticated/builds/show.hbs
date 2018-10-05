@@ -3,9 +3,7 @@
 
 <div class="ui top attached tabular menu">
   {{#each model.streams as |stream|}}
-    {{#each stream.boxes as |box index|}}
-      {{box-tab box=box stream=stream build=model index=index}}
-    {{/each}}
+    {{stream-tab stream=stream}}
   {{/each}}
 </div>
 

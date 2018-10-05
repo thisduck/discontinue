@@ -1,5 +1,13 @@
 <h2>Build Requests</h2>
 
+<div class="ui form">
+  <div class="field">
+    {{input name="branch" value=branch}}
+  </div>
+</div>
+
+<br>
+
 {{#each model as |request|}}
   {{dis-build build=request lastBuild=request.lastBuild}}
   <br >

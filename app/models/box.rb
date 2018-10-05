@@ -255,9 +255,9 @@ class Box < ApplicationRecord
     ].join("\n")
 
     post_commands = [
+      "echo '#{build_finished_text}'",
       "rvm use 2.3.7",
       "ruby ~/scripts/continue_cache.rb cache",
-      "echo '#{build_finished_text}'",
     ].join("\n")
 
     # write build command to tmp file.
@@ -331,15 +331,8 @@ class Box < ApplicationRecord
   end
 
   def setup_redis!
-    redis_sets = [
-      'cucumber',
-      'rspec',
-    ]
-
     redis = Redis.new
-    redis_sets.each do |set|
-      redis.set("#{set}_#{stream.build.id}", stream.build.id)
-    end
+    redis.set("discontinue_#{stream.build_stream_id}", stream.build.id)
   end
 
   def wait_until_ssh!
@@ -465,7 +458,7 @@ class Box < ApplicationRecord
             puts e.backtrace.join("\n")
           end
         end
-        sleep 10
+        sleep 3
       end
     end
 

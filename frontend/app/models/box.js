@@ -7,6 +7,7 @@ export default DS.Model.extend({
   stream: DS.belongsTo('stream'),
   started_at: DS.attr('date'),
   finished_at: DS.attr('date'),
+  humanized_time: DS.attr(),
 
   active: computed('state', function() {
     if (this.get('state').endsWith('ing')) {
