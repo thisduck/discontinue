@@ -1,5 +1,4 @@
 import Component from '@ember/component';
-import { task, timeout } from 'ember-concurrency';
 
 export default Component.extend({
   tagName: '',
@@ -9,14 +8,6 @@ export default Component.extend({
     this.set("toggles", []);
   },
 
-  pollBox: task(function * () {
-    while (true) {
-      if (this.get('box.active')) {
-        this.get('box').reload();
-      }
-      yield timeout(3000);
-    }
-  }).on('init').enqueue(),
   actions: {
     onToggle(index, f) {
       let t = this.get('toggles');

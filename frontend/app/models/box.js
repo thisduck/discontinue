@@ -2,7 +2,7 @@ import DS from 'ember-data';
 import { computed } from '@ember/object';
 
 export default DS.Model.extend({
-  output: DS.attr(),
+  // output: DS.attr(),
   state: DS.attr(),
   stream: DS.belongsTo('stream'),
   started_at: DS.attr('date'),

@@ -5,7 +5,7 @@ class Api::BuildRequestResource < JSONAPI::Resource
 
   paginator :paged
   filter :branch, apply: ->(records, value, _options) {
-    records.where("branch like ?", "#{value[0]}%")
+    records.where("branch like ?", "%#{value[0]}%")
   }
 
   def last_build_id
