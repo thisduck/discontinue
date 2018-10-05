@@ -68,7 +68,8 @@ gem 'jsonapi-resources'
 
 gem 'aasm'
 
-gem 'delayed_job_active_record'
+gem "delayed_job", github: "financeit/delayed_job", branch: "improved_reloading"
+gem "delayed_job_active_record", github: "financeit/delayed_job_active_record", branch: "jobs_to_run"
 gem 'paperclip'
 gem 'terrapin'
 gem 'spawnling'
