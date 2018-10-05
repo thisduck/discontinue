@@ -5,7 +5,14 @@ def log(message)
   puts "[#{Time.now.to_s}]: #{message}"
 end
 
-option = ARGV.first
+option = ARGV[0]
+key = ARGV[1]
+directory = ARGV[2]
+
+if key && !directory
+  raise "key passed without directory/file."
+end
+
 cache_directories = YAML.load File.read(File.expand_path('~/cache_file.yml'))
 cache_directories = cache_directories.collect do |directory|
   if directory.start_with?("$")
@@ -28,7 +35,7 @@ def object_key(file, branch: ENV["CI_BRANCH"])
   else
     version = "other"
   end
-  "#{ENV['CI_REPO_NAME']}/#{version}/#{branch}/#{ENV['CI_BUILD_STREAM_CONFIG']}/#{file}"
+  "#{ENV['CI_REPO_NAME']}/#{version}/#{branch}/#{ENV['CI_STREAM_CONFIG']}/#{file}"
 end
 
 def tar_file_name(directory)
@@ -36,9 +43,16 @@ def tar_file_name(directory)
 end
 
 bucket = s3.bucket(ENV['S3_BUCKET'])
+branch = ENV['CI_BRANCH']
+
+if key
+  cache_directories = [directory]
+  branch = key
+end
 
 case option
 when "cache"
+
   cache_directories.each do |directory|
     tar_file = tar_file_name(directory)
     log "tarring #{directory}."
@@ -46,7 +60,7 @@ when "cache"
       `tar czf #{tar_file} #{directory}`
       log "tarring #{directory} complete."
       log "uploading #{tar_file} to S3."
-      obj = bucket.object(object_key(tar_file))
+      obj = bucket.object(object_key(tar_file, branch: branch))
       obj.upload_file(tar_file)
       log "uploading #{tar_file} to S3 complete."
     else
@@ -56,13 +70,13 @@ when "cache"
 when "fetch"
   cache_directories.each do |directory|
     tar_file = tar_file_name(directory)
-    obj = bucket.object(object_key(tar_file))
+    obj = bucket.object(object_key(tar_file, branch: branch))
     log "checking #{tar_file} in S3."
-     unless obj.exists?
+    unless obj.exists?
       log "checking #{tar_file} on master in S3."
       obj = bucket.object(object_key(tar_file, branch: "master"))
     end
-     if obj.exists?
+    if obj.exists?
       log "downloading #{tar_file} from S3."
       obj.download_file(tar_file)
       log "downloading #{tar_file} from S3 complete."
