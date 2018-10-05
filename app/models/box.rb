@@ -76,7 +76,9 @@ class Box < ApplicationRecord
 
   def output_content
     return '' if output_content_without_encoding.blank?
-    output_content_without_encoding.force_encoding("utf-8")
+    output_content_without_encoding
+      .encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      .force_encoding("utf-8")
   end
 
   def active?
