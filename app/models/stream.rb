@@ -52,9 +52,21 @@ class Stream < ApplicationRecord
     end
   end
 
+  def yaml_config
+    YAML.load config
+  end
+
+  def build_commands
+    yaml_config['build_commands']
+  end
+
+  def box_count
+    yaml_config['box_count'].to_i
+  end
+
   private
   def start_stream
-    self.box_count.to_i.times do |index|
+    self.box_count.times do |index|
       box = self.boxes.create(
         box_number: index,
         instance_type: 'c4.xlarge',

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_30_103618) do
+ActiveRecord::Schema.define(version: 2018_10_06_213647) do
 
   create_table "boxes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "stream_id"
@@ -88,14 +88,32 @@ ActiveRecord::Schema.define(version: 2018_09_30_103618) do
     t.string "build_stream_id"
     t.string "name"
     t.string "aasm_state"
-    t.string "box_count"
-    t.text "build_commands"
+    t.text "config"
     t.datetime "started_at"
     t.datetime "finished_at"
     t.text "error_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["build_id"], name: "index_streams_on_build_id"
+  end
+
+  create_table "test_results", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "test_id"
+    t.string "test_type"
+    t.string "description"
+    t.string "status"
+    t.string "file_path"
+    t.string "line_number"
+    t.bigint "build_id"
+    t.bigint "stream_id"
+    t.bigint "box_id"
+    t.json "exception"
+    t.integer "duration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["box_id"], name: "index_test_results_on_box_id"
+    t.index ["build_id"], name: "index_test_results_on_build_id"
+    t.index ["stream_id"], name: "index_test_results_on_stream_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -113,4 +131,7 @@ ActiveRecord::Schema.define(version: 2018_09_30_103618) do
   add_foreign_key "builds", "build_requests"
   add_foreign_key "builds", "repositories"
   add_foreign_key "streams", "builds"
+  add_foreign_key "test_results", "boxes"
+  add_foreign_key "test_results", "builds"
+  add_foreign_key "test_results", "streams"
 end

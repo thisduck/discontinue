@@ -7,20 +7,11 @@
   </div>
 
   <h3>Stream Configurations</h3>
-  {{#each model.streamConfigs as |config|}}
+  {{#each model.streamConfigs as |config index|}}
     <div class="field">
-      <label for="">Stream Name</label>
-      {{input value=config.name}}
-    </div>
-
-    <div class="field">
-      <label for="">Stream Build Commands</label>
-      {{textarea value=config.build_commands}}
-    </div>
-
-    <div class="field">
-      <label for="">Box Count</label>
-      {{input value=config.box_count}}
+      <label for="">Stream Config</label>
+      <!-- {{textarea value=config}} -->
+      {{ember-ace lines=20 value=config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action "updateConfig" index) }}
     </div>
 
     <div class="field">

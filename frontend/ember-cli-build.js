@@ -6,6 +6,10 @@ module.exports = function(defaults) {
   let app = new EmberApp(defaults, {
     // Add options here
 
+    ace: {
+      themes: ['tomorrow_night'],
+      modes: ['yaml'],
+    }
   });
 
   // Use `app.import` to add additional libraries to the generated

@@ -6,6 +6,10 @@ export default Controller.extend({
       this.get('model').save();
     },
 
+    updateConfig(index, value) {
+      this.set('model.streamConfigs.' + index, value);
+    },
+
     addStreamConfig() {
       let config = {name: '', build_commands: '', box_count: 1};
       this.get('model.streamConfigs').pushObject(config);

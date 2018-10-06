@@ -69,12 +69,12 @@ class Build < ApplicationRecord
     end
 
     self.repository.stream_configs.each_with_index do |config, index|
+      yaml = YAML.load config
       stream = self.streams.create!(
         started_at: Time.now,
         build_stream_id: "#{self.id}-#{index}",
-        build_commands: config['build_commands'],
-        box_count: config['box_count'],
-        name: config['name']
+        config: config,
+        name: yaml['name']
       )
 
       puts "STREAM #{stream.build_stream_id} created!"

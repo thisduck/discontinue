@@ -277,7 +277,7 @@ class Box < ApplicationRecord
       f.puts %#exe() { echo "DISCONTINUE$(tstamp)\$ ${@/eval/}" ; "$@" ; rc=$?; if [[ $rc != 0  ]]; then exit $rc; fi }#
 
       f.puts "if ! mkdir /tmp/#{BUILD_SCRIPT_PREFIX}_#{id}.lock 2>/dev/null; then"
-      f.puts '  echo "Myscript is already running." >&2'
+      f.puts '  echo "build is already running." >&2'
       f.puts '  exit 1'
       f.puts 'fi'
 
@@ -289,7 +289,8 @@ class Box < ApplicationRecord
         f.puts %/exe eval "#{line.gsub('"', '\"')}"/
       end
 
-      stream.build_commands.encode(universal_newline: true).split("\n").each do |line|
+      stream.build_commands.each do |line|
+        line = line.encode(universal_newline: true)
         f.puts %/exe eval "#{line.gsub('"', '\"')}"/
       end
 
@@ -320,7 +321,7 @@ class Box < ApplicationRecord
       'partner/bower_components',
       'direct/node_modules',
       'partner/node_modules',
-      'public/assets',
+      # 'public/assets',
       'tmp/cache/assets',
       'bundled_gems',
     ]
