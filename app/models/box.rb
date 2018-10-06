@@ -249,23 +249,40 @@ class Box < ApplicationRecord
   end
 
   def setup_build_script!
-    pre_commands = [
-      "rvm use 2.3.7",
-      "gem install aws-sdk-s3 parallel mixlib-shellout",
-      "export TERM=xterm CI=1 CI_BUILD_NUMBER=#{build.id} CI_REPO_NAME='#{build.repository.name}' CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last} CI_BRANCH=#{build.branch} CI_REPO=#{build.repository.github_url} CI_COMMIT_ID=#{build.sha} CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}",
-      "export CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l`",
-      "git clone --branch '#{build.branch}' --depth 20 #{build.repository.github_url} ~/clone",
-      "cd ~/clone",
-      "git checkout -qf #{build.sha}",
-      "ruby ~/scripts/continue_cache.rb fetch",
-      "cp ~/scripts/*.rb ~/clone/.",
-    ].join("\n")
+    invisible_pre_commands = YAML.load <<~COMMANDS
+      ---
+      - start_number=`echo "(\${CI_BOX_NUMBER} * \${CI_CPU_COUNT}) + 1" | bc`
+      - end_number=`echo "(\${CI_BOX_NUMBER} + 1) * \${CI_CPU_COUNT} + 1" | bc`
+      - range=''
+      - while [ \\$start_number -lt \\$end_number ]; do range+="\\${start_number},"; let start_number=start_number+1; done
+      - export CI_BOX_RANGE=\${range::-1}
+    COMMANDS
 
-    post_commands = [
-      "echo '#{build_finished_text}'",
-      "rvm use 2.3.7",
-      "ruby ~/scripts/continue_cache.rb cache",
-    ].join("\n")
+    pre_commands = YAML.load <<~COMMANDS
+      ---
+      - rvm use 2.3.7
+      - gem install aws-sdk-s3 parallel mixlib-shellout
+
+      - export TERM=xterm CI=1 CI_BUILD_NUMBER=#{build.id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last} 
+      - export CI_REPO_NAME='#{build.repository.name}' CI_REPO=#{build.repository.github_url} 
+      - export CI_BRANCH=#{build.branch} CI_COMMIT_ID=#{build.sha} 
+      - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}
+      - export CI_CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l` 
+      - export CI_TOTAL_CPUS=`echo "\${CI_BOX_COUNT} * \${CI_CPU_COUNT}" | bc`
+
+      - git clone --branch '#{build.branch}' --depth 20 #{build.repository.github_url} ~/clone
+      - cd ~/clone
+      - git checkout -qf #{build.sha}
+      - ruby ~/scripts/continue_cache.rb fetch
+      - cp ~/scripts/*.rb ~/clone/.
+    COMMANDS
+
+    post_commands = YAML.load <<~COMMANDS
+      ---
+      - echo '#{build_finished_text}'
+      - rvm use 2.3.7
+      - ruby ~/scripts/continue_cache.rb cache
+    COMMANDS
 
     # write build command to tmp file.
     build_file = File.join(Rails.root, "tmp", "#{BUILD_SCRIPT_PREFIX}_#{id}.sh")
@@ -281,21 +298,23 @@ class Box < ApplicationRecord
       f.puts '  exit 1'
       f.puts 'fi'
 
-      pre_commands.encode(universal_newline: true).split("\n").each do |line|
-        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
-      end
+      commands = [
+        {visible: true, commands: pre_commands},
+        {visible: false, commands: invisible_pre_commands},
+        {visible: true, commands: build.setup_commands},
+        {visible: true, commands: stream.build_commands},
+        {visible: true, commands: post_commands},
+      ].flatten
 
-      build.setup_commands.encode(universal_newline: true).split("\n").each do |line|
-        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
-      end
-
-      stream.build_commands.each do |line|
-        line = line.encode(universal_newline: true)
-        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
-      end
-
-      post_commands.encode(universal_newline: true).split("\n").each do |line|
-        f.puts %/exe eval "#{line.gsub('"', '\"')}"/
+      commands.each do |group|
+        group[:commands].each do |line|
+          line = line.encode(universal_newline: true)
+          if group[:visible]
+            f.puts %/exe eval "#{line.gsub('"', '\"')}"/
+          else
+            f.puts %/eval "#{line.gsub('"', '\"')}"/
+          end
+        end
       end
     end
 

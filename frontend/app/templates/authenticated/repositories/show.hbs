@@ -2,16 +2,15 @@
 
 <div class="ui form">
   <div class="field">
-    <label for="">Setup Commands</label>
-    {{textarea value=model.setup_commands}}
+    <label for="">Config</label>
+    {{ember-ace lines=20 value=model.config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action (mut model.config)) }}
   </div>
 
   <h3>Stream Configurations</h3>
   {{#each model.streamConfigs as |config index|}}
     <div class="field">
       <label for="">Stream Config</label>
-      <!-- {{textarea value=config}} -->
-      {{ember-ace lines=20 value=config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action "updateConfig" index) }}
+      {{ember-ace lines=20 value=config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action "updateStreamConfig" index) }}
     </div>
 
     <div class="field">

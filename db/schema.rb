@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_06_213647) do
+ActiveRecord::Schema.define(version: 2018_10_06_221451) do
 
   create_table "boxes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "stream_id"
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_213647) do
     t.bigint "build_request_id"
     t.bigint "repository_id"
     t.string "aasm_state"
-    t.text "setup_commands"
+    t.text "config"
     t.datetime "started_at"
     t.datetime "finished_at"
     t.text "error_message"
@@ -77,7 +77,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_213647) do
     t.string "name"
     t.string "github_id"
     t.string "github_url"
-    t.text "setup_commands"
+    t.text "config"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "stream_configs"

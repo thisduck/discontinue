@@ -52,13 +52,21 @@ class Build < ApplicationRecord
     Build.transaction do
       options[:started_at] = Time.now
       options[:finished_at] = nil 
-      options[:setup_commands] = options[:build_request].repository.setup_commands
+      options[:config] = options[:build_request].repository.config
       build = Build.create! options
 
       build.start!
 
       build
     end
+  end
+
+  def yaml_config
+    YAML.load config
+  end
+
+  def setup_commands
+    yaml_config['setup_commands']
   end
 
   private

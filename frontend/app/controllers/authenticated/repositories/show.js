@@ -6,7 +6,7 @@ export default Controller.extend({
       this.get('model').save();
     },
 
-    updateConfig(index, value) {
+    updateStreamConfig(index, value) {
       this.set('model.streamConfigs.' + index, value);
     },
 
