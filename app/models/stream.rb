@@ -64,6 +64,12 @@ class Stream < ApplicationRecord
     yaml_config['box_count'].to_i
   end
 
+  def cache_dirs
+    build.cache_dirs +
+      ( yaml_config['cache_dirs'] || [])
+  end
+
+
   private
   def start_stream
     self.box_count.times do |index|

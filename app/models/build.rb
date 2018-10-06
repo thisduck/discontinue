@@ -69,6 +69,10 @@ class Build < ApplicationRecord
     yaml_config['setup_commands']
   end
 
+  def cache_dirs
+    yaml_config['cache_dirs'] || []
+  end
+
   private
 
   def start_build

@@ -335,22 +335,13 @@ class Box < ApplicationRecord
   end
 
   def setup_cache_yml!
-    cache_dirs = [
-      'direct/bower_components',
-      'partner/bower_components',
-      'direct/node_modules',
-      'partner/node_modules',
-      # 'public/assets',
-      'tmp/cache/assets',
-      'bundled_gems',
-    ]
+    cache_dirs = stream.cache_dirs
 
     cache_file = File.join(Rails.root, "tmp", "cache_file_#{id}")
     File.open(cache_file, "wb") do |f|
       f.write cache_dirs.to_yaml
     end
 
-    # move ssh keys to ssh location
     runner = Runner.new
     runner.run "scp #{cache_file} #{machine.at_login}:~/cache_file.yml"
 
