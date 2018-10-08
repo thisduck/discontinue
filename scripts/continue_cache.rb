@@ -1,9 +1,5 @@
-require 'aws-sdk-s3'
-require 'yaml'
-
-def log(message)
-  puts "[#{Time.now.to_s}]: #{message}"
-end
+file_dir = __dir__
+require file_dir + '/helpers.rb'
 
 option = ARGV[0]
 key = ARGV[1]
@@ -13,36 +9,28 @@ if key && !directory
   raise "key passed without directory/file."
 end
 
-cache_directories = YAML.load File.read(File.expand_path('~/cache_file.yml'))
-cache_directories = cache_directories.collect do |directory|
-  if directory.start_with?("$")
-    ENV[directory[1..-1]]
+cache_directories = expand_yaml('~/cache_file.yml').collect do |dir|
+  if dir.start_with?("$")
+    ENV[dir[1..-1]]
   else
-    directory
+    dir
   end
 end
 
-s3 = Aws::S3::Resource.new(
-  region: 'us-east-1'
-)
+def cache_key(file, branch: ENV["CI_BRANCH"])
+  key = [
+    'cache',
+    branch,
+    ENV['CI_STREAM_CONFIG']
+  ].join('/')
 
-def object_key(file, branch: ENV["CI_BRANCH"])
-  version = `cat /proc/version`.chomp
-  if version.downcase.include?("ubuntu")
-    version = "ubuntu"
-  elsif version.downcase.include?("centos") || version.downcase.include?("red hat")
-    version = "centos"
-  else
-    version = "other"
-  end
-  "#{ENV['CI_REPO_NAME']}/#{version}/#{branch}/#{ENV['CI_STREAM_CONFIG']}/#{file}"
+  s3_object_key(file, key: key)
 end
 
 def tar_file_name(directory)
   directory.gsub(/\//, '_') + ".tar.gz"
 end
 
-bucket = s3.bucket(ENV['S3_BUCKET'])
 branch = ENV['CI_BRANCH']
 
 if key
@@ -60,8 +48,10 @@ when "cache"
       `tar czf #{tar_file} #{directory}`
       log "tarring #{directory} complete."
       log "uploading #{tar_file} to S3."
-      obj = bucket.object(object_key(tar_file, branch: branch))
-      obj.upload_file(tar_file)
+      s3_upload_file(
+        cache_key(tar_file, branch: branch),
+        tar_file,
+      )
       log "uploading #{tar_file} to S3 complete."
     else
       log "#{directory} does not exist."
@@ -70,11 +60,11 @@ when "cache"
 when "fetch"
   cache_directories.each do |directory|
     tar_file = tar_file_name(directory)
-    obj = bucket.object(object_key(tar_file, branch: branch))
+    obj = s3_bucket.object(cache_key(tar_file, branch: branch))
     log "checking #{tar_file} in S3."
     unless obj.exists?
       log "checking #{tar_file} on master in S3."
-      obj = bucket.object(object_key(tar_file, branch: "master"))
+      obj = s3_bucket.object(cache_key(tar_file, branch: "master"))
     end
     if obj.exists?
       log "downloading #{tar_file} from S3."

@@ -100,7 +100,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
   create_table "test_results", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "test_id"
     t.string "test_type"
-    t.string "description"
+    t.text "description"
     t.string "status"
     t.string "file_path"
     t.string "line_number"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
     t.bigint "stream_id"
     t.bigint "box_id"
     t.json "exception"
-    t.integer "duration"
+    t.bigint "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["box_id"], name: "index_test_results_on_box_id"

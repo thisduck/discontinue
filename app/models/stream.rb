@@ -1,6 +1,7 @@
 class Stream < ApplicationRecord
   belongs_to :build
   has_many :boxes, dependent: :destroy
+  has_many :test_results
 
   include AASM
   aasm do 
@@ -67,6 +68,26 @@ class Stream < ApplicationRecord
   def cache_dirs
     build.cache_dirs +
       ( yaml_config['cache_dirs'] || [])
+  end
+
+  def artifacts
+    build.artifacts +
+      ( yaml_config['artifacts'] || [])
+  end
+
+  def artifact_listing(keys: [])
+    key = ([
+      build.repository.name,
+      "artifacts",
+      "build_#{build.id}",
+      "stream_#{id}"
+    ] + keys).join('/')
+
+    s3 = Aws::S3::Resource.new(
+      region: 'us-east-1'
+    )
+    s3_bucket = s3.bucket('continue-cache')
+    s3_bucket.objects(prefix: key).to_a
   end
 
 

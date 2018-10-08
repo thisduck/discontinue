@@ -3,6 +3,8 @@ class Build < ApplicationRecord
   belongs_to :repository
 
   has_many :streams, dependent: :destroy
+  has_many :boxes, through: :streams
+  has_many :test_results
 
   validates_presence_of :branch, :aasm_state, :build_request
 
@@ -71,6 +73,24 @@ class Build < ApplicationRecord
 
   def cache_dirs
     yaml_config['cache_dirs'] || []
+  end
+
+  def artifacts
+    yaml_config['artifacts'] || []
+  end
+
+  def artifact_listing(keys: [])
+    key = ([
+      repository.name,
+      "artifacts",
+      "build_#{id}"
+    ] + keys).join('/')
+
+    s3 = Aws::S3::Resource.new(
+      region: 'us-east-1'
+    )
+    s3_bucket = s3.bucket('continue-cache')
+    s3_bucket.objects(prefix: key).to_a
   end
 
   private
