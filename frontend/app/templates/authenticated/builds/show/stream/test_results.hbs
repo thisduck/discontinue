@@ -1,0 +1,18 @@
+<div class="ui bottom attached tab segment active" >
+  <table class="ui selectable celled table">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Test Type</th>
+        <th>Location</th>
+        <th>Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each model as |result|}}
+        {{test-result result=result}}
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
