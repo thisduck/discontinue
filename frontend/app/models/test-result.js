@@ -11,6 +11,7 @@ export default DS.Model.extend({
   exception: DS.attr(),
   duration: DS.attr(),
   stream: DS.belongsTo('stream'),
+  box: DS.belongsTo('box'),
 
 
 });
