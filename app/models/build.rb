@@ -111,7 +111,7 @@ class Build < ApplicationRecord
 
       puts "STREAM #{stream.build_stream_id} created!"
 
-      stream.start!
+      Stream.delay.start(stream.id)
     end
   end
 

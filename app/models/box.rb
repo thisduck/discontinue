@@ -256,6 +256,11 @@ class Box < ApplicationRecord
     s3_bucket.objects(prefix: key).to_a
   end
 
+  def write_to_log_file(message)
+    File.open(output.path, "a") do |f|
+      f.puts "DISCONTINUE[#{Time.now}] #{message}"
+    end
+  end
 
   private
 
@@ -302,12 +307,12 @@ class Box < ApplicationRecord
     end
   end
 
-
-  def build_box
+  def start_box
     begin
-      puts "build box for #{id}"
+      puts "start box for #{id}"
 
       [
+        :wait_until_ssh!,
         :setup_redis!,
         :setup_cache_yml!,
         :setup_artifacts_yml!,
@@ -319,34 +324,6 @@ class Box < ApplicationRecord
         send(command)
         puts "Done #{command} on Box #{id}"
       end
-    rescue => e
-      puts "error in build_box"
-      puts e.message
-      puts e.backtrace.join("\n")
-      raise e
-    end
-  end
-
-  def start_box
-    begin
-      puts "start box for #{id}"
-      self.update_attributes(
-        started_at: Time.now,
-        finished_at: nil,
-        output: StringFile.create(body: 'hello', name: "output.txt"),
-      )
-
-      [
-        :start_machine!,
-        :wait_until_ssh!,
-      ].each do |command|
-        puts "Running #{command} on Box #{id}"
-        write_to_log_file command.to_s.humanize
-        send(command)
-        puts "Done #{command} on Box #{id}"
-      end
-
-      build_box
 
       run!
     rescue => e
@@ -354,12 +331,6 @@ class Box < ApplicationRecord
       puts e.message
       puts e.backtrace.join("\n")
       raise e
-    end
-  end
-
-  def write_to_log_file(message)
-    File.open(output.path, "a") do |f|
-      f.puts "DISCONTINUE[#{Time.now}] #{message}"
     end
   end
 
@@ -507,6 +478,10 @@ class Box < ApplicationRecord
   end
 
   def wait_until_ssh!
+    puts "wait for instance running"
+    # Wait for the instance to be created, running, and passed status checks
+    ec2 = Aws::EC2::Resource.new( region: 'us-east-1',)
+    ec2.client.wait_until(:instance_running, {instance_ids: [instance_id]})
     puts "gonna ssh"
     until machine.can_ssh?
       puts "can't ssh [#{machine.ip_address}]"
@@ -516,13 +491,6 @@ class Box < ApplicationRecord
     sync_to_log_file
 
     puts "did ssh [#{machine.ip_address}]"
-  end
-
-  def start_machine!
-    puts "creating aws instance [#{self.stream.build.repository.name}][#{self.stream.name}]"
-    instance = Machine.start
-    puts "created aws instance [#{self.stream.build.repository.name}][#{self.stream.name}]"
-    self.update_attributes(instance_id: instance.first.id)
   end
 
   def destroy_machine!
@@ -584,48 +552,6 @@ class Box < ApplicationRecord
 
     def destroy
       instance.terminate
-    end
-
-    def self.start
-      begin
-        ec2 = Aws::EC2::Resource.new(
-          region: 'us-east-1',
-        )
-
-        instance = ec2.create_instances({
-          block_device_mappings: [
-            {
-              device_name: "/dev/sda1",
-              ebs: {
-                delete_on_termination: true,
-                volume_size: 30,
-                volume_type: "gp2",
-              },
-            },
-          ],
-
-          image_id: 'ami-0a3553817958f15f8',
-          min_count: 1,
-          max_count: 1,
-          # key_name: 'MyGroovyKeyPair',
-          security_group_ids: ['sg-0bbe8a0edf1c6ebbc'],
-          # user_data: encoded_script,
-          instance_type: 'c4.xlarge',
-          # instance_type: 't3.2xlarge',
-          subnet_id: 'subnet-9d1563d7',
-        })
-
-
-        # Wait for the instance to be created, running, and passed status checks
-        ec2.client.wait_until(:instance_running, {instance_ids: [instance.first.id]})
-
-        instance
-      rescue => e
-        puts "error with aws creation"
-        puts e.message
-        puts e.backtrace.join("\n")
-        raise e
-      end
     end
   end
 

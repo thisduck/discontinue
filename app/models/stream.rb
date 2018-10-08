@@ -90,6 +90,10 @@ class Stream < ApplicationRecord
     s3_bucket.objects(prefix: key).to_a
   end
 
+  def self.start(stream_id)
+    stream = Stream.find stream_id
+    stream.start!
+  end
 
   private
   def start_stream
@@ -98,11 +102,65 @@ class Stream < ApplicationRecord
         box_number: index,
         instance_type: 'c4.xlarge',
         started_at: Time.now,
-        finished_at: nil
+        finished_at: nil,
+        output: StringFile.create(body: 'hello', name: "output.txt"),
       )
 
+      box.write_to_log_file("Creating Machine Instance")
+
+    end
+
+    instances = create_instances
+    boxes.each_with_index do |box, index|
+      instance = instances[index]
+      box.update_attributes(instance_id: instance.id)
+      instance.create_tags({ tags: [{ key: 'Name', value: "Discontinue Box #{box.id}" }]})
       Box.delay.start(box.id)
     end
+  end
+
+  def create_instances
+    begin
+      ec2 = Aws::EC2::Resource.new(
+        region: 'us-east-1',
+      )
+
+      puts "Creating instances for stream [#{id}]"
+
+      instances = ec2.create_instances({
+        block_device_mappings: [
+          {
+            device_name: "/dev/sda1",
+            ebs: {
+              delete_on_termination: true,
+              volume_size: 30,
+              volume_type: "gp2",
+            },
+          },
+        ],
+
+        image_id: 'ami-0a3553817958f15f8',
+        min_count: box_count,
+        max_count: box_count,
+        security_group_ids: ['sg-0bbe8a0edf1c6ebbc'],
+        instance_type: 'c4.xlarge',
+        # instance_type: 't3.2xlarge',
+        subnet_id: 'subnet-9d1563d7',
+      })
+
+      puts "Created instances for stream [#{id}]"
+
+      instances.batch_create_tags({ tags: [{ key: 'Group', value: "Discontinue Build #{build.id}, Stream #{id} #{name}" }]})
+
+
+      instances
+    rescue => e
+      puts "error with aws creation"
+      puts e.message
+      puts e.backtrace.join("\n")
+      raise e
+    end
+
   end
 
 
