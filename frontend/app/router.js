@@ -13,6 +13,7 @@ Router.map(function() {
     this.route('builds', function() { 
       this.route('index', { path: '/' });
       this.route('show', { path: '/:build_id' }, function() {
+        this.route('summary');
         this.route('stream', { path: '/stream/:stream_id' }, function() {
           this.route('box', { path: '/box/:box_id' });
         });

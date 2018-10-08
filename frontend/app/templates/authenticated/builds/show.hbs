@@ -2,6 +2,9 @@
 <br >
 
 <div class="ui top attached tabular menu">
+  {{#link-to 'authenticated.builds.show.summary' model.id class="ui item"}}
+    Summary
+  {{/link-to}}
   {{#each model.streams as |stream|}}
     {{stream-tab stream=stream}}
   {{/each}}
