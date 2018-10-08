@@ -9,6 +9,7 @@ export default DS.Model.extend({
   buildRequest: DS.belongsTo('build-request'),
   state: DS.attr(),
   hook_hash: DS.attr(),
+  summary: DS.attr(),
   events: DS.attr('array'),
   triggerEvent: memberAction({ path: 'trigger_event' }),
   streams: DS.hasMany('streams'),
@@ -27,5 +28,16 @@ export default DS.Model.extend({
     }
 
     return false;
+  }),
+
+  summaryResults: computed('summary', function() {
+    let results = []
+    this.get('summary').forEach((result) => {
+      result.stream = this.get("store").findRecord("stream", result.stream_id);
+      results.push(result)
+    })
+
+    return results;
+
   }),
 });
