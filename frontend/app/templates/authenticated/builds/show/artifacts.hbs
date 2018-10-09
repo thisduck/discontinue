@@ -1,0 +1,43 @@
+<div class="ui bottom attached tab segment active" >
+  <div class="ui list">
+    {{#each model.streams as |stream|}}
+      <div class="item">
+        <i class="folder icon"></i>
+        <div class="content">
+          <div class="header">
+            {{stream.name}}
+          </div>
+          <div class="list">
+            {{#each stream.boxes as |box|}}
+              <div class="item">
+                <i class="folder icon"></i>
+                <div class="content">
+                  <div class="header">
+                    Box
+                    {{box.box_number}}
+                  </div>
+                  <div class="list">
+                    {{#each box.artifactListing as |artifact|}}
+                      <div class="item">
+                        <i class="file icon"></i>
+                        <div class="content">
+                          <div class="header">
+                            Report
+                          </div>
+                          <div class ="description">
+                            {{artifact.key}}
+                          </div>
+                        </div>
+                      </div>
+                    {{/each}}
+                  </div>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</div>
+

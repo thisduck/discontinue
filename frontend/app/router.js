@@ -17,6 +17,7 @@ Router.map(function() {
         this.route('stream', { path: '/stream/:stream_id' }, function() {
           this.route('box', { path: '/box/:box_id' });
         });
+        this.route('artifacts');
       });
     });
     this.route('build_requests', function() { });
