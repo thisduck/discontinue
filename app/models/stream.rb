@@ -75,6 +75,14 @@ class Stream < ApplicationRecord
       ( yaml_config['artifacts'] || [])
   end
 
+  def image_id
+    ( yaml_config['image_id'] || build.image_id)
+  end
+
+  def instance_type
+    ( yaml_config['instance_type'] || build.instance_type)
+  end
+
   def artifact_listing(keys: [])
     key = ([
       build.repository.name,
@@ -145,12 +153,11 @@ class Stream < ApplicationRecord
           market_type: "spot", # accepts spot
         },
 
-
-        image_id: 'ami-0a3553817958f15f8',
+        image_id: image_id,
         min_count: box_count,
         max_count: box_count,
         security_group_ids: ['sg-0bbe8a0edf1c6ebbc'],
-        instance_type: 'c4.xlarge',
+        instance_type: instance_type,
         # instance_type: 't3.2xlarge',
         subnet_id: 'subnet-9d1563d7',
       })

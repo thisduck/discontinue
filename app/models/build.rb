@@ -79,6 +79,14 @@ class Build < ApplicationRecord
     yaml_config['artifacts'] || []
   end
 
+  def image_id
+    yaml_config['image_id']
+  end
+
+  def instance_type
+    yaml_config['instance_type']
+  end
+
   def artifact_listing(keys: [])
     key = ([
       repository.name,
