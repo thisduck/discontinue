@@ -26,11 +26,12 @@ class BuildRequest < ApplicationRecord
   end
 
   def ignore_build?
-    return true
     return true if skip_ci_message?
 
     # TODO: add ignore branches feature
-    return true if branch.start_with?("finbot_")
+    filter_branches = repository.filter_branches
+    return true if filter_branches['exclude'].any? {|filter| File.fnmatch(filter, branch) }
+    return true if filter_branches['include'].none? {|filter| File.fnmatch(filter, branch) }
 
     false
   end
