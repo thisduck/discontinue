@@ -8,4 +8,8 @@ class Api::TestResultResource < JSONAPI::Resource
   paginator :paged
   filter :status
   filter :stream_id
+
+  def duration
+    @model.duration / 1_000_000_000.0
+  end
 end

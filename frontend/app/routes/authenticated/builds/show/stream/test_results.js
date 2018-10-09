@@ -17,10 +17,10 @@ export default Route.extend({
     filter['stream-id'] = stream.id;
 
     return this.store.query('test-result', {
-      sort: '-created-at', 
+      sort: '-duration', 
       filter: filter,
       page: {
-        size: 10,
+        size: 50,
         number: 1
       }
     })

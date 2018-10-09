@@ -1,4 +1,4 @@
-<tr class="{{if (eq result.status 'passed') 'positive' 'negative'}}" {{action 'toggleException'}}>
+<tr class="{{if (eq result.status 'passed') 'positive' (if (eq result.status 'skipped') 'warning' 'negative')}}" {{action 'toggleException'}}>
   <td data-label="Box">{{link-to result.box.id 'authenticated.builds.show.stream.show.box' result.stream.build.id result.stream.id result.box.id}}</td>
   <td data-label="Description">{{result.description}}</td>
   <td data-label="Test Type">{{result.test_type}}</td>

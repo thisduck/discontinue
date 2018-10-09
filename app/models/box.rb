@@ -221,13 +221,15 @@ class Box < ApplicationRecord
   end
 
   def process_report_data!
-    report_data.each do |test|
+    results = report_data.map do |test|
       test['test_id'] = Digest::SHA256.hexdigest test['test_id']
       test['build_id'] = build.id
       test['stream_id'] = stream.id
       test['box_id'] = id
-      TestResult.create!(test.symbolize_keys)
+      TestResult.new(test.symbolize_keys)
     end
+
+    TestResult.import results
   end
 
   def report_data
@@ -291,6 +293,7 @@ class Box < ApplicationRecord
         :store_cache!,
         :store_artifacts!,
         :finish_post_processing!,
+        :process_report_data!,
       ].each do |command|
         puts "Running #{command} on Box #{id}"
         sync_log_file

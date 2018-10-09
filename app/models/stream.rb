@@ -114,7 +114,10 @@ class Stream < ApplicationRecord
     boxes.each_with_index do |box, index|
       instance = instances[index]
       box.update_attributes(instance_id: instance.id)
-      instance.create_tags({ tags: [{ key: 'Name', value: "Discontinue Box #{box.id}" }]})
+      instance.create_tags({ tags: [
+        { key: 'Name', value: "Discontinue Box #{box.id}" },
+        { key: 'Group', value: "Discontinue Build #{build.id}, Stream #{id} #{name}" }
+      ]})
       Box.delay.start(box.id)
     end
   end
@@ -138,6 +141,10 @@ class Stream < ApplicationRecord
             },
           },
         ],
+        instance_market_options: {
+          market_type: "spot", # accepts spot
+        },
+
 
         image_id: 'ami-0a3553817958f15f8',
         min_count: box_count,
@@ -150,7 +157,6 @@ class Stream < ApplicationRecord
 
       puts "Created instances for stream [#{id}]"
 
-      instances.batch_create_tags({ tags: [{ key: 'Group', value: "Discontinue Build #{build.id}, Stream #{id} #{name}" }]})
 
 
       instances
