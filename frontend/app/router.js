@@ -15,7 +15,10 @@ Router.map(function() {
       this.route('show', { path: '/:build_id' }, function() {
         this.route('summary');
         this.route('stream', { path: '/stream/:stream_id' }, function() {
-          this.route('box', { path: '/box/:box_id' });
+          this.route('show', { path: '/' }, function() {
+            this.route('box', { path: '/box/:box_id' });
+          });
+          this.route('test_results', { path: '/test_results' });
         });
         this.route('artifacts');
       });

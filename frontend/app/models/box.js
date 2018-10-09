@@ -6,6 +6,7 @@ export default DS.Model.extend({
   state: DS.attr(),
   stream: DS.belongsTo('stream'),
   commands: DS.hasMany('command'),
+  testResults: DS.hasMany('test-result'),
   started_at: DS.attr('date'),
   finished_at: DS.attr('date'),
   humanized_time: DS.attr(),

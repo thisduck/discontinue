@@ -6,6 +6,7 @@ export default DS.Model.extend({
   state: DS.attr(),
   build: DS.belongsTo('build'),
   boxes: DS.hasMany('box'),
+  testResults: DS.hasMany('test-result'),
   started_at: DS.attr('date'),
   finished_at: DS.attr('date'),
   humanized_time: DS.attr(),

@@ -3,6 +3,7 @@ class Api::StreamResource < JSONAPI::Resource
 
   belongs_to :build
   has_many :boxes
+  has_many :test_results
 
   def humanized_time
     HumanizeSeconds.humanize( (@model.finished_at || Time.now) - @model.started_at )
