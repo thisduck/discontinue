@@ -122,10 +122,6 @@ class Stream < ApplicationRecord
     boxes.each_with_index do |box, index|
       instance = instances[index]
       box.update_attributes(instance_id: instance.id)
-      instance.create_tags({ tags: [
-        { key: 'Name', value: "Discontinue Box #{box.id}" },
-        { key: 'Group', value: "Discontinue Build #{build.id}, Stream #{id} #{name}" }
-      ]})
       Box.delay.start(box.id)
     end
   end

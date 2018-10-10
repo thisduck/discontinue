@@ -482,9 +482,8 @@ class Box < ApplicationRecord
 
   def wait_until_ssh!
     puts "wait for instance running"
-    # Wait for the instance to be created, running, and passed status checks
-    ec2 = Aws::EC2::Resource.new( region: 'us-east-1',)
-    ec2.client.wait_until(:instance_running, {instance_ids: [instance_id]})
+    machine.wait_until_available
+    machine.set_tags(self)
     puts "gonna ssh"
     until machine.can_ssh?
       puts "can't ssh [#{machine.ip_address}]"
@@ -507,11 +506,19 @@ class Box < ApplicationRecord
       @instance_id = instance_id
     end
 
+    def ec2
+      Aws::EC2::Resource.new( region: 'us-east-1',)
+    end
+
     def instance
       @instance ||= Aws::EC2::Instance.new(
         instance_id,
         region: 'us-east-1',
       )
+    end
+
+    def wait_until_available
+      ec2.client.wait_until(:instance_running, {instance_ids: [instance_id]})
     end
 
     def ip_address
@@ -555,6 +562,13 @@ class Box < ApplicationRecord
 
     def destroy
       instance.terminate
+    end
+
+    def set_tags(box)
+      instance.create_tags({ tags: [
+        { key: 'Name', value: "Discontinue Box #{box.id}" },
+        { key: 'Group', value: "Discontinue Build #{box.build.id}, Stream #{box.stream.id} #{box.stream.name}" }
+      ]})
     end
   end
 
