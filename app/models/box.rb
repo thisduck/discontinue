@@ -180,6 +180,7 @@ class Box < ApplicationRecord
       "export TERM=xterm CI=1 CI_BUILD_ID=#{build.id} CI_STREAM_ID=#{stream.id} CI_BOX_ID=#{id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last}" ,
       "export CI_REPO_NAME='#{build.repository.name}' CI_REPO=#{build.repository.github_url}" ,
       "export CI_BRANCH=#{build.branch} CI_COMMIT_ID=#{build.sha}" ,
+      "export CREDIS_HOST=172.16.1.37:6379" ,
       ( "export #{environment_variables}" if environment_variables.present? ) ,
     ].compact
   end
@@ -352,7 +353,7 @@ class Box < ApplicationRecord
 
     runner = Runner.new
     # this should return immediately and run the script in the background on the remote machine.
-    runner.run "ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export CREDIS_HOST=172.16.1.37:6379 S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
+    runner.run "ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
 
     unless runner.success?
       crash!
@@ -376,7 +377,7 @@ class Box < ApplicationRecord
     pre_commands = YAML.load <<~COMMANDS
       ---
       - rvm use 2.3.7
-      - gem install aws-sdk-s3 parallel mixlib-shellout
+      - gem install aws-sdk-s3 parallel mixlib-shellout redis
 
       - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}
       - export CI_CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l` 
@@ -476,6 +477,7 @@ class Box < ApplicationRecord
   def setup_redis!
     redis = Redis.new
     redis.set("discontinue_#{stream.build_stream_id}", stream.build.id)
+    redis.set("discontinue_#{stream.build_stream_id}_cache", stream.build.id)
   end
 
   def wait_until_ssh!
