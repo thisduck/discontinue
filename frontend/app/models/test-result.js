@@ -12,6 +12,7 @@ export default DS.Model.extend({
   duration: DS.attr(),
   stream: DS.belongsTo('stream'),
   box: DS.belongsTo('box'),
+  build_id: DS.attr(),
 
 
 });

@@ -11,10 +11,13 @@ export default Component.extend({
 
   poll: task(function * () {
     while (true) {
-      if (this.get('box.active')) {
+      yield timeout(5000);
+      if (this.get('box')) {
         this.get('box.commands').reload();
+        if (!this.get('box.active')) {
+          break;
+        }
       }
-      yield timeout(3000);
     }
   }).on('init').enqueue(),
 

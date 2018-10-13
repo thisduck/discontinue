@@ -10,6 +10,7 @@ Router.map(function() {
   this.route('index', { path: '/' });
   this.route('login');
   this.route('authenticated', { path: '' }, function() {
+    this.route('test_results', function() { });
     this.route('builds', function() { 
       this.route('index', { path: '/' });
       this.route('show', { path: '/:build_id' }, function() {
