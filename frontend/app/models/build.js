@@ -11,6 +11,7 @@ export default DS.Model.extend({
   hook_hash: DS.attr(),
   summary: DS.attr(),
   timings: DS.attr(),
+  profileSummary: DS.attr(),
   events: DS.attr('array'),
   triggerEvent: memberAction({ path: 'trigger_event' }),
   streams: DS.hasMany('streams'),

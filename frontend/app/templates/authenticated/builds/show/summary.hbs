@@ -40,4 +40,47 @@
       {{/each}}
     </tbody>
   </table>
+
+  <h5> Profile Summary</h5>
+  {{#each model.profileSummary as |result|}}
+    <div>
+      <br>
+      <b>{{result.stream_name}}</b>
+      <table class="ui selectable celled table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each result.slow_tests as |test|}}
+            <tr>
+              <td data-label="Test">{{test.name}}</td>
+              <td data-label="Duration">{{test.duration}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      <br>
+
+      <table class="ui selectable celled table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each result.slow_files as |test|}}
+            <tr>
+              <td data-label="File">{{test.name}}</td>
+              <td data-label="Duration">{{test.duration}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  {{/each}}
 </div>
