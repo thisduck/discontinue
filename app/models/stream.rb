@@ -1,3 +1,4 @@
+require 'humanize_seconds'
 class Stream < ApplicationRecord
   belongs_to :build
   has_many :boxes, dependent: :destroy
@@ -107,6 +108,14 @@ class Stream < ApplicationRecord
   def self.start(stream_id)
     stream = Stream.find stream_id
     stream.start!
+  end
+
+  def time_taken
+    (finished_at || Time.now) - started_at 
+  end
+
+  def humanized_time
+    HumanizeSeconds.humanize(time_taken)
   end
 
   private

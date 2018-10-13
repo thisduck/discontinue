@@ -1,3 +1,4 @@
+require 'humanize_seconds'
 class Build < ApplicationRecord
   belongs_to :build_request
   belongs_to :repository
@@ -103,6 +104,14 @@ class Build < ApplicationRecord
     )
     s3_bucket = s3.bucket('continue-cache')
     s3_bucket.objects(prefix: key).to_a
+  end
+
+  def time_taken
+    (finished_at || Time.now) - started_at 
+  end
+
+  def humanized_time
+    HumanizeSeconds.humanize(time_taken)
   end
 
   private

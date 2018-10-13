@@ -259,6 +259,14 @@ class Box < ApplicationRecord
     end
   end
 
+  def time_taken
+    (finished_at || Time.now) - started_at 
+  end
+
+  def humanized_time
+    HumanizeSeconds.humanize(time_taken)
+  end
+
   private
 
   def update_status_from_output

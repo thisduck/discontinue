@@ -1,7 +1,8 @@
+require 'humanize_seconds'
 class Api::BuildResource < JSONAPI::Resource
   attributes :branch, :sha, :build_request_id, :state,
     :hook_hash, :events, :repository_id, :created_at,
-    :summary
+    :summary, :timings
 
   belongs_to :build_request
   belongs_to :repository
@@ -19,6 +20,28 @@ class Api::BuildResource < JSONAPI::Resource
 
   def events
     @model.aasm.events(permitted: true).map(&:name)
+  end
+
+  def timings
+    results = []
+    times = []
+    @model.streams.each do |stream|
+      box_times = stream.boxes.collect(&:time_taken).sum
+      times << box_times
+
+      results << {
+        name: stream.name,
+        time: stream.humanized_time,
+        total_time: HumanizeSeconds.humanize(box_times)
+      }
+    end
+
+    results << {
+      name: "Total",
+      time: @model.humanized_time,
+      total_time: HumanizeSeconds.humanize(times.sum)
+    }
+    results
   end
 
   def summary

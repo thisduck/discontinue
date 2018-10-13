@@ -5,11 +5,6 @@ class Api::StreamResource < JSONAPI::Resource
   has_many :boxes
   has_many :test_results
 
-  def humanized_time
-    HumanizeSeconds.humanize( (@model.finished_at || Time.now) - @model.started_at )
-
-  end
-
   def state
     @model.aasm_state
   end

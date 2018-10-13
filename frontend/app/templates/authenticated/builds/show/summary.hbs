@@ -1,4 +1,25 @@
 <div class="ui bottom attached tab segment active" >
+  <h5>Timing Summary</h5>
+  <table class="ui selectable celled table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Time</th>
+        <th>Total Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each model.timings as |result|}}
+        <tr>
+          <td data-label="Name">{{result.name}}</td>
+          <td data-label="Time">{{result.time}}</td>
+          <td data-label="Total Time">{{result.total_time}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <h5> Test Result Summary</h5>
   <table class="ui selectable celled table">
     <thead>
       <tr>
