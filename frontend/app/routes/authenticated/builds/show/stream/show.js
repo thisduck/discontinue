@@ -14,12 +14,12 @@ export default Route.extend({
   poll: task(function * (id) {
     yield timeout(500);
     while (true) {
-      yield timeout(5000);
       let model = this.store.peekRecord('stream', id);
       model.get('boxes').reload();
       if (!model.get('active')) {
         break;
       }
+      yield timeout(5000);
     }
   }).cancelOn('deactivate').restartable(),
 });

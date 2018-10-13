@@ -17,7 +17,6 @@ export default Route.extend({
   poll: task(function * (id) {
     yield timeout(500);
     while (true) {
-      yield timeout(5000);
       let model = this.store.peekRecord('build', id);
       model.reload().then(() => {
         model.get('streams').reload();
@@ -25,6 +24,7 @@ export default Route.extend({
       if (!model.get('active')) {
         break;
       }
+      yield timeout(5000);
     }
   }).cancelOn('deactivate').restartable(),
 });

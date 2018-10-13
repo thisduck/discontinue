@@ -1,6 +1,6 @@
-<div class="ui segments">
-  <div class="ui top attached secondary menu">
-    <h4 class="ui item">
+<div class="ui {{color}} fluid card">
+  <div class="content">
+    <span class="left floated">
       {{#if showLink}}
         {{#link-to 'authenticated.builds.show' build.id}}
           #{{build.id}} {{build.state}}
@@ -8,23 +8,21 @@
       {{else}}
         #{{build.id}} {{build.state}}
       {{/if}}
-    </h4>
-    <div class="right menu">
-      {{#ui-dropdown class="item" onChange=(action (mut gender))}}
-        <div class="default text">Options</div>
-        <i class="dropdown icon"></i>
-        <div class="menu">
-          {{#each build.events as |event|}}
-            <div class="item" {{action "triggerEvent" event}}>
-              {{event}}
-            </div>
-          {{/each}}
-        </div>
-      {{/ui-dropdown}}
-    </div>
+    </span>
+    {{#ui-dropdown class="ui right floated small button" onChange=(action (mut gender))}}
+      <div class="default text">Options</div>
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        {{#each build.events as |event|}}
+          <div class="item" {{action "triggerEvent" event}}>
+            {{event}}
+          </div>
+        {{/each}}
+      </div>
+    {{/ui-dropdown}}
   </div>
 
-  <div class="ui bottom attached segment">
+  <div class="content">
     <span>
       {{fa-icon 'code'}} {{build.repository.name}}
     </span>

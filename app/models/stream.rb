@@ -61,6 +61,12 @@ class Stream < ApplicationRecord
     yaml_config['build_commands']
   end
 
+  def environment_variables
+    build.environment_variables.merge(
+      yaml_config['environment'] || {}
+    )
+  end
+
   def box_count
     yaml_config['box_count'].to_i
   end

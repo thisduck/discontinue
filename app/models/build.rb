@@ -67,6 +67,10 @@ class Build < ApplicationRecord
     YAML.load config
   end
 
+  def environment_variables
+    yaml_config['environment'] || {}
+  end
+
   def setup_commands
     yaml_config['setup_commands']
   end
