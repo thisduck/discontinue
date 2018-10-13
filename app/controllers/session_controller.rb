@@ -29,8 +29,10 @@ class SessionController < ApplicationController
 
     github_user = client.user
     user = User.where(github_auth_id: github_user.id).first
-    user = User.where(email: github_user.email).first if user.blank?
-    user = User.create!(email: github_user.email) if user.blank?
+
+    email = github_user.email || github_user.id
+    user = User.where(email: email).first if user.blank?
+    user = User.create!(email: email) if user.blank?
 
     user.update_attributes({
       access_token: access_token,
