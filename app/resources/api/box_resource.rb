@@ -1,6 +1,4 @@
 class Api::BoxResource < JSONAPI::Resource
-  include ActionView::Helpers::NumberHelper
-
   attributes :state, :started_at, :finished_at, :stream_id, :humanized_time,
     :artifact_listing, :box_number
 
@@ -18,9 +16,16 @@ class Api::BoxResource < JSONAPI::Resource
         key: key,
         filename: File.basename(key),
         extension: File.extname(key),
-        size: number_to_human_size(artifact.data.size),
+        size: number_helper.number_to_human_size(artifact.data.size),
         presigned_url: artifact.presigned_url('get'),
       }
+    end
+  end
+
+  private
+  def number_helper
+    @number_helper ||= Class.new.tap do |helper|
+      helper.extend ActionView::Helpers::NumberHelper
     end
   end
 end
