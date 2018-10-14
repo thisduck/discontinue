@@ -10,14 +10,15 @@ export default Component.extend({
   },
 
   poll: task(function * () {
+    yield timeout(200);
     while (true) {
-      yield timeout(5000);
       if (this.get('box')) {
         this.get('box.commands').reload();
         if (!this.get('box.active')) {
           break;
         }
       }
+      yield timeout(5000);
     }
   }).on('init').enqueue(),
 

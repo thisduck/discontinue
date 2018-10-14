@@ -22,7 +22,7 @@ module.exports = function(environment) {
       providers: {
         'github-oauth2': {
           apiKey: '4bc231037495c4ee40b6',
-          scope: 'repo repo:status read:user read:org'
+          scope: 'repo repo:status read:user read:org user:email',
         }
       }
     },

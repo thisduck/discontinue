@@ -1,3 +1,4 @@
+require 'humanize_seconds'
 class Stream < ApplicationRecord
   belongs_to :build
   has_many :boxes, dependent: :destroy
@@ -61,6 +62,12 @@ class Stream < ApplicationRecord
     yaml_config['build_commands']
   end
 
+  def environment_variables
+    build.environment_variables.merge(
+      yaml_config['environment'] || {}
+    )
+  end
+
   def box_count
     yaml_config['box_count'].to_i
   end
@@ -101,6 +108,14 @@ class Stream < ApplicationRecord
   def self.start(stream_id)
     stream = Stream.find stream_id
     stream.start!
+  end
+
+  def time_taken
+    (finished_at || Time.now) - started_at 
+  end
+
+  def humanized_time
+    HumanizeSeconds.humanize(time_taken)
   end
 
   private

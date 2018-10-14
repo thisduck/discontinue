@@ -1,3 +1,4 @@
+require 'humanize_seconds'
 class Build < ApplicationRecord
   belongs_to :build_request
   belongs_to :repository
@@ -29,11 +30,11 @@ class Build < ApplicationRecord
       transitions from: :running, to: :stopped
     end
 
-    event :pass_build do
+    event :pass_build, after_commit: -> { notify(on: :finish) } do
       transitions to: :passed
     end
 
-    event :fail_build do
+    event :fail_build, after_commit: -> { notify(on: :finish) } do
       transitions to: :failed
     end
   end
@@ -67,6 +68,10 @@ class Build < ApplicationRecord
     YAML.load config
   end
 
+  def environment_variables
+    yaml_config['environment'] || {}
+  end
+
   def setup_commands
     yaml_config['setup_commands']
   end
@@ -87,6 +92,10 @@ class Build < ApplicationRecord
     yaml_config['instance_type']
   end
 
+  def notification_options
+    repository.yaml_config['notifications'] || []
+  end
+
   def artifact_listing(keys: [])
     key = ([
       repository.name,
@@ -101,9 +110,119 @@ class Build < ApplicationRecord
     s3_bucket.objects(prefix: key).to_a
   end
 
+  def time_taken
+    (finished_at || Time.now) - started_at 
+  end
+
+  def humanized_time
+    HumanizeSeconds.humanize(time_taken)
+  end
+
+  def url
+    root_url = Rails.application.routes.url_helpers.url_for(
+      controller: 'ember_cli/ember', 
+      action: "index", 
+      host: Rails.application.config.action_mailer.default_url_options[:host], 
+      port: Rails.application.config.action_mailer.default_url_options[:port]
+    )
+
+    "#{root_url}builds/#{id}"
+  end
+
+  def notify(on:)
+    # just for slack for now
+    notification_options.each do |options|
+      next if options['type'] != 'slack'
+      next if options['branches'].none? {|filter| File.fnmatch(filter, branch) }
+
+      channel = options['channel']
+
+      send = false
+      emojis = {
+        "failed" => ":broken_heart:",
+        "passed" => ":green_heart:",
+      }
+      extra = []
+      if on == :start
+        status = "Started"
+        color = "warning"
+        send = options['trigger'].include?('start')
+      elsif on == :finish
+        status =  "#{emojis[aasm_state]} #{aasm_state.humanize}"
+        color = passed? ? "good" : "danger"
+
+        if options['trigger'].include?('change')
+          last_build = Build.where(branch: branch).where("finished_at is not null AND finished_at < ?", finished_at).order(finished_at: :desc).first
+
+          if last_build
+            if last_build.aasm_state != aasm_state
+              send = true
+              extra << {
+                title: "Last Build",
+                value: "<#{last_build.url}|##{last_build.id}> #{last_build.aasm_state.humanize}",
+                short: false
+              }
+            end
+          end
+        end
+
+        if passed? && options['trigger'].include?('pass')
+          send = true
+        elsif failed? && options['trigger'].include?('fail')
+          send = true
+        end
+      end
+
+      if send 
+        HTTParty.post(
+          options['webhook'], 
+          body: {
+            channel: channel,
+            username: "discontinue",
+            color: color,
+            fields: [
+              {
+                title: "Build",
+                value: "<#{url}|##{id}>",
+                short: true
+              },
+              {
+                title: "Status",
+                value: status,
+                short: true
+              },
+              {
+                title: "Repository",
+                value: "<https://github.com/#{repository.name}|#{repository.name}>",
+                short: true
+              },
+              {
+                title: "Branch",
+                value: "<https://github.com/#{repository.name}/tree/#{branch}|#{branch}>",
+                short: true
+              },
+              {
+                title: "Commit",
+                value: "<#{hook_hash['compare']}|#{sha[0..9]}>",
+                short: true
+              },
+              {
+                title: "Pusher",
+                value: "#{hook_hash['pusher']['name']}",
+                short: true
+              },
+            ] + extra
+          }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+      end
+    end
+  end
+
   private
 
   def start_build
+    notify(on: :start)
     if self.stopped?
       self.streams.destroy_all
     end

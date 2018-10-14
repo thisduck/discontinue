@@ -1,6 +1,18 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 
 export default Component.extend({
+  tagName: '',
+  color: computed('build.state', function() {
+
+    if (this.get('build.state') == "passed") {
+      return 'green'
+    } else if (this.get('build.active')) {
+      return '';
+    }
+
+    return 'red';
+  }),
   actions: {
     triggerEvent(event) {
       this.get('build').triggerEvent({event: event}).then(() => {

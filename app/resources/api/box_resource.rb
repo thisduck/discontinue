@@ -1,4 +1,3 @@
-require 'humanize_seconds'
 class Api::BoxResource < JSONAPI::Resource
   include ActionView::Helpers::NumberHelper
 
@@ -7,10 +6,6 @@ class Api::BoxResource < JSONAPI::Resource
 
   belongs_to :stream
   has_many :commands
-
-  def humanized_time
-    HumanizeSeconds.humanize( (@model.finished_at || Time.now) - @model.started_at )
-  end
 
   def state
     @model.aasm_state

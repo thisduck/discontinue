@@ -1,9 +1,14 @@
 file_dir = __dir__
 require file_dir + '/helpers.rb'
+require 'redis'
 
 option = ARGV[0]
 key = ARGV[1]
 directory = ARGV[2]
+
+host, port = ENV['CREDIS_HOST'].split(":")
+redis = Redis.new(host: host, port: port)
+redis_key = "discontinue_#{ENV['CI_BUILD_STREAM_CONFIG']}_cache"
 
 if key && !directory
   raise "key passed without directory/file."
@@ -40,6 +45,13 @@ end
 
 case option
 when "cache"
+
+  unless key
+    if redis.del(redis_key).zero?
+      puts "Already cached. Exiting."
+      exit 0
+    end
+  end
 
   cache_directories.each do |directory|
     tar_file = tar_file_name(directory)

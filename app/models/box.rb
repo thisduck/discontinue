@@ -133,23 +133,13 @@ class Box < ApplicationRecord
   end
 
   def update_sync_and_state
+    self.reload
     return unless running?
 
     sync_log_file if machine.can_ssh?
     unless machine.build_running?
       puts "build not running time for post [#{id}]"
-      Spawnling.new(:argv => "spawn #{SPAWNLING_PREFIX}-#{id}-") do
-        begin
-          puts "in spawnling for post #{id}"
-          post_process!
-        rescue => e
-          message = "#{e.message}\n#{e.backtrace.join("\n")}"
-          self.error_message = message
-          self.error!
-          puts message
-          raise e
-        end
-      end
+      post_process!
     end
   end
 
@@ -183,11 +173,16 @@ class Box < ApplicationRecord
   end
 
   def env_exports
+    environment_variables = stream.environment_variables.collect do |key, value|
+      %/#{key}="#{value.gsub('"', '\"')}"/
+    end.join(' ')
     [
       "export TERM=xterm CI=1 CI_BUILD_ID=#{build.id} CI_STREAM_ID=#{stream.id} CI_BOX_ID=#{id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last}" ,
       "export CI_REPO_NAME='#{build.repository.name}' CI_REPO=#{build.repository.github_url}" ,
       "export CI_BRANCH=#{build.branch} CI_COMMIT_ID=#{build.sha}" ,
-    ]
+      "export CREDIS_HOST=172.16.1.37:6379" ,
+      ( "export #{environment_variables}" if environment_variables.present? ) ,
+    ].compact
   end
 
   def store_cache!
@@ -264,6 +259,14 @@ class Box < ApplicationRecord
     end
   end
 
+  def time_taken
+    (finished_at || Time.now) - started_at 
+  end
+
+  def humanized_time
+    HumanizeSeconds.humanize(time_taken)
+  end
+
   private
 
   def update_status_from_output
@@ -282,31 +285,35 @@ class Box < ApplicationRecord
     self.update_attributes(finished_at: Time.now, instance_id: nil)
     stream.sync!
   ensure
-    m.destroy
+    m&.destroy
   end
 
   def post_process_box
-    begin
-      puts "post process box for #{id}"
+    Spawnling.new(:argv => "spawn #{SPAWNLING_PREFIX}-#{id}-") do
+      begin
+        puts "in spawnling for post #{id}"
+        puts "post process box for #{id}"
 
-      [
-        :store_cache!,
-        :store_artifacts!,
-        :finish_post_processing!,
-        :process_report_data!,
-      ].each do |command|
-        puts "Running #{command} on Box #{id}"
-        sync_log_file
-        write_to_log_file command.to_s.humanize
-        sync_to_log_file
-        send(command)
-        puts "Done #{command} on Box #{id}"
+        [
+          :store_cache!,
+          :store_artifacts!,
+          :finish_post_processing!,
+          :process_report_data!,
+          :update_status_from_output,
+        ].each do |command|
+          puts "Running #{command} on Box #{id}"
+          sync_log_file
+          write_to_log_file command.to_s.humanize
+          sync_to_log_file
+          send(command)
+          puts "Done #{command} on Box #{id}"
+        end
+      rescue => e
+        puts "error in post_process_box"
+        puts e.message
+        puts e.backtrace.join("\n")
+        raise e
       end
-    rescue => e
-      puts "error in post_process_box"
-      puts e.message
-      puts e.backtrace.join("\n")
-      raise e
     end
   end
 
@@ -354,7 +361,7 @@ class Box < ApplicationRecord
 
     runner = Runner.new
     # this should return immediately and run the script in the background on the remote machine.
-    runner.run "ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export CREDIS_HOST=172.16.1.37:6379 S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
+    runner.run "ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
 
     unless runner.success?
       crash!
@@ -378,7 +385,7 @@ class Box < ApplicationRecord
     pre_commands = YAML.load <<~COMMANDS
       ---
       - rvm use 2.3.7
-      - gem install aws-sdk-s3 parallel mixlib-shellout
+      - gem install aws-sdk-s3 parallel mixlib-shellout redis
 
       - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}
       - export CI_CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l` 
@@ -478,6 +485,7 @@ class Box < ApplicationRecord
   def setup_redis!
     redis = Redis.new
     redis.set("discontinue_#{stream.build_stream_id}", stream.build.id)
+    redis.set("discontinue_#{stream.build_stream_id}_cache", stream.build.id)
   end
 
   def wait_until_ssh!
@@ -537,7 +545,7 @@ class Box < ApplicationRecord
 
         runner.success?
       rescue => e
-        puts e.message
+        puts "CANNOT SSH: #{e.message}"
         false
       end
     end
@@ -562,6 +570,8 @@ class Box < ApplicationRecord
 
     def destroy
       instance.terminate
+    rescue Aws::EC2::Errors::InvalidInstanceIDNotFound
+      puts "Machine Destroy: Instance ID not found. [#{instance_id}]"
     end
 
     def set_tags(box)
@@ -578,21 +588,11 @@ class Box < ApplicationRecord
         Box.running.each do |box|
           begin
             box.update_sync_and_state
-          rescue =>e 
+          rescue => e 
             puts e.message
             puts e.backtrace.join("\n")
           end
         end
-
-        Box.post_processing.each do |box|
-          begin
-            box.update_post_and_state
-          rescue =>e 
-            puts e.message
-            puts e.backtrace.join("\n")
-          end
-        end
-        sleep 3
       end
     end
 
