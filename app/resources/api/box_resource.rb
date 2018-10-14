@@ -17,8 +17,6 @@ class Api::BoxResource < JSONAPI::Resource
   end
 
   def artifact_listing
-    box_delimiter = "box_#{@model.id}"
-
     @model.artifact_listing.map do |artifact|
       key = artifact.key
       {
