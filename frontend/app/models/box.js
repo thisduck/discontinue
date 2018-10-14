@@ -10,6 +10,8 @@ export default DS.Model.extend({
   started_at: DS.attr('date'),
   finished_at: DS.attr('date'),
   humanized_time: DS.attr(),
+  artifactListing: DS.attr(),
+  box_number: DS.attr(),
 
   active: computed('state', function() {
     if (this.get('state').endsWith('ing')) {

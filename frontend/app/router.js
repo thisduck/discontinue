@@ -21,6 +21,7 @@ Router.map(function() {
           });
           this.route('test_results', { path: '/test_results' });
         });
+        this.route('artifacts');
       });
     });
     this.route('build_requests', function() { });

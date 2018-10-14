@@ -1,0 +1,46 @@
+<div class="ui bottom attached tab segment active">
+  <div class="ui list">
+    {{#each model.streams as |stream|}}
+      <div class="item">
+        <i class="folder icon"></i>
+        <div class="content">
+          <div class="header">{{stream.name}}</div>
+          <div class="list">
+            {{#each stream.boxes as |box|}}
+              <div class="item">
+                <i class="folder icon"></i>
+                <div class="content">
+                  <div class="header">
+                    Box
+                    {{box.box_number}}
+                  </div>
+                  <table class="ui fixed single line very basic compact filetree table">
+                    <tbody>
+                      {{#each box.artifactListing as |artifact|}}
+                        <tr>
+                          <td class="twelve wide">
+                            <i class="file {{if (eq artifact.extension ".json") 'alternate' (if (eq artifact.extension ".html") 'code' 'image')}} outline icon"></i>
+                            <a href="{{artifact.presigned_url}}" target="_blank">
+                              {{artifact.filename}}
+                            </a>
+                          </td>
+                          <td class="two wide">
+                            {{artifact.extension}}
+                          </td>
+                          <td class="two wide">
+                            {{artifact.size}}
+                          </td>
+                        </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</div>
+

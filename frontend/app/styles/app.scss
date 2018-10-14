@@ -9,3 +9,10 @@ pre.output_contents {
   white-space: -o-pre-wrap;    /* Opera 7 */
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
+.ui.very.basic.compact.filetree.table {
+  margin-top: 0;
+  td {
+    border-top: 0px;
+  }
+}

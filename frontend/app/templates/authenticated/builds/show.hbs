@@ -8,6 +8,9 @@
   {{#each model.streams as |stream|}}
     {{stream-tab stream=stream}}
   {{/each}}
+  {{#link-to 'authenticated.builds.show.artifacts' model.id class="ui item"}}
+    Artifacts
+  {{/link-to}}
 </div>
 
 {{outlet}}
