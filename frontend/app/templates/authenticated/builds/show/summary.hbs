@@ -9,7 +9,7 @@
       </tr>
     </thead>
     <tbody>
-      {{#each model.timings as |result|}}
+      {{#each model.buildTiming.results as |result|}}
         <tr>
           <td data-label="Name">{{result.name}}</td>
           <td data-label="Time">{{result.time}}</td>
@@ -30,7 +30,7 @@
       </tr>
     </thead>
     <tbody>
-      {{#each model.summaryResults as |result|}}
+      {{#each model.buildSummary.display as |result|}}
         <tr class="{{if (eq result.status 'passed') 'positive' (if (eq result.status 'skipped') 'warning' 'negative')}}">
           <td data-label="Stream">{{result.stream.name}}</td>
           <td data-label="Test Type">{{result.test_type}}</td>
@@ -42,7 +42,7 @@
   </table>
 
   <h5> Profile Summary</h5>
-  {{#each model.profileSummary as |result|}}
+  {{#each model.profileSummary.results as |result|}}
     <div>
       <br>
       <b>{{result.stream_name}}</b>

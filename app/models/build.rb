@@ -219,6 +219,20 @@ class Build < ApplicationRecord
     end
   end
 
+  # TODO: make these belong to stream
+  # in proper manner
+  def build_summary
+    self
+  end
+
+  def build_timing
+    self
+  end
+
+  def profile_summary
+    self
+  end
+
   private
 
   def start_build
