@@ -9,7 +9,7 @@
   <div class="right menu">
     {{#if session.isAuthenticated}}
       <div class="item">
-        <img src="{{currentUser.user.github_avatar_url}}" class="ui avatar image" >
+        <img src={{currentUser.user.github_avatar_url}} class="ui avatar image" >
         <span>
           {{currentUser.user.github_login}}
         </span>
