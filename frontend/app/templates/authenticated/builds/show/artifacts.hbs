@@ -20,7 +20,7 @@
                         <tr>
                           <td class="twelve wide">
                             <i class="file {{if (eq artifact.extension ".json") 'alternate' (if (eq artifact.extension ".html") 'code' 'image')}} outline icon"></i>
-                            <a href="{{artifact.presigned_url}}" target="_blank">
+                            <a href="{{artifact.presignedUrl}}" target="_blank">
                               {{artifact.filename}}
                             </a>
                           </td>
