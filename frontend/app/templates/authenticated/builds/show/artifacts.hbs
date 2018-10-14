@@ -16,7 +16,7 @@
                   </div>
                   <table class="ui fixed single line very basic compact filetree table">
                     <tbody>
-                      {{#each box.artifactListing as |artifact|}}
+                      {{#each box.artifacts as |artifact|}}
                         <tr>
                           <td class="twelve wide">
                             <i class="file {{if (eq artifact.extension ".json") 'alternate' (if (eq artifact.extension ".html") 'code' 'image')}} outline icon"></i>

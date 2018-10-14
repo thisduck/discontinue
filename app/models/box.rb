@@ -161,6 +161,10 @@ class Box < ApplicationRecord
     Command::Relation.new(self)
   end
 
+  def artifacts
+    Artifact::Relation.new(self)
+  end
+
   def finish_post_processing!
     sync_log_file if machine.can_ssh?
     runner = Runner.new
