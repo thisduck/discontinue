@@ -1,5 +1,7 @@
 require 'humanize_seconds'
 class Api::BoxResource < JSONAPI::Resource
+  include ActionView::Helpers::NumberHelper
+
   attributes :state, :started_at, :finished_at, :stream_id, :humanized_time,
     :artifact_listing, :box_number
 
@@ -15,15 +17,16 @@ class Api::BoxResource < JSONAPI::Resource
   end
 
   def artifact_listing
-    build_id = stream.build.id
-    stream_id = stream.id
+    box_delimiter = "box_#{@model.id}"
 
     @model.artifact_listing.map do |artifact|
+      key = artifact.key
       {
-        key: artifact.key,
-        build_id: build_id,
-        stream_id: stream_id,
-        box_id: id
+        key: key,
+        filename: File.basename(key),
+        extension: File.extname(key),
+        size: number_to_human_size(artifact.data.size),
+        presigned_url: artifact.presigned_url('get'),
       }
     end
   end

@@ -58,7 +58,7 @@
     "loader.js": "^4.7.0",
     "qunit-dom": "^0.7.1",
     "sass": "^1.14.1",
-    "semantic-ui-ember": "^3.0.3",
+    "semantic-ui-ember": "Semantic-Org/Semantic-UI-Ember#master",
     "torii": "^0.10.1"
   },
   "engines": {

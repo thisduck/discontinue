@@ -243,19 +243,13 @@ class Box < ApplicationRecord
   end
 
   def artifact_listing(keys: [])
-    key = ([
-      build.repository.name,
-      "artifacts",
-      "build_#{build.id}",
-      "stream_#{stream.id}",
-      "box_#{id}",
-    ] + keys).join('/')
+    artifact_key = ([key, *keys]).join('/')
 
     s3 = Aws::S3::Resource.new(
       region: 'us-east-1'
     )
     s3_bucket = s3.bucket('continue-cache')
-    s3_bucket.objects(prefix: key).to_a
+    s3_bucket.objects(prefix: artifact_key).to_a
   end
 
   def write_to_log_file(message)
@@ -265,6 +259,16 @@ class Box < ApplicationRecord
   end
 
   private
+
+  def key
+    key ||= ([
+      build.repository.name,
+      "artifacts",
+      "build_#{build.id}",
+      "stream_#{stream.id}",
+      "box_#{id}",
+    ]).join('/')
+  end
 
   def update_status_from_output
     runner = Runner.new
