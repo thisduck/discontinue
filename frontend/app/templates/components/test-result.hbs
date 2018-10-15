@@ -1,4 +1,4 @@
-<tr class="{{if (eq result.status 'passed') 'positive' (if (eq result.status 'skipped') 'warning' 'negative')}}" {{action 'toggleException'}}>
+<tr class="{{if (eq result.status 'passed') 'positive' (if (eq result.status 'skipped') 'warning' 'negative')}}" {{action 'toggleMore'}}>
   {{#if showBuild}}
     <td data-label="Build">{{link-to result.build_id 'authenticated.builds.show' result.stream.build.id}}</td>
   {{/if}}
@@ -8,7 +8,7 @@
   <td style="    word-wrap: break-word; " data-label="Location">{{result.file_path}}:{{result.line_number}}</td>
   <td data-label="Duration">{{result.duration}}</td>
 </tr>
-{{#if showException}}
+{{#if showMore}}
   {{#if result.exception.message}}
     <tr>
       <td colspan='5'>
@@ -23,4 +23,9 @@
       </td>
     </tr>
   {{/if}}
+  <tr>
+    <td colspan='5'>
+      {{dis-artifacts artifacts=result.artifacts}}
+    </td>
+  </tr>
 {{/if}}

@@ -1,5 +1,4 @@
 import DS from 'ember-data';
-import { computed } from '@ember/object';
 
 export default DS.Model.extend({
   status: DS.attr(),
@@ -12,7 +11,6 @@ export default DS.Model.extend({
   duration: DS.attr(),
   stream: DS.belongsTo('stream'),
   box: DS.belongsTo('box'),
+  artifacts: DS.hasMany('artifact'),
   build_id: DS.attr(),
-
-
 });

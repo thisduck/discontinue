@@ -18,14 +18,25 @@ class Artifact
   end
 
   class Relation
-    attr_reader :box
+    attr_reader :box, :filter
 
-    def initialize(box)
-      @box = box
+    def initialize(model)
+      if model.is_a?(TestResult)
+        @box = model.box
+        @filter = model.test_id
+      else
+        @box = model
+      end
+    end
+
+    def artifacts
+      artifacts = box.artifact_listing
+      artifacts.select!{|x| x.key.include?(@filter) } if @filter
+      artifacts
     end
 
     def order(*args)
-      box.artifact_listing.collect do |artifact, index|
+      artifacts.collect do |artifact, index|
         key = artifact.key
         Artifact.new({
           key: key,

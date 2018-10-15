@@ -5,6 +5,7 @@ class Api::TestResultResource < JSONAPI::Resource
 
   belongs_to :stream
   belongs_to :box
+  has_many   :artifacts
   paginator :paged
   filter :status
   filter :stream_id

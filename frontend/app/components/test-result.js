@@ -2,10 +2,10 @@ import Component from '@ember/component';
 
 export default Component.extend({
   tagName: '',
-  showException: false,
+  showMore: false,
   actions: {
-    toggleException() {
-      this.toggleProperty('showException');
+    toggleMore() {
+      this.toggleProperty('showMore');
     }
   }
 });
