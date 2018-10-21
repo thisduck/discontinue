@@ -1,26 +1,26 @@
-<h2>{{model.name}}</h2>
+{{#ui-header}}{{model.name}}{{/ui-header}}
 
 <div class="ui form">
-  <div class="field">
-    <label for="">Config</label>
-    {{ember-ace lines=20 value=model.config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action (mut model.config)) }}
+  <div class="mb-4">
+    <label for="" class="mb-2 inline-block text-grey-darker font-bold">Config</label>
+    {{ember-ace lines=20 value=(if model.config model.config '') mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action (mut model.config)) }}
   </div>
 
-  <h3>Stream Configurations</h3>
+  {{#ui-header level=3}}Stream Configurations{{/ui-header}}
   {{#each model.streamConfigs as |config index|}}
-    <div class="field">
-      <label for="">Stream Config</label>
+    <div class="mb-4">
+      <label for="" class="mb-2 inline-block text-grey-darker font-bold">Stream Config</label>
       {{ember-ace lines=20 value=config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action "updateStreamConfig" index) }}
     </div>
 
-    <div class="field">
-      <button class="ui basic red button" {{action "removeStreamConfig" config}}>{{fa-icon "minus"}} Remove Stream {{config.name}}</button>
+    <div class="mb-4">
+      <button class="text-danger border border-danger px-3 py-2 hover:border-danger-dark inline-block" {{action "removeStreamConfig" config}}>{{fa-icon "minus"}} Remove Stream {{config.name}}</button>
     </div>
   {{/each}}
 
-  <div class="field">
-    <button class="ui basic secondary button" {{action "addStreamConfig"}}>{{fa-icon "plus"}} Add Stream Configuration</button>
+  <div class="mb-4">
+    <button class="text-primary border border-primary px-3 py-2 hover:border-primary-dark inline-block" {{action "addStreamConfig"}}>{{fa-icon "plus"}} Add Stream Configuration</button>
   </div>
 
-  <button class="ui button primary" {{action "save"}}>Save</button>
+  <button class="text-white bg-primary px-3 py-2 hover:bp-primary-dark inline-block" {{action "save"}}>Save</button>
 </div>

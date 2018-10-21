@@ -18,7 +18,7 @@
 
 export default {
   sans: [
-    'Niramit',
+    'Raleway',
     'system-ui',
     'BlinkMacSystemFont',
     '-apple-system',
@@ -45,8 +45,8 @@ export default {
     'serif'
   ],
   header: [
+    'Montserrat',
     'Raleway',
-    'Niramit',
     'sans-serif'
   ],
   mono: [

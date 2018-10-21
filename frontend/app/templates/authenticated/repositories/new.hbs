@@ -1,14 +1,11 @@
-<h2>Add Repository</h2>
+{{#ui-header}}Add Repository{{/ui-header}}
 
-<div class="ui segments">
-  {{#each model as |repo|}}
-    <div class="ui clearing segment">
-      <div class="ui right floated button mini" {{action 'create' repo}}>Add</div>
-      <div class="content" style="height: 29px;">
-        {{fa-icon 'code' size='lg'}}
-        {{repo.name}}
-      </div>
+{{#each model as |repo|}}
+  <div class="p-3 mb-3 border shadow bg-white flex justify-between items-center">
+    <div class="text-grey-darker">
+      {{fa-icon 'code' size='lg'}}
+      {{repo.name}}
     </div>
-  {{/each}}
-</div>
-
+    <div class="text-white bg-primary px-3 py-2 hover:bp-primary-dark inline-block" {{action 'create' repo}}>Add</div>
+  </div>
+{{/each}}

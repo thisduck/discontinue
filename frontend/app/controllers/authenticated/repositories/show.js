@@ -11,7 +11,7 @@ export default Controller.extend({
     },
 
     addStreamConfig() {
-      let config = {name: '', build_commands: '', box_count: 1};
+      let config = '';
       this.get('model.streamConfigs').pushObject(config);
     },
 

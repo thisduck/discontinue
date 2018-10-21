@@ -1,1 +1,5 @@
+{{#if (eq level 2)}}
 <h2 class="font-header text-grey-darkest mb-3">{{yield}}</h2>
+{{else if (eq level 3)}}
+<h3 class="font-header text-grey-darkest mb-3">{{yield}}</h3>
+{{/if}}
