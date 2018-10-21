@@ -1,0 +1,17 @@
+<span class="relative">
+  <button class="ml-3 text-grey-dark p-2 focus:outline-none" {{action 'toggleShow'}}>
+    {{fa-icon 'ellipsis-v'}}
+  </button>
+
+  {{#if show}}
+  <ul class="list-reset absolute pin-r py-1 shadow border bg-white z-10">
+    {{#each items as |item|}}
+      <li class="py-2 px-4 hover:bg-grey-light hover:text-white" {{action 'selectItem' item}}>
+        <button class="hover:bg-grey-light hover:text-white">
+          {{item}}
+        </button>
+      </li>
+    {{/each}}
+  </ul>
+  {{/if}}
+</span>

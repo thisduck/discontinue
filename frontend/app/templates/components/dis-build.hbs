@@ -1,6 +1,6 @@
-<div class="p-3 border border-t-4 bg-white shadow flex justify-between border-{{color}}">
+<div class="p-3 mb-3 border border-t-4 bg-white shadow flex justify-between items-center border-{{color}}">
   <div class="w-3/4">
-    <div class="text-grey-darker text-lg mb-3">
+    <div class="text-grey-darker text-lg mb-3 flex items-center">
       <span class="mr-3">
         {{#if showLink}}
           {{#link-to 'authenticated.builds.show' build.id class="no-underline"}}
@@ -40,16 +40,22 @@
 
   {{/if}}
 
-  <div>
-    <div class="default text">Options</div>
-    <i class="dropdown icon"></i>
-    <div class="menu">
-      {{#each build.events as |event|}}
-        <div class="item" {{action "triggerEvent" event}}>
-          {{event}}
-        </div>
-      {{/each}}
-    </div>
+  <div class="">
+    <span class="border border-{{color}} bg-{{color}} text-white pb-1 px-1 text-center text-sm rounded">
+      {{build.state}}
+    </span>
+
+    {{ui-dropdown items=build.events itemSelected=(action 'triggerEvent')}}
+
+    <!-- <div class="default text">Options</div> -->
+    <!-- <i class="dropdown icon"></i> -->
+    <!-- <div class="menu"> -->
+    <!--   {{#each build.events as |event|}} -->
+    <!--     <div class="item" {{action "triggerEvent" event}}> -->
+    <!--       {{event}} -->
+    <!--     </div> -->
+    <!--   {{/each}} -->
+    <!-- </div> -->
   </div>
 
 </div>

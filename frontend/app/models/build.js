@@ -16,6 +16,7 @@ export default DS.Model.extend({
   events: DS.attr('array'),
   triggerEvent: memberAction({ path: 'trigger_event' }),
   streams: DS.hasMany('streams'),
+  startedAt: DS.attr('datetime'),
 
   active: computed('state', function() {
     if (this.get('state').endsWith('ing')) {
