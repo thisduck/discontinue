@@ -33,7 +33,6 @@ export default {
     'sans-serif'
   ],
   serif: [
-    'Petrona',
     'Constantia',
     'Lucida Bright',
     'Lucidabright',
@@ -44,6 +43,11 @@ export default {
     'Liberation Serif',
     'Georgia',
     'serif'
+  ],
+  header: [
+    'Raleway',
+    'Niramit',
+    'sans-serif'
   ],
   mono: [
     'Source Code Pro',

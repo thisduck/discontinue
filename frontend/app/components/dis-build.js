@@ -6,13 +6,14 @@ export default Component.extend({
   color: computed('build.state', function() {
 
     if (this.get('build.state') == "passed") {
-      return 'green'
+      return 'success'
     } else if (this.get('build.active')) {
-      return '';
+      return 'info';
     }
 
-    return 'red';
+    return 'danger';
   }),
+
   actions: {
     triggerEvent(event) {
       this.get('build').triggerEvent({event: event}).then(() => {

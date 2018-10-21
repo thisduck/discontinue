@@ -1,53 +1,55 @@
-<div class="ui {{color}} fluid card">
-  <div class="content">
-    <span class="left floated">
-      {{#if showLink}}
-        {{#link-to 'authenticated.builds.show' build.id}}
-          #{{build.id}} {{build.state}}
-        {{/link-to}}
-      {{else}}
-        #{{build.id}} {{build.state}}
-      {{/if}}
-    </span>
-    <div>
-      <div class="default text">Options</div>
-      <i class="dropdown icon"></i>
-      <div class="menu">
-        {{#each build.events as |event|}}
-          <div class="item" {{action "triggerEvent" event}}>
-            {{event}}
-          </div>
-        {{/each}}
-      </div>
+<div class="p-3 border border-t-4 bg-white shadow flex justify-between border-{{color}}">
+  <div class="w-3/4">
+    <div class="text-grey-darker text-lg mb-3">
+      <span class="mr-3">
+        {{#if showLink}}
+          {{#link-to 'authenticated.builds.show' build.id class="no-underline"}}
+            #{{build.id}}
+          {{/link-to}}
+        {{else}}
+          #{{build.id}}
+        {{/if}}
+      </span>
+
+      <span class="mr-3">
+        {{fa-icon 'code'}} {{build.repository.name}}/<strong>{{build.branch}}</strong>
+      </span>
+
+      <a href="{{build.commitUrl}}" target="_blank" class="mr-3">
+        <span class="border p-1 text-xs rounded text-grey-dark">
+          {{fa-icon 'code-commit' class="far"}} {{build.shortSha}}
+        </span>
+      </a>
+
+      <span class="text-grey-dark text-sm">
+        {{build.author}}
+      </span>
+    </div>
+
+    <div class="text-sm">
+      <pre>{{build.commitMessage}}</pre>
     </div>
   </div>
 
-  <div class="content">
-    <span>
-      {{fa-icon 'code'}} {{build.repository.name}}
-    </span>
-    &middot;
-
-    <strong>
-      {{fa-icon 'code-merge'}} {{build.branch}}
-    </strong>
-    &middot;
-
-    <a href="{{build.hook_hash.head_commit.url}}" target="_blank">
-      {{fa-icon 'code-commit'}} {{build.sha}}
-    </a>
-    &middot;
-
-    <span>
-      {{fa-icon 'user'}} {{build.hook_hash.head_commit.author.username}}
-    </span>
-    &middot;
-
-    {{#if lastBuild}}
+  {{#if lastBuild}}
+    <div class="content">
       {{#link-to 'authenticated.builds.show' lastBuild.id}}
         Last Build #{{lastBuild.id}}
       {{/link-to}}
-    {{/if}}
+    </div>
 
+  {{/if}}
+
+  <div>
+    <div class="default text">Options</div>
+    <i class="dropdown icon"></i>
+    <div class="menu">
+      {{#each build.events as |event|}}
+        <div class="item" {{action "triggerEvent" event}}>
+          {{event}}
+        </div>
+      {{/each}}
+    </div>
   </div>
+
 </div>

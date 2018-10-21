@@ -9,7 +9,7 @@ export default DS.Model.extend({
   repository: DS.belongsTo('repository'),
   buildRequest: DS.belongsTo('build-request'),
   state: DS.attr(),
-  hook_hash: DS.attr(),
+  hookHash: DS.attr(),
   buildSummary: DS.belongsTo('build-summary'),
   buildTiming: DS.belongsTo('build-timing'),
   profileSummary: DS.belongsTo('profile-summary'),
@@ -31,6 +31,22 @@ export default DS.Model.extend({
     }
 
     return false;
+  }),
+
+  commitUrl: computed('hookHash', function() {
+    return this.get('hookHash.head_commit.url')
+  }),
+
+  commitMessage: computed('hookHash', function() {
+    return this.get('hookHash.head_commit.message')
+  }),
+
+  author: computed('hookHash', function() {
+    return this.get('hookHash.head_commit.author.username')
+  }),
+
+  shortSha: computed('sha', function() {
+    return this.get('sha').slice(0, 8)
   }),
 
   reloadSummary() {
