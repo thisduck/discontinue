@@ -1,26 +1,40 @@
-<div class="ui fixed inverted menu" style="padding: 0px 15px;">
-  {{#link-to 'index' class='header item'}}Discontinue{{/link-to}}
-  {{#if session.isAuthenticated}}
-    {{#link-to 'authenticated.repositories' class='item'}}Repositories{{/link-to}}
-    {{#link-to 'authenticated.builds' class='item'}}Builds{{/link-to}}
-    {{#link-to 'authenticated.build_requests' class='item'}}Build Requests{{/link-to}}
-  {{/if}}
-
-  <div class="right menu">
+<div class="bg-white shadow px-6 py-1 sticky w-full flex justify-between h-12 items-center">
+  <ul class="list-reset flex">
+    <li class="px-3">
+      {{#link-to 'index' class='font-mono no-underline font-bold text-black'}}Discontinue{{/link-to}}
+    </li>
     {{#if session.isAuthenticated}}
-      <div class="item">
-        <img src={{currentUser.user.github_avatar_url}} class="ui avatar image" >
+      <li class="px-3">
+        {{#link-to 'authenticated.repositories' class='no-underline text-grey-darkest'}}Repositories{{/link-to}}
+      </li>
+      <li class="px-3">
+        {{#link-to 'authenticated.builds' class='no-underline text-grey-darkest'}}Builds{{/link-to}}
+      </li>
+      <li class="px-3">
+        {{#link-to 'authenticated.build_requests' class='no-underline text-grey-darkest'}}Build Requests{{/link-to}}
+      </li>
+    {{/if}}
+  </ul>
+
+  <ul class="list-reset flex items-center">
+    {{#if session.isAuthenticated}}
+      <li class="item flex items-center px-3 text-grey-darkest">
+        <img src={{currentUser.user.github_avatar_url}} class="h-8 w-8 mr-2 rounded-full" >
         <span>
           {{currentUser.user.github_login}}
         </span>
-      </div>
-      <a class="item" href="#" onclick={{action "logout"}}>Log Out</a>
+      </li>
+      <li class="px-3">
+        <a class="no-underline text-grey-darkest" href="#" onclick={{action "logout"}}>Log Out</a>
+      </li>
     {{else}}
-      <a class="item" href="#" onclick={{action "login"}}>Github Login</a>
+      <li class="px-3">
+        <a class="no-underline text-grey-darkest" href="#" onclick={{action "login"}}>Github Login</a>
+      </li>
     {{/if}}
-  </div>
+  </ul>
 </div>
 
-<div class="ui main text" style="margin-top: 55px; padding: 20px 30px;">
+<div class="mt-6">
   {{outlet}}
 </div>
