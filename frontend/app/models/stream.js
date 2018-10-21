@@ -4,6 +4,7 @@ import { computed } from '@ember/object';
 export default DS.Model.extend({
   name: DS.attr(),
   state: DS.attr(),
+  buildId: DS.attr(),
   build: DS.belongsTo('build'),
   boxes: DS.hasMany('box'),
   testResults: DS.hasMany('test-result'),

@@ -1,7 +1,9 @@
 import Component from '@ember/component';
 import { task, timeout } from 'ember-concurrency';
+import { inject as service } from '@ember/service';
 
 export default Component.extend({
+  store: service(),
   tagName: '',
 
   didReceiveAttrs () {
@@ -10,15 +12,18 @@ export default Component.extend({
   },
 
   poll: task(function * () {
-    yield timeout(200);
+    if (!this.get('box.active')) {
+      return;
+    }
+
     while (true) {
-      if (this.get('box')) {
-        this.get('box.commands').reload();
-        if (!this.get('box.active')) {
-          break;
-        }
-      }
       yield timeout(5000);
+      this.get('box.commands').reload();
+      if (!this.get('box.active')) {
+        let build = this.get('store').peekRecord('build', this.get('box.stream.buildId'));
+        build.reloadSummary();
+        break;
+      }
     }
   }).on('init').enqueue(),
 

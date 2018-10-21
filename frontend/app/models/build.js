@@ -3,6 +3,7 @@ import { memberAction } from 'ember-api-actions';
 import { computed } from '@ember/object';
 
 export default DS.Model.extend({
+
   branch: DS.attr(),
   sha: DS.attr(),
   repository: DS.belongsTo('repository'),
@@ -32,4 +33,9 @@ export default DS.Model.extend({
     return false;
   }),
 
+  reloadSummary() {
+    this.get('buildSummary').reload();
+    this.get('buildTiming').reload();
+    this.get('profileSummary').reload();
+  }
 });

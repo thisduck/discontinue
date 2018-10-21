@@ -11,7 +11,10 @@ export default Route.extend({
 
   setupController(controller, model) {
     this._super(...arguments);
-    this.get('poll').perform(model.id);
+
+    if (model.get('active')) {
+      this.get('poll').perform(model.id);
+    }
   },
 
   poll: task(function * (id) {
@@ -19,9 +22,16 @@ export default Route.extend({
     while (true) {
       let model = this.store.peekRecord('build', id);
       model.reload().then(() => {
-        model.get('streams').reload();
+        let active_streams = model.get('streams').filter((stream) => stream.get("active")).length;
+        model.get('streams').reload().then(function() {
+          let still_active = model.get('streams').filter((stream) => stream.get("active")).length;
+          if (active_streams != still_active) {
+            model.reloadSummary();
+          }
+        });
       });
       if (!model.get('active')) {
+        model.reloadSummary();
         break;
       }
       yield timeout(5000);

@@ -3,23 +3,29 @@ import { task, timeout } from 'ember-concurrency';
 
 export default Route.extend({
   model() {
-    return this.modelFor('authenticated.builds.show.stream');
+    let { stream_id } = this.paramsFor('authenticated.builds.show.stream');
+    return this.store.findRecord('stream', stream_id, { include: 'boxes' })
+
   },
 
   setupController(controller, model) {
     this._super(...arguments);
-    this.get('poll').perform(model.id);
+    if (model.get('active')) {
+      this.get('poll').perform(model.id);
+    }
   },
 
   poll: task(function * (id) {
-    yield timeout(500);
     while (true) {
+      yield timeout(5000);
+
+      yield this.refresh();
       let model = this.store.peekRecord('stream', id);
-      model.get('boxes').reload();
       if (!model.get('active')) {
+        let build = this.store.peekRecord('build', model.get('buildId'));
+        build.reloadSummary();
         break;
       }
-      yield timeout(5000);
     }
   }).cancelOn('deactivate').restartable(),
 });
