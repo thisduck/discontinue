@@ -1,17 +1,27 @@
 {{dis-build build=model}}
-<br >
 
-<div class="ui top attached tabular menu">
-  {{#link-to 'authenticated.builds.show.summary' model.id class="ui item"}}
-    Summary
-  {{/link-to}}
-  {{#each model.streams as |stream|}}
-    {{stream-tab stream=stream}}
-  {{/each}}
-  {{#link-to 'authenticated.builds.show.artifacts' model.id class="ui item"}}
-    Artifacts
-  {{/link-to}}
+
+<div class="flex mt-6">
+  <ul class="list-reset p-3">
+    <li class="border-b py-2">
+      {{#link-to 'authenticated.builds.show.summary' model.id class="text-grey-darker"}}
+        Summary
+      {{/link-to}}
+    </li>
+    {{#each model.streams as |stream|}}
+      <li class="border-b py-2">
+        {{stream-tab stream=stream}}
+      </li>
+    {{/each}}
+    <li class="border-b py-2">
+      {{#link-to 'authenticated.builds.show.artifacts' model.id class="text-grey-darker"}}
+        Artifacts
+      {{/link-to}}
+    </li>
+  </ul>
+
+  <div class="p-3 border bg-white w-full">
+    {{outlet}}
+  </div>
 </div>
-
-{{outlet}}
 

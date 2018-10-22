@@ -19,3 +19,17 @@
 a {
   @apply .no-underline;
 }
+
+
+.table {
+  @apply .w-full .border-collapse .border;
+}
+
+.table thead tr th {
+  @apply .text-grey-darker .border-0;
+}
+
+.table th, .table td {
+  @apply .p-2 .text-left;
+  @apply .border-t .border-b;
+}

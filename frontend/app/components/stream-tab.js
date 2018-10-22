@@ -5,13 +5,13 @@ export default Component.extend({
   tagName: '',
   tabClass: computed('stream.{passed,active}', function() {
     if (this.get('stream.active')) {
-      return '';
+      return 'info';
     }
 
     if (this.get('stream.passed')) {
-      return 'green';
+      return 'success';
     } else {
-      return 'red';
+      return 'danger';
     }
 
   })

@@ -1,8 +1,8 @@
-<div class="ui bottom attached tab segment active" >
-  <h5>Timing Summary</h5>
-  <table class="ui selectable celled table">
+<div class="">
+  {{#ui-header level=4}}Timing Summary{{/ui-header}}
+  <table class="table mb-6">
     <thead>
-      <tr>
+      <tr class="">
         <th>Name</th>
         <th>Time</th>
         <th>Total Time</th>
@@ -19,8 +19,8 @@
     </tbody>
   </table>
 
-  <h5> Test Result Summary</h5>
-  <table class="ui selectable celled table">
+  {{#ui-header level=4}}Test Result Summary{{/ui-header}}
+  <table class="table mb-6">
     <thead>
       <tr>
         <th>Stream</th>
@@ -41,46 +41,46 @@
     </tbody>
   </table>
 
-  <h5> Profile Summary</h5>
-  {{#each model.profileSummary.results as |result|}}
-    <div>
-      <br>
-      <b>{{result.stream_name}}</b>
-      <table class="ui selectable celled table">
-        <thead>
-          <tr>
-            <th>Test</th>
-            <th>Duration</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each result.slow_tests as |test|}}
-            <tr>
-              <td data-label="Test">{{test.name}}</td>
-              <td data-label="Duration">{{test.duration}}</td>
-            </tr>
-          {{/each}}
-        </tbody>
-      </table>
+  {{#ui-header level=4}}Profile Summary{{/ui-header}}
 
-      <br>
-
-      <table class="ui selectable celled table">
-        <thead>
+  <table class="table mb-6">
+    {{#each model.profileSummary.results as |result|}}
+      <thead>
+        <tr>
+          <th colspan="2">{{result.stream_name}} Slowest Tests</th>
+        </tr>
+        <tr>
+          <th>Test</th>
+          <th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each result.slow_tests as |test|}}
           <tr>
-            <th>File</th>
-            <th>Duration</th>
+            <td data-label="Test">{{test.name}}</td>
+            <td data-label="Duration">{{test.duration}}</td>
           </tr>
-        </thead>
-        <tbody>
-          {{#each result.slow_files as |test|}}
-            <tr>
-              <td data-label="File">{{test.name}}</td>
-              <td data-label="Duration">{{test.duration}}</td>
-            </tr>
-          {{/each}}
-        </tbody>
-      </table>
-    </div>
-  {{/each}}
+        {{/each}}
+      </tbody>
+
+      <thead>
+        <tr>
+          <th colspan="2">{{result.stream_name}} Slowest Files</th>
+        </tr>
+        <tr>
+          <th>File</th>
+          <th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each result.slow_files as |test|}}
+          <tr>
+            <td data-label="File">{{test.name}}</td>
+            <td data-label="Duration">{{test.duration}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    {{/each}}
+  </table>
+
 </div>

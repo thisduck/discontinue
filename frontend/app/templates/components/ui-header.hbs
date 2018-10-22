@@ -2,4 +2,8 @@
 <h2 class="font-header text-grey-darkest mb-3">{{yield}}</h2>
 {{else if (eq level 3)}}
 <h3 class="font-header text-grey-darkest mb-3">{{yield}}</h3>
+{{else if (eq level 4)}}
+<h4 class="font-header text-grey-darkest mb-3 uppercase">{{yield}}</h4>
+{{else if (eq level 5)}}
+<h5 class="font-header text-grey-darkest mb-3 uppercase">{{yield}}</h5>
 {{/if}}

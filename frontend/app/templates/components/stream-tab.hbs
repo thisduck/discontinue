@@ -1,10 +1,9 @@
-{{#link-to 'authenticated.builds.show.stream' stream.build.id stream.id class="ui item"}}
+{{#link-to 'authenticated.builds.show.stream' stream.build.id stream.id class=(concat 'text-' tabClass)}}
   {{#if stream.active}}
-    <div class="ui tiny active inline loader"></div>
+    <span class="ui tiny active inline loader"></span>
+    &nbsp;
   {{/if}}
-  &nbsp;
-  <div style="color: {{tabClass}}">
-    {{stream.name}}
-    [{{stream.humanized_time}}]
-  </div>
+  {{stream.name}}
+  <br>
+  [{{stream.humanized_time}}]
 {{/link-to}}
