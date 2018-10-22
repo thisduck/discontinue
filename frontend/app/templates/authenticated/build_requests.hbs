@@ -1,9 +1,10 @@
 {{#ui-header}}Build Requests{{/ui-header}}
 
-<div class="ui form">
-  <div class="field">
-    {{input name="branch" value=branch}}
-  </div>
+<div class="">
+  <label class="flex items-center">
+    {{fa-icon 'search' size='2x' class="z-10 pl-3"}}
+    {{input name="branch" value=branch class='-ml-8 w-full px-10 py-2 border hover:border-info focus:border-primary focus:outline-none'}}
+  </label>
 </div>
 
 <br>
