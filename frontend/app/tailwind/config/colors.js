@@ -28,9 +28,22 @@ export default {
   white: '#ffffff',
 
   'primary': '#0866C6',
+
+  'success-darker': '#0d4503',
+  'success-dark': '#1a8e06',
   'success': '#23bf08',
+  'success-light': '#2cf00a',
+  'success-lighter': '#68f84f',
+  'success-lightest': '#a7fb98',
+
   'warning': '#f49917',
+  'warning-lighter': '#facf91',
+  'warning-lightest': '#fdefda',
+
   'danger': '#DC3545',
+  'danger-lighter': '#efa2a9',
+  'danger-lightest': '#fae3e5',
+
   'info': '#17A2B8',
 
   'red-darkest': '#3b0d0c',

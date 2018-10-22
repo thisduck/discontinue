@@ -31,7 +31,7 @@
     </thead>
     <tbody>
       {{#each model.buildSummary.display as |result|}}
-        <tr class="{{if (eq result.status 'passed') 'positive' (if (eq result.status 'skipped') 'warning' 'negative')}}">
+        <tr class="{{concat 'bg-' (if (eq result.status 'passed') 'success' (if (eq result.status 'skipped') 'warning' 'danger')) '-lightest'}}">
           <td data-label="Stream">{{result.stream.name}}</td>
           <td data-label="Test Type">{{result.test_type}}</td>
           <td data-label="Status">{{link-to result.status 'authenticated.builds.show.stream.test_results' model.id result.stream.id (query-params status=result.status)}}</td>

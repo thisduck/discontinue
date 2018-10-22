@@ -1,17 +1,17 @@
-<table class="ui fixed single line very basic compact filetree table">
+<table class="table table-fixed font-mono text-sm">
   <tbody>
     {{#each artifacts as |artifact|}}
       <tr>
-        <td class="twelve wide">
-          <i class="file {{if (eq artifact.extension ".json") 'alternate' (if (eq artifact.extension ".html") 'code' 'image')}} outline icon"></i>
+        <td class="break-words">
+          {{fa-icon (if (eq artifact.extension ".json") 'file-o' (if (eq artifact.extension ".html") 'file-code-o' 'file-image-o'))}}
           <a href="{{artifact.presignedUrl}}" target="_blank">
             {{artifact.filename}}
           </a>
         </td>
-        <td class="two wide">
+        <td class="w-24">
           {{artifact.extension}}
         </td>
-        <td class="two wide">
+        <td class="w-24">
           {{artifact.size}}
         </td>
       </tr>

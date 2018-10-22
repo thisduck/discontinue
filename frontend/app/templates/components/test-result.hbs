@@ -1,4 +1,4 @@
-<tr class="{{if (eq result.status 'passed') 'positive' (if (eq result.status 'skipped') 'warning' 'negative')}}" {{action 'toggleMore'}}>
+<tr class="{{concat 'bg-' (if (eq result.status 'passed') 'success' (if (eq result.status 'skipped') 'warning' 'danger')) '-lightest'}}" {{action 'toggleMore'}}>
   {{#if showBuild}}
     <td data-label="Build">{{link-to result.build_id 'authenticated.builds.show' result.stream.build.id}}</td>
   {{/if}}

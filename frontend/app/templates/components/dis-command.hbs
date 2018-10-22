@@ -1,8 +1,13 @@
-<div class="ui segment {{color}} {{activeClass}}">
+<div class="p-2">
   <div class="title" {{action 'toggleCommand'}}>
-    [{{command.humanized_time}}] {{ command.command }}
+    <div class="w-16 inline-block text-xs text-grey-dark text-right mr-2">[{{command.humanized_time}}]</div> 
+    <span class="font-mono text-sm">
+      {{ command.command }}
+    </span>
   </div>
-  <div class="content {{activeClass}}">
-    <pre class="output_contents">{{{ansi_lines}}}</pre>
-  </div>
+  {{#if toggle}}
+    <div class="content {{activeClass}} mt-2 text-sm">
+      <pre class="output_contents">{{{ansi_lines}}}</pre>
+    </div>
+  {{/if}}
 </div>

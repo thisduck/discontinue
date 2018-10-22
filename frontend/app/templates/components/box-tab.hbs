@@ -1,8 +1,8 @@
-{{#link-to 'authenticated.builds.show.stream.show.box' build.id stream.id box.id class=" ui item"}}
+{{#link-to 'authenticated.builds.show.stream.show.box' build.id stream.id box.id class="px-3"}}
   {{#if box.active}}
     <div class="ui tiny active inline loader"></div>
+    &nbsp;
   {{/if}}
-  &nbsp;
   <div style="color: {{tabClass}}">
     {{index}} [{{box.humanized_time}}]
   </div>
