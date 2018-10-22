@@ -3,7 +3,7 @@
     {{#each artifacts as |artifact|}}
       <tr>
         <td class="break-words">
-          {{fa-icon (if (eq artifact.extension ".json") 'file-o' (if (eq artifact.extension ".html") 'file-code-o' 'file-image-o'))}}
+          {{fa-icon (if (eq artifact.extension ".json") 'file' (if (eq artifact.extension ".html") 'file-code' 'file-image')) prefix='far'}}
           <a href="{{artifact.presignedUrl}}" target="_blank">
             {{artifact.filename}}
           </a>

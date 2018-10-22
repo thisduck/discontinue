@@ -1,9 +1,12 @@
-{{#link-to 'authenticated.builds.show.stream' stream.build.id stream.id class=(concat 'text-' tabClass)}}
+<li class="p-2 {{if (is-url-active 'authenticated.builds.show.stream' stream.build.id stream.id) (concat 'font-bold border-b-2 border-' tabClass)}} text-{{tabClass}} flex">
   {{#if stream.active}}
-    <span class="ui tiny active inline loader"></span>
-    &nbsp;
+    {{fa-icon 'spinner' spin=true class="mr-2"}}
   {{/if}}
-  {{stream.name}}
-  <br>
-  [{{stream.humanized_time}}]
-{{/link-to}}
+  {{#link-to 'authenticated.builds.show.stream' stream.build.id stream.id class=(concat 'text-' tabClass)}}
+    {{stream.name}}
+    <br>
+    <span class="text-xs">
+      [{{stream.humanized_time}}]
+    </span>
+  {{/link-to}}
+</li>

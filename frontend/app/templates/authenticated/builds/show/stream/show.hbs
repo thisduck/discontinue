@@ -1,9 +1,10 @@
 {{#ui-header level=4}}{{model.name}}{{/ui-header}}
-<div class="flex mb-3">
+
+<ul class="flex list-reset mb-3">
   {{#each model.boxes as |box index|}}
     {{box-tab box=box stream=model build=model.build index=index}}
   {{/each}}
-</div>
+</ul>
 
 <div class="w-full">
   {{outlet}}

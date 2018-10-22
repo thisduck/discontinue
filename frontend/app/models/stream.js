@@ -13,6 +13,10 @@ export default DS.Model.extend({
   humanized_time: DS.attr(),
 
   active: computed('state', function() {
+    if (!this.get('build.active')) {
+      return false;
+    }
+
     if (this.get('state').endsWith('ing')) {
       return true;
     }

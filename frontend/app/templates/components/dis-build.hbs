@@ -12,21 +12,25 @@
       </span>
 
       <span class="mr-3">
-        {{fa-icon 'code'}} {{build.repository.name}}/<strong>{{build.branch}}</strong>
+        {{fa-icon 'code'}} {{build.repository.name}}
+      </span>
+
+      <span class="mr-3">
+        {{fa-icon 'code-branch'}} <strong>{{build.branch}}</strong>
       </span>
 
       <a href="{{build.commitUrl}}" target="_blank" class="mr-3">
-        <span class="border p-1 text-xs rounded text-grey-dark">
-          {{fa-icon 'code-commit' class="far"}} {{build.shortSha}}
+        <span class="text-xs text-grey-dark font-mono">
+          {{fa-icon 'dot-circle' prefix="far"}} {{build.shortSha}}
         </span>
       </a>
 
       <span class="text-grey-dark text-sm">
-        {{build.author}}
+        {{fa-icon 'user' prefix="far"}} {{build.author}}
       </span>
     </div>
 
-    <div class="text-sm">
+    <div class="text-sm text-grey-dark">
       <pre>{{build.commitMessage}}</pre>
     </div>
   </div>

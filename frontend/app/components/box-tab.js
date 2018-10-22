@@ -5,13 +5,13 @@ export default Component.extend({
   tagName: '',
   tabClass: computed('box.{passed,active}', function() {
     if (this.get('box.active')) {
-      return '';
+      return 'info';
     }
 
     if (this.get('box.passed')) {
-      return 'green';
+      return 'success';
     } else {
-      return 'red';
+      return 'danger';
     }
 
   })
