@@ -13,7 +13,7 @@ class Build < ApplicationRecord
 
   aasm do 
     state :waiting, initial: true
-    state :running, before_enter: :start_build
+    state :running, after_enter: :start_build
     state :stopped, before_enter: :stop_build
     state :passed
     state :failed
@@ -239,6 +239,11 @@ class Build < ApplicationRecord
     notify(on: :start)
     if self.stopped?
       self.streams.destroy_all
+    end
+
+    if self.repository.stream_configs.blank?
+      self.fail_build!
+      return
     end
 
     self.repository.stream_configs.each_with_index do |config, index|

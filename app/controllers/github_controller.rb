@@ -6,17 +6,9 @@ class GithubController < ApplicationController
   before_action :verify_github_webhook, only: [:webhook]
 
   def webhook
-    hook = GithubPushHook.new(params)
-    repo = Repository.where(github_id: hook.repository_id).first
-
-    if hook.branch.present?
-      BuildRequest.add_request(
-        branch: hook.branch,
-        sha: hook.sha,
-        hook_hash: hook.hash,
-        repository: repo
-      )
-    end
+    event = request.env['HTTP_X_GITHUB_EVENT']
+    event_handler = "GithubEvents::#{event.classify}".constantize.new(params.as_json)
+    event_handler.handle
 
     render plain: ''
   end

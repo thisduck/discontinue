@@ -694,6 +694,7 @@ GEM
       thor (~> 0.14)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
+    hashie (3.6.0)
     html_page (0.1.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
@@ -860,6 +861,7 @@ DEPENDENCIES
   delayed_job_active_record!
   ember-cli-rails
   figaro
+  hashie
   httparty
   jbuilder (~> 2.5)
   jsonapi-resources
@@ -888,4 +890,4 @@ RUBY VERSION
    ruby 2.3.7p456
 
 BUNDLED WITH
-   1.16.5
+   1.17.1

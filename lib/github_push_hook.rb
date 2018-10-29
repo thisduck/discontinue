@@ -2,8 +2,8 @@ class GithubPushHook
   attr_accessor :original_hash, :hash
 
   def initialize(_original_hash)
-    @original_hash = _original_hash
-    @hash = GithubPushHook.clean_push_hook(@original_hash)
+    @original_hash = Hashie::Mash.new _original_hash
+    @hash = Hashie::Mash.new GithubPushHook.clean_push_hook(@original_hash)
   end
 
   def initial_web_hook?

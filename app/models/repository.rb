@@ -1,8 +1,14 @@
 class Repository < ApplicationRecord
-  validates_presence_of :name, :github_id, :github_url
+  belongs_to :account
+
+  validates_presence_of :name, :integration_type, :integration_id
 
   def yaml_config
-    YAML.load config
+    if config
+      YAML.load(config)
+    else
+      {}
+    end
   end
 
   def filter_branches

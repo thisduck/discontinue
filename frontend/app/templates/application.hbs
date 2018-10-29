@@ -19,9 +19,9 @@
   <ul class="list-reset flex items-center">
     {{#if session.isAuthenticated}}
       <li class="item flex items-center px-3 text-grey-darkest">
-        <img src={{currentUser.user.github_avatar_url}} class="h-8 w-8 mr-2 rounded-full" >
+        <img src={{currentUser.user.avatar_url}} class="h-8 w-8 mr-2 rounded-full" >
         <span>
-          {{currentUser.user.github_login}}
+          {{currentUser.user.integrationLogin}}
         </span>
       </li>
       <li class="px-3">

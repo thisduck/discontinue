@@ -12,6 +12,24 @@
 
 ActiveRecord::Schema.define(version: 2018_10_06_221451) do
 
+  create_table "accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "integration_type"
+    t.string "integration_id"
+    t.string "integration_account_type"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "accounts_users", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "account_id"
+    t.bigint "user_id"
+    t.index ["account_id", "user_id"], name: "index_accounts_users_on_account_id_and_user_id"
+    t.index ["account_id"], name: "index_accounts_users_on_account_id"
+    t.index ["user_id"], name: "index_accounts_users_on_user_id"
+  end
+
   create_table "boxes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "stream_id"
     t.string "instance_id"
@@ -75,12 +93,18 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
 
   create_table "repositories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
-    t.string "github_id"
-    t.string "github_url"
+    t.string "full_name"
+    t.string "integration_type"
+    t.string "integration_id"
+    t.string "url"
+    t.boolean "private_repo"
+    t.boolean "active"
     t.text "config"
+    t.bigint "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "stream_configs"
+    t.index ["account_id"], name: "index_repositories_on_account_id"
   end
 
   create_table "streams", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -118,10 +142,12 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "email"
-    t.string "github_auth_id"
-    t.string "github_login"
-    t.string "github_avatar_url"
+    t.string "integration_type"
+    t.string "integration_id"
+    t.string "integration_login"
+    t.string "avatar_url"
     t.string "access_token"
+    t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -130,6 +156,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
   add_foreign_key "build_requests", "repositories"
   add_foreign_key "builds", "build_requests"
   add_foreign_key "builds", "repositories"
+  add_foreign_key "repositories", "accounts"
   add_foreign_key "streams", "builds"
   add_foreign_key "test_results", "boxes"
   add_foreign_key "test_results", "builds"

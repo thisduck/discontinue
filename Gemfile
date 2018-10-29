@@ -83,3 +83,4 @@ gem 'aws-sdk-ec2', '~> 1'
 gem 'activerecord-import'
 
 gem 'httparty'
+gem 'hashie'

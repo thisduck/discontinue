@@ -28,17 +28,16 @@ class SessionController < ApplicationController
     client = Octokit::Client.new(access_token: access_token)
 
     github_user = client.user
-    user = User.where(github_auth_id: github_user.id).first
-
-    email = github_user.email || github_user.id
-    user = User.where(email: email).first if user.blank?
-    user = User.create!(email: email) if user.blank?
+    user = User.where(
+      integration_type: 'github',
+      integration_id: github_user.id
+    ).first_or_create
 
     user.update_attributes({
+      email: github_user.email,
       access_token: access_token,
-      github_auth_id: github_user.id,
-      github_login: github_user.login,
-      github_avatar_url: github_user.avatar_url
+      integration_login: github_user.login,
+      avatar_url: github_user.avatar_url
     })
 
     user
