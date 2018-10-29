@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   post 'session' => 'session#create'
 
   get 'github/repositories'
+  get 'github/pull_requests'
   post 'github/webhook'
 
   get 'api/users/current' => 'session#current'
@@ -9,6 +10,9 @@ Rails.application.routes.draw do
     jsonapi_resources :repositories
     jsonapi_resources :build_requests do
       jsonapi_relationships
+      collection do 
+        put :build_from_pull
+      end
       member do
         put :trigger_event
       end

@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import { memberAction } from 'ember-api-actions';
+import { memberAction, collectionAction } from 'ember-api-actions';
 import { computed } from '@ember/object';
 
 export default DS.Model.extend({
@@ -10,6 +10,7 @@ export default DS.Model.extend({
   hookHash: DS.attr(),
   events: DS.attr('array'),
   triggerEvent: memberAction({ path: 'trigger_event' }),
+  buildFromPull: collectionAction({path: 'build_from_pull', type: 'PUT'}),
   lastBuild: DS.belongsTo('build'),
 
   active: computed(function() {

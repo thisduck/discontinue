@@ -17,6 +17,11 @@ class GithubController < ApplicationController
     render json: current_user.github.organizations.first.rels[:repos].get.data.collect(&:to_hash)
   end
 
+  def pull_requests
+    repository = Repository.find params[:repository_id]
+    render json: current_user.github.pulls(repository.github_id.to_i, state: "open").collect(&:to_hash)
+  end
+
   protected
 
   def verify_github_webhook

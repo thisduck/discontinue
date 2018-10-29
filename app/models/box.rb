@@ -386,11 +386,9 @@ class Box < ApplicationRecord
       - export CI_BOX_RANGE=\${range::-1}
     COMMANDS
 
+    # - gem install aws-sdk-s3 parallel mixlib-shellout redis
     pre_commands = YAML.load <<~COMMANDS
       ---
-      - rvm use 2.3.7
-      - gem install aws-sdk-s3 parallel mixlib-shellout redis
-
       - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}
       - export CI_CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l` 
       - export CI_TOTAL_CPUS=`echo "\${CI_BOX_COUNT} * \${CI_CPU_COUNT}" | bc`

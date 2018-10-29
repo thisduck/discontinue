@@ -12,7 +12,8 @@
       {{fa-icon 'code' size='lg'}}
       {{repo.name}}
     </div>
-    {{#link-to 'authenticated.repositories.show' repo.id class="ui right floated mini button"}} Settings {{/link-to}}
+    {{#link-to 'authenticated.repositories.pull_requests' repo.id class=""}} Pull Requests {{/link-to}}
+    {{#link-to 'authenticated.repositories.show' repo.id class=""}} Settings {{/link-to}}
   </div>
 {{/each}}
 

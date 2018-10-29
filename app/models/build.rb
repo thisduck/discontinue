@@ -174,6 +174,7 @@ class Build < ApplicationRecord
       end
 
       if send 
+        pusher = hook_hash['pusher'] ? hook_hash['pusher']['name'] : '?'
         HTTParty.post(
           options['webhook'], 
           body: {
@@ -208,7 +209,7 @@ class Build < ApplicationRecord
               },
               {
                 title: "Pusher",
-                value: "#{hook_hash['pusher']['name']}",
+                value: "#{pusher}",
                 short: true
               },
             ] + extra

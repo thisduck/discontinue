@@ -29,6 +29,7 @@ Router.map(function() {
       this.route('new');
       this.route('index', { path: '/' });
       this.route('show', { path: '/:repository_id' });
+      this.route('pull_requests', { path: '/:repository_id/pull_requests' });
     });
   });
 });

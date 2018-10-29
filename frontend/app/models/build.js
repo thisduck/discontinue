@@ -43,7 +43,8 @@ export default DS.Model.extend({
   }),
 
   author: computed('hookHash', function() {
-    return this.get('hookHash.head_commit.author.username')
+    return this.get('hookHash.head_commit.author.username') ||
+      this.get('hookHash.head_commit.author.name');
   }),
 
   shortSha: computed('sha', function() {
