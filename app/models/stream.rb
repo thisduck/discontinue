@@ -128,7 +128,7 @@ class Stream < ApplicationRecord
     self.box_count.times do |index|
       box = self.boxes.create(
         box_number: index,
-        instance_type: 'c4.xlarge',
+        instance_type: instance_type,
         started_at: Time.now,
         finished_at: nil,
         output: StringFile.create(body: 'hello', name: "output.txt"),
@@ -142,6 +142,7 @@ class Stream < ApplicationRecord
       instance = instances[index]
       box.update_attributes(instance_id: instance.id)
       Box.delay.connect(box.id)
+      BoxTimeoutJob.perform_later(box.id)
     end
   end
 

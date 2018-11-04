@@ -23,6 +23,7 @@ class Box < ApplicationRecord
     state :connecting
     state :running
     state :post_processing
+
     state :stopped
     state :errored
     state :crashed

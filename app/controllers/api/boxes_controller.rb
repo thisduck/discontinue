@@ -10,6 +10,8 @@ class Api::BoxesController < ApiController
     File.open(box.output.path, "w") do |f|
       f.write(params[:log])
     end
+
+    box.update_column(:output_updated_at, Time.now)
   end
 
   def update_log_file
@@ -18,6 +20,8 @@ class Api::BoxesController < ApiController
     File.open(box.output.path, "a") do |f|
       f.write(params[:log])
     end
+
+    box.update_column(:output_updated_at, Time.now)
   end
 
   def post_process
