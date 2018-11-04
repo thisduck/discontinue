@@ -9,6 +9,10 @@
 
 <br>
 
+{{dis-pagination pagination=model.meta.pagination route="authenticated.build_requests" page=page}}
+
 {{#each model as |request|}}
   {{dis-build build=request lastBuild=request.lastBuild}}
 {{/each}}
+
+{{dis-pagination pagination=model.meta.pagination route="authenticated.build_requests" page=page}}

@@ -9,6 +9,10 @@
 
 <br>
 
+{{dis-pagination pagination=model.meta.pagination route="authenticated.builds.index" page=page}}
+
 {{#each model as |build|}}
   {{dis-build build=build showLink='1'}}
 {{/each}}
+
+{{dis-pagination pagination=model.meta.pagination route="authenticated.builds.index" page=page}}

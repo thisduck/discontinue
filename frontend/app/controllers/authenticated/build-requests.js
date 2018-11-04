@@ -1,5 +1,8 @@
 import Controller from '@ember/controller';
 
 export default Controller.extend({
-  query: ''
+  queryParams: ['query', 'page', 'size'],
+  query: '',
+  page: 1,
+  size: 10
 });

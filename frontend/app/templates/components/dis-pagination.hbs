@@ -1,0 +1,38 @@
+<div class="mb-3 flex justify-end">
+  <span class="mr-3 px-3 py-2 inline-block">
+    Page {{page}} / {{pagination.last.number}}
+  </span>
+
+  {{#if pagination.first}}
+    {{link-to "first" route (query-params page=pagination.first.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
+  {{else}}
+    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
+      first
+    </span>
+  {{/if}}
+
+  {{#if pagination.prev}}
+    {{link-to "prev" route (query-params page=pagination.prev.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
+  {{else}}
+    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
+      prev
+    </span>
+  {{/if}}
+
+  {{#if pagination.next}}
+    {{link-to "next" route (query-params page=pagination.next.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
+  {{else}}
+    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
+      next
+    </span>
+  {{/if}}
+
+  {{#if pagination.last}}
+    {{link-to "last" route (query-params page=pagination.last.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block"}}
+  {{else}}
+    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block">
+      last
+    </span>
+  {{/if}}
+
+</div>

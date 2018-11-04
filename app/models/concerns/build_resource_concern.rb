@@ -28,7 +28,12 @@ module BuildResourceConcern
         params[:per_page] = options[:paginator].size
       end
 
-      records.search(value[0], params)
+      results = records.search(value[0], params)
+      options[:context][:elastic] = {
+        total: results.response.dig("hits", "total")
+      }
+
+      results
     }
   end
 
@@ -41,7 +46,7 @@ module BuildResourceConcern
   end
 
   def events
-    @model.aasm.events(permitted: true).map(&:name)
+    @model.aasm.events(permitted: true).map(&:name) - [:pass_build, :fail_build]
   end
 
   class_methods do
@@ -59,6 +64,13 @@ module BuildResourceConcern
       else
         super
       end
+    end
+
+    def find_count(filters, options = {})
+      total = options[:context].dig(:elastic, :total)
+      return total if total
+
+      super
     end
   end
 end

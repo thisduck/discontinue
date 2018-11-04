@@ -5,10 +5,12 @@ export default Route.extend({
   store: service(),
 
   queryParams: {
-    query: { refreshModel: true }
+    query: { refreshModel: true },
+    page: { refreshModel: true },
+    size: { refreshModel: true },
   },
 
-  model({ query }) {
+  model({ query, size, page }) {
     let filter = {};
     if (query) {
       filter['query'] = query
@@ -18,8 +20,8 @@ export default Route.extend({
       sort: '-created-at', 
       filter: filter,
       page: {
-        size: 10,
-        number: 1
+        size: size,
+        number: page
       }
     })
   },
