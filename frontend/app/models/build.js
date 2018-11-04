@@ -35,7 +35,8 @@ export default DS.Model.extend({
   }),
 
   commitUrl: computed('hookHash', function() {
-    return this.get('hookHash.head_commit.url')
+    return this.get('hookHash.head_commit.html_url') ||
+      this.get('hookHash.head_commit.url')
   }),
 
   commitMessage: computed('hookHash', function() {

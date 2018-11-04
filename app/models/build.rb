@@ -30,13 +30,25 @@ class Build < ApplicationRecord
       transitions from: :running, to: :stopped
     end
 
-    event :pass_build, after_commit: -> { notify(on: :finish) } do
+    event :pass_build, after_commit: :after_pass_or_fail do
       transitions to: :passed
     end
 
-    event :fail_build, after_commit: -> { notify(on: :finish) } do
+    event :fail_build, after_commit: :after_pass_or_fail do
       transitions to: :failed
     end
+  end
+
+  def after_pass_or_fail
+    notify(on: :finish)
+
+    status = passed? ? "success" : "failure"
+
+    repository.account.client.create_status(repository.integration_id.to_i, sha, status, {
+      context: "test",
+      target_url: url,
+      description: "Discontinue Tests Finished.",
+    })
   end
 
   def sync!
@@ -238,6 +250,13 @@ class Build < ApplicationRecord
 
   def start_build
     notify(on: :start)
+
+    repository.account.client.create_status(repository.integration_id.to_i, sha, "pending", {
+      context: "test",
+      target_url: url,
+      description: "Discontinue Tests Running",
+    })
+
     if self.stopped?
       self.streams.destroy_all
     end

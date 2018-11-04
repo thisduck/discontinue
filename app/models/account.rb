@@ -14,18 +14,21 @@ class Account < ApplicationRecord
   end
 
   def access_token
-    href = installation.rels[:access_tokens].href
-    response = HTTParty.post(
-      href,
+    @access_token ||= 
+      begin
+        href = installation.rels[:access_tokens].href
+        response = HTTParty.post(
+          href,
 
-      headers: {
-        "User-Agent" => "Discontinue App",
-        "Authorization" => "Bearer #{GithubApi.jwt}",
-        "Accept" => "application/vnd.github.machine-man-preview+json"
-      }
+          headers: {
+            "User-Agent" => "Discontinue App",
+            "Authorization" => "Bearer #{GithubApi.jwt}",
+            "Accept" => "application/vnd.github.machine-man-preview+json"
+          }
 
-    )
-    response["token"]
+        )
+        response["token"]
+      end
   end
 
   def client
