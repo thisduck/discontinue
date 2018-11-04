@@ -20,7 +20,7 @@ class Box < ApplicationRecord
   include AASM
   aasm do 
     state :waiting, initial: true
-    state :starting
+    state :connecting
     state :running
     state :post_processing
     state :stopped
@@ -49,16 +49,16 @@ class Box < ApplicationRecord
       transitions to: :errored
     end
 
-    event :start, after_commit: :start_box do
-      transitions from: :waiting, to: :starting
+    event :connect, after_commit: :connect_box do
+      transitions from: :waiting, to: :connecting
     end
 
-    event :run, after_commit: :execute_build_script! do
-      transitions from: :starting, to: :running
+    event :run, after_commit: :run_box do
+      transitions from: :connecting, to: :running
     end
 
     event :stop, after: :clear_box do
-      transitions from: :running, to: :stopped
+      transitions to: :stopped
     end
   end
 
@@ -67,17 +67,9 @@ class Box < ApplicationRecord
     box.post_process!
   end
 
-  def self.start(box_id)
-    begin
-      box = Box.find box_id
-      box.start!
-    rescue => e
-      message = "#{e.message}\n#{e.backtrace.join("\n")}"
-      self.error_message = message
-      self.error!
-      puts message
-      raise e
-    end
+  def self.connect(box_id)
+    box = Box.find box_id
+    box.connect!
   end
 
   def output_content_without_encoding
@@ -272,6 +264,22 @@ class Box < ApplicationRecord
     HumanizeSeconds.humanize(time_taken)
   end
 
+  def self.retry_connection(box_id)
+    box = Box.find box_id
+    box.retry_connection
+  end
+
+  def retry_connection
+    if machine.running? && machine.can_ssh?
+      sync_to_log_file
+      machine.set_tags(self)
+      run!
+      return
+    end
+
+    Box.delay(run_at: 5.seconds.from_now).retry_connection(id)
+  end
+
   private
 
   def update_status_from_output
@@ -319,12 +327,15 @@ class Box < ApplicationRecord
     end
   end
 
-  def start_box
+  def connect_box
+    Box.delay.retry_connection(id)
+  end
+
+  def run_box
     begin
-      puts "start box for #{id}"
+      puts "run box for #{id}"
 
       [
-        :wait_until_ssh!,
         :setup_redis!,
         :setup_cache_yml!,
         :setup_artifacts_yml!,
@@ -337,9 +348,9 @@ class Box < ApplicationRecord
         puts "Done #{command} on Box #{id}"
       end
 
-      run!
+      execute_build_script!
     rescue => e
-      puts "error in start_box"
+      puts "error in run_box"
       puts e.message
       puts e.backtrace.join("\n")
       raise e
@@ -502,21 +513,6 @@ class Box < ApplicationRecord
     redis.set("discontinue_#{stream.build_stream_id}_cache", stream.build.id)
   end
 
-  def wait_until_ssh!
-    puts "wait for instance running"
-    machine.wait_until_available
-    machine.set_tags(self)
-    puts "gonna ssh"
-    until machine.can_ssh?
-      puts "can't ssh [#{machine.ip_address}]"
-      sleep 5
-    end
-
-    sync_to_log_file
-
-    puts "did ssh [#{machine.ip_address}]"
-  end
-
   def destroy_machine!
     machine.destroy if instance_id
   end
@@ -539,8 +535,8 @@ class Box < ApplicationRecord
       )
     end
 
-    def wait_until_available
-      ec2.client.wait_until(:instance_running, {instance_ids: [instance_id]})
+    def running?
+      instance.state.name == "running"
     end
 
     def ip_address

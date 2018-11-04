@@ -135,14 +135,13 @@ class Stream < ApplicationRecord
       )
 
       box.write_to_log_file("Creating Machine Instance")
-
     end
 
     instances = create_instances
     boxes.each_with_index do |box, index|
       instance = instances[index]
       box.update_attributes(instance_id: instance.id)
-      Box.delay.start(box.id)
+      Box.delay.connect(box.id)
     end
   end
 
