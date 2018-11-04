@@ -1,4 +1,6 @@
 class BuildRequest < ApplicationRecord
+  include BuildSearchData
+
   belongs_to :repository
   has_many :builds
   has_one :last_build, -> { order(created_at: :desc) }, class_name: 'Build'

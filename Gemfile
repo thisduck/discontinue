@@ -85,3 +85,5 @@ gem 'activerecord-import'
 
 gem 'httparty'
 gem 'hashie'
+
+gem 'searchkick'

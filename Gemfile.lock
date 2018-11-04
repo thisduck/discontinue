@@ -680,6 +680,14 @@ GEM
     daemons (1.2.6)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
+    elasticsearch (6.1.0)
+      elasticsearch-api (= 6.1.0)
+      elasticsearch-transport (= 6.1.0)
+    elasticsearch-api (6.1.0)
+      multi_json
+    elasticsearch-transport (6.1.0)
+      faraday
+      multi_json
     ember-cli-rails (0.10.0)
       cocaine (~> 0.5.8)
       ember-cli-rails-assets (~> 0.6.2)
@@ -809,6 +817,10 @@ GEM
     sawyer (0.8.1)
       addressable (>= 2.3.5, < 2.6)
       faraday (~> 0.8, < 1.0)
+    searchkick (3.1.2)
+      activemodel (>= 4.2)
+      elasticsearch (>= 5)
+      hashie
     spawnling (2.1.6)
     spring (2.0.2)
       activesupport (>= 4.2)
@@ -879,6 +891,7 @@ DEPENDENCIES
   redis
   rest-client
   sass-rails (~> 5.0)
+  searchkick
   spawnling
   spring
   spring-watcher-listen (~> 2.0.0)

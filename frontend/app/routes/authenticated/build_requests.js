@@ -5,13 +5,13 @@ export default Route.extend({
   store: service(),
 
   queryParams: {
-    branch: { refreshModel: true }
+    query: { refreshModel: true }
   },
 
-  model({ branch }) {
+  model({ query }) {
     let filter = {};
-    if (branch) {
-      filter['branch'] = branch
+    if (query) {
+      filter['query'] = query
     }
 
     return this.store.query('build-request', {

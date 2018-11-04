@@ -1,5 +1,7 @@
 require 'humanize_seconds'
 class Build < ApplicationRecord
+  include BuildSearchData
+
   belongs_to :build_request
   belongs_to :repository
 
@@ -45,9 +47,9 @@ class Build < ApplicationRecord
     status = passed? ? "success" : "failure"
 
     repository.account.client.create_status(repository.integration_id.to_i, sha, status, {
-      context: "test",
+      context: "Discontinue",
       target_url: url,
-      description: "Discontinue Tests Finished.",
+      description: "[#{humanized_time}] Tests #{aasm_state}.",
     })
   end
 

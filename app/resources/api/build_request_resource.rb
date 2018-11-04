@@ -1,12 +1,9 @@
 class Api::BuildRequestResource < JSONAPI::Resource
-  attributes :branch, :sha, :repository_id, :state, :hook_hash, :events, :last_build_id, :created_at
-  has_one :repository
-  has_one :last_build, class_name: "Build", always_include_linkage_data: true
+  include BuildResourceConcern
 
-  paginator :paged
-  filter :branch, apply: ->(records, value, _options) {
-    records.where("branch like ?", "%#{value[0]}%")
-  }
+  attributes :last_build_id
+
+  has_one :last_build, class_name: "Build", always_include_linkage_data: true
 
   def self.records(options = {})
     context = options[:context]
@@ -17,11 +14,4 @@ class Api::BuildRequestResource < JSONAPI::Resource
     @model.builds.last.try :id
   end
 
-  def state
-    @model.aasm_state
-  end
-
-  def events
-    @model.aasm.events(permitted: true).map(&:name)
-  end
 end
