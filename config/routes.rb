@@ -26,7 +26,19 @@ Rails.application.routes.draw do
       end
     end
     jsonapi_resources :streams
-    jsonapi_resources :boxes
+    jsonapi_resources :boxes do
+      jsonapi_relationships
+      member do
+        post :save_log_file
+        post :update_log_file
+        post :post_process
+        post :cached
+        post :acquire_populate_lock
+        post :populate_queue
+        post :wait_for_queue
+        post :pop_queue
+      end
+    end
     jsonapi_resources :test_results
   end
 

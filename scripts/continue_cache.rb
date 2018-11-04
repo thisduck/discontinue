@@ -1,14 +1,11 @@
 file_dir = __dir__
 require file_dir + '/helpers.rb'
-require 'redis'
+require 'faraday'
 
 option = ARGV[0]
 key = ARGV[1]
 directory = ARGV[2]
 
-host, port = ENV['CREDIS_HOST'].split(":")
-redis = Redis.new(host: host, port: port)
-redis_key = "discontinue_#{ENV['CI_BUILD_STREAM_CONFIG']}_cache"
 
 if key && !directory
   raise "key passed without directory/file."
@@ -47,7 +44,11 @@ case option
 when "cache"
 
   unless key
-    if redis.del(redis_key).zero?
+    url = "#{ENV['DISCONTINUE_API']}/api/boxes/#{ENV['CI_BOX_ID']}/cached"
+    redis_key = "discontinue_#{ENV['CI_BUILD_STREAM_CONFIG']}_cache"
+    response = Faraday.post(url, redis_key: redis_key)
+
+    if response.body == "true"
       puts "Already cached. Exiting."
       exit 0
     end

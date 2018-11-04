@@ -62,20 +62,21 @@ class Box < ApplicationRecord
     end
   end
 
+  def self.post_process(box_id)
+    box = Box.find box_id
+    box.post_process!
+  end
+
   def self.start(box_id)
-    puts "going into spawnling for #{box_id}"
-    Spawnling.new(:argv => "spawn #{SPAWNLING_PREFIX}-#{box_id}-") do
-      begin
-        puts "in spawnling for #{box_id}"
-        box = Box.find box_id
-        box.start!
-      rescue => e
-        message = "#{e.message}\n#{e.backtrace.join("\n")}"
-        self.error_message = message
-        self.error!
-        puts message
-        raise e
-      end
+    begin
+      box = Box.find box_id
+      box.start!
+    rescue => e
+      message = "#{e.message}\n#{e.backtrace.join("\n")}"
+      self.error_message = message
+      self.error!
+      puts message
+      raise e
     end
   end
 
@@ -182,9 +183,9 @@ class Box < ApplicationRecord
     end.join(' ')
     [
       "export TERM=xterm CI=1 CI_BUILD_ID=#{build.id} CI_STREAM_ID=#{stream.id} CI_BOX_ID=#{id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last}" ,
-      "export CI_REPO_NAME='#{build.repository.name}' CI_REPO=#{build.repository.github_url}" ,
+      "export CI_REPO_NAME='#{build.repository.name}' CI_REPO=#{build.repository.url}" ,
       "export CI_BRANCH=#{build.branch} CI_COMMIT_ID=#{build.sha}" ,
-      "export CREDIS_HOST=172.16.1.37:6379" ,
+      "export DISCONTINUE_API='http://54.242.5.53:8080'" ,
       ( "export #{environment_variables}" if environment_variables.present? ) ,
     ].compact
   end
@@ -293,31 +294,28 @@ class Box < ApplicationRecord
   end
 
   def post_process_box
-    Spawnling.new(:argv => "spawn #{SPAWNLING_PREFIX}-#{id}-") do
-      begin
-        puts "in spawnling for post #{id}"
-        puts "post process box for #{id}"
+    begin
+      puts "post process box for #{id}"
 
-        [
-          :store_cache!,
-          :store_artifacts!,
-          :finish_post_processing!,
-          :process_report_data!,
-          :update_status_from_output,
-        ].each do |command|
-          puts "Running #{command} on Box #{id}"
-          sync_log_file
-          write_to_log_file command.to_s.humanize
-          sync_to_log_file
-          send(command)
-          puts "Done #{command} on Box #{id}"
-        end
-      rescue => e
-        puts "error in post_process_box"
-        puts e.message
-        puts e.backtrace.join("\n")
-        raise e
+      [
+        :store_cache!,
+        :store_artifacts!,
+        :finish_post_processing!,
+        :process_report_data!,
+        :update_status_from_output,
+      ].each do |command|
+        puts "Running #{command} on Box #{id}"
+        sync_log_file
+        write_to_log_file command.to_s.humanize
+        sync_to_log_file
+        send(command)
+        puts "Done #{command} on Box #{id}"
       end
+    rescue => e
+      puts "error in post_process_box"
+      puts e.message
+      puts e.backtrace.join("\n")
+      raise e
     end
   end
 
@@ -364,11 +362,26 @@ class Box < ApplicationRecord
     sync_to_log_file
 
     runner = Runner.new
+    runner.run %@ssh -n -f #{machine.at_login} 'bash --login -c "gem install aws-sdk-s3 parallel mixlib-shellout redis rufus-scheduler httparty faraday &> output.txt"'@
+
+    unless runner.success?
+      crash!
+      return
+    end
+
     # this should return immediately and run the script in the background on the remote machine.
     runner.run "ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
 
     unless runner.success?
       crash!
+      return
+    end
+
+    runner.run %@ssh -n -f #{machine.at_login} "nohup bash --login -c '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};    ruby ~/scripts/discontinue_checker.rb' >> checker.log 2>&1 &"@
+
+    unless runner.success?
+      crash!
+      return
     end
   end
 
@@ -386,14 +399,13 @@ class Box < ApplicationRecord
       - export CI_BOX_RANGE=\${range::-1}
     COMMANDS
 
-    # - gem install aws-sdk-s3 parallel mixlib-shellout redis
     pre_commands = YAML.load <<~COMMANDS
       ---
       - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}
       - export CI_CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l` 
       - export CI_TOTAL_CPUS=`echo "\${CI_BOX_COUNT} * \${CI_CPU_COUNT}" | bc`
 
-      - git clone --branch '#{build.branch}' --depth 20 #{build.repository.github_url} ~/clone
+      - git clone --branch '#{build.branch}' --depth 20 #{build.repository.url} ~/clone
       - cd ~/clone
       - git checkout -qf #{build.sha}
       - ruby ~/scripts/continue_cache.rb fetch
@@ -532,7 +544,8 @@ class Box < ApplicationRecord
     end
 
     def ip_address
-      @ip_address ||= instance.private_ip_address
+      # @ip_address ||= instance.private_ip_address
+      @ip_address ||= instance.public_ip_address
     end
 
     def at_login
