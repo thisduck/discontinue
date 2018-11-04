@@ -13,7 +13,7 @@ module GithubEvents
         integration_id: hook.repository_id
       ).first
 
-      if hook.branch.present?
+      if hook.branch.present? && !hook.sha.include?("00000000")
         BuildRequest.add_request(
           branch: hook.branch,
           sha: hook.sha,

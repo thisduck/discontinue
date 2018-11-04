@@ -16,6 +16,11 @@ class Api::BuildResource < JSONAPI::Resource
     records.where("branch like ?", "%#{value[0]}%")
   }
 
+  def self.records(options = {})
+    context = options[:context]
+    context[:current_user].builds
+  end
+
   def state
     @model.aasm_state
   end

@@ -1,12 +1,12 @@
 {{#ui-header}}Pull Requests{{/ui-header}}
 
-{{#each model as |pull|}}
+{{#each model.pull_requests as |pull|}}
   <div class="p-3 mb-3 border shadow bg-white flex justify-between items-center">
     <div class="text-grey-darker">
       {{fa-icon 'code' size='lg'}}
       {{pull.head.repo.full_name}}
       {{pull.head.ref}}
     </div>
-    <div class="text-white bg-primary px-3 py-2 hover:bp-primary-dark inline-block" {{action 'build' pull}}>Build</div>
+    <div class="text-white bg-primary px-3 py-2 hover:bp-primary-dark inline-block" {{action 'build' pull model.repository_id}}>Build</div>
   </div>
 {{/each}}

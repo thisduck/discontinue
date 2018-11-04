@@ -19,7 +19,12 @@ class GithubController < ApplicationController
 
   def pull_requests
     repository = Repository.find params[:repository_id]
-    render json: current_user.github.pulls(repository.github_id.to_i, state: "open").collect(&:to_hash)
+    render json: repository.account.client.pulls(repository.integration_id.to_i, state: "open").collect(&:to_hash)
+  end
+
+  def branches
+    repository = Repository.find params[:repository_id]
+    render json: repository.account.client.branches(repository.integration_id.to_i).collect(&:to_hash)
   end
 
   protected

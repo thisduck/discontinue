@@ -11,7 +11,9 @@ class SessionController < ApplicationController
       token = make_token(user)
 
       render json: { token: token }
-    rescue StandardError
+    rescue StandardError => e
+      puts e.message
+      puts e.backtrace
       render json: {}, status: :unauthorized
     end
   end
@@ -39,6 +41,24 @@ class SessionController < ApplicationController
       integration_login: github_user.login,
       avatar_url: github_user.avatar_url
     })
+
+    client.organizations.each do |org|
+      account = Account.where(
+        integration_type: 'github', 
+        integration_id: org['id']
+      ).first
+
+      next if account.blank?
+
+      unless user.accounts.include?(account)
+        user.accounts << account 
+        user.save
+      end
+
+    end
+
+    # hook up to existing accounts
+    
 
     user
   end

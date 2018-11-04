@@ -7,11 +7,11 @@ module GithubEvents
     end
 
     def handle
-      account_params = params['installation']['account']
+      installation_params = params['installation']
       sender_params = params['sender']
       repositories_params = params['repositories'] || []
 
-      account = create_account account_params
+      account = create_account installation_params
 
       if sender_params['type'] == 'User'
         user = create_user(sender_params, account)
@@ -39,13 +39,15 @@ module GithubEvents
       repository
     end
 
-    def create_account(account_params)
+    def create_account(installation_params)
+      account_params = installation_params['account']
       account = Account.where(
         integration_type: 'github', 
         integration_id: account_params['id']
       ).first_or_create
 
       account.update_attributes(
+        integration_installation_id: installation_params['id'],
         integration_account_type: account_params['type'],
         name: account_params['login']
       )

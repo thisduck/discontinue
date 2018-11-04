@@ -677,6 +677,7 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
+    daemons (1.2.6)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     ember-cli-rails (0.10.0)
@@ -857,6 +858,7 @@ DEPENDENCIES
   bootsnap (>= 1.1.0)
   byebug
   coffee-rails (~> 4.2)
+  daemons
   delayed_job!
   delayed_job_active_record!
   ember-cli-rails

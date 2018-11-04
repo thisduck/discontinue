@@ -17,6 +17,7 @@ class CreateUsersAndAccounts < ActiveRecord::Migration[5.2]
       t.string :integration_type
       t.string :integration_id
       t.string :integration_account_type
+      t.string :integration_installation_id
       t.boolean :active
 
       t.timestamps

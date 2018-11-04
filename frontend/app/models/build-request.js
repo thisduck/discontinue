@@ -11,6 +11,7 @@ export default DS.Model.extend({
   events: DS.attr('array'),
   triggerEvent: memberAction({ path: 'trigger_event' }),
   buildFromPull: collectionAction({path: 'build_from_pull', type: 'PUT'}),
+  buildFromBranch: collectionAction({path: 'build_from_branch', type: 'PUT'}),
   lastBuild: DS.belongsTo('build'),
 
   active: computed(function() {

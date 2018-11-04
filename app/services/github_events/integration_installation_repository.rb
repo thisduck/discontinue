@@ -2,12 +2,12 @@ module GithubEvents
   class IntegrationInstallationRepository < ::GithubEvents::Installation
 
     def handle
-      account_params = params['installation']['account']
+      installation_params = params['installation']
       sender_params = params['sender']
       repositories_added = params['repositories_added'] || []
       repositories_removed = params['repositories_removed'] || []
 
-      account = create_account account_params
+      account = create_account installation_params
       user = create_user(sender_params, account) if sender_params['type'] == 'User'
 
       repositories_added.each do |repo|

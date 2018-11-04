@@ -1,0 +1,12 @@
+{{#ui-header}}Branches{{/ui-header}}
+
+{{#each model.branches as |branch|}}
+  <div class="p-3 mb-3 border shadow bg-white flex justify-between items-center">
+    <div class="text-grey-darker">
+      {{fa-icon 'code' size='lg'}}
+      {{branch.name}}
+      <!-- {{branch.commit.sha}} -->
+    </div>
+    <button class="text-white bg-primary px-3 py-2 hover:bp-primary-dark inline-block" {{action 'build' branch model.repository_id}}>Build</button>
+  </div>
+{{/each}}

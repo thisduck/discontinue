@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
     t.string "integration_type"
     t.string "integration_id"
     t.string "integration_account_type"
+    t.string "integration_installation_id"
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

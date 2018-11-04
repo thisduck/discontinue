@@ -120,6 +120,11 @@ class Stream < ApplicationRecord
 
   private
   def start_stream
+    if self.box_count.blank? || self.box_count.zero?
+      self.fail_stream!
+      return
+    end
+
     self.box_count.times do |index|
       box = self.boxes.create(
         box_number: index,
