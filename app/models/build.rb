@@ -47,7 +47,7 @@ class Build < ApplicationRecord
     status = passed? ? "success" : "failure"
 
     repository.account.client.create_status(repository.integration_id.to_i, sha, status, {
-      context: "Discontinue",
+      context: "Discontinue Test",
       target_url: url,
       description: "[#{humanized_time}] Tests #{aasm_state}.",
     })
@@ -254,9 +254,9 @@ class Build < ApplicationRecord
     notify(on: :start)
 
     repository.account.client.create_status(repository.integration_id.to_i, sha, "pending", {
-      context: "test",
+      context: "Discontinue Test",
       target_url: url,
-      description: "Discontinue Tests Running",
+      description: "Tests running.",
     })
 
     if self.stopped?
