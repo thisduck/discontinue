@@ -252,13 +252,13 @@ class Box < ApplicationRecord
   end
 
   def write_to_log_file(message)
-    File.open(output.path, "a") do |f|
+    File.open(output.path, 'a') do |f|
       f.puts "DISCONTINUE[#{Time.now}] #{message}"
     end
   end
 
   def time_taken
-    (finished_at || Time.now) - started_at 
+    (finished_at || Time.now) - started_at
   end
 
   def humanized_time
@@ -271,7 +271,13 @@ class Box < ApplicationRecord
   end
 
   def retry_connection
-    if machine.running? && machine.can_ssh?
+    can_ssh = machine.can_ssh?
+    puts '*' * 10
+    puts "Retrying connection: #{id} #{machine.ip_address}"
+    puts "Machine running: #{machine.running?}"
+    puts "Machine can ssh: #{can_ssh}"
+    puts '*' * 10
+    if machine.running? && can_ssh
       sync_to_log_file
       machine.set_tags(self)
       run!
