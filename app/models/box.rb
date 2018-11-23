@@ -277,7 +277,7 @@ class Box < ApplicationRecord
     puts "Machine running: #{machine.running?}"
     puts "Machine can ssh: #{can_ssh}"
     puts '*' * 10
-    if machine.running? && can_ssh
+    if can_ssh
       sync_to_log_file
       machine.set_tags(self)
       run!
