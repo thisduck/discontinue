@@ -7,6 +7,7 @@ require 'digest'
 class Box < ApplicationRecord
   SPAWNLING_PREFIX = '-build-stream-box'
   BUILD_SCRIPT_PREFIX = "build_discontinue"
+  RUBY_PATH = '~/.rvm/rubies/ruby-2.3.7/bin/ruby'
 
   belongs_to :stream
   has_one :build, through: :stream
@@ -185,7 +186,7 @@ class Box < ApplicationRecord
 
   def store_cache!
     runner = Runner.new
-    runner.run %@ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  bash -lc "cd ~/clone; ruby ~/scripts/continue_cache.rb cache >> ~/log_continue_#{id}.log 2>&1" '@
+    runner.run %@ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  bash -lc "cd ~/clone; #{RUBY_PATH} ~/scripts/continue_cache.rb cache >> ~/log_continue_#{id}.log 2>&1" '@
 
     unless runner.success?
       crash!
@@ -196,7 +197,7 @@ class Box < ApplicationRecord
   def store_artifacts!
     runner = Runner.new
     # this should return immediately and run the script in the background on the remote machine.
-    runner.run %@ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  bash -lc "cd ~/clone; ruby ~/scripts/artifact.rb >> ~/log_continue_#{id}.log 2>&1" '@
+    runner.run %@ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  bash -lc "cd ~/clone; #{RUBY_PATH} ~/scripts/artifact.rb >> ~/log_continue_#{id}.log 2>&1" '@
 
     unless runner.success?
       crash!
@@ -395,7 +396,7 @@ class Box < ApplicationRecord
       return
     end
 
-    runner.run %@ssh -n -f #{machine.at_login} "nohup bash --login -c '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};    ruby ~/scripts/discontinue_checker.rb' >> checker.log 2>&1 &"@
+    runner.run %@ssh -n -f #{machine.at_login} "nohup bash --login -c '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};    #{RUBY_PATH} ~/scripts/discontinue_checker.rb' >> checker.log 2>&1 &"@
 
     unless runner.success?
       crash!
@@ -426,7 +427,7 @@ class Box < ApplicationRecord
       - git clone --branch '#{build.branch}' --depth 20 #{build.repository.url} ~/clone
       - cd ~/clone
       - git checkout -qf #{build.sha}
-      - ruby ~/scripts/continue_cache.rb fetch
+      - #{RUBY_PATH} ~/scripts/continue_cache.rb fetch
       - cp ~/scripts/*.rb ~/clone/.
     COMMANDS
 
