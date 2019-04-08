@@ -30,5 +30,16 @@ module Discontinue
     # Don't generate system test files.
     config.generators.system_tests = nil
     config.active_job.queue_adapter = :delayed_job
+
+    config.middleware.use(
+      ExceptionNotification::Rack,
+      :email => {
+        # :deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
+        :email_prefix => "[Discontinue Exception] ",
+        :sender_address => %{"notifier" <notifier@example.com>},
+        :exception_recipients => %w{adnan.ali@gmail.com}
+      }
+    )
+
   end
 end

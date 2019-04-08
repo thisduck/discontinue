@@ -695,6 +695,9 @@ GEM
       railties (>= 3.2)
     ember-cli-rails-assets (0.6.2)
     erubi (1.7.1)
+    exception_notification (4.2.2)
+      actionmailer (>= 4.0, < 6)
+      activesupport (>= 4.0, < 6)
     execjs (2.7.0)
     faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
@@ -756,6 +759,9 @@ GEM
       mime-types
       mimemagic (~> 0.3.0)
       terrapin (~> 0.6.0)
+    passenger (5.3.7)
+      rack
+      rake (>= 0.8.1)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -874,6 +880,7 @@ DEPENDENCIES
   delayed_job!
   delayed_job_active_record!
   ember-cli-rails
+  exception_notification
   figaro
   hashie
   httparty
@@ -884,6 +891,7 @@ DEPENDENCIES
   mysql2
   octokit (~> 4.0)
   paperclip
+  passenger
   pry-byebug
   pry-rails
   puma (~> 3.11)
