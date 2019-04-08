@@ -11,7 +11,8 @@ class GithubApi
 
   def self.jwt
     # Private key contents
-    private_pem = File.read(ENV['GITHUB_PEM_PATH'])
+    private_pem = ENV['GITHUB_PEM']
+    private_pem ||= File.read(ENV['GITHUB_PEM_PATH'])
     private_key = OpenSSL::PKey::RSA.new(private_pem)
 
     # Generate the JWT

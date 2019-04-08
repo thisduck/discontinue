@@ -25,21 +25,34 @@ class Stream < ApplicationRecord
       transitions to: :failed
     end
 
-    event :stop do
+    event :stop, after: :after_stop do
       transitions from: :running, to: :stopped
     end
   end
 
+  def after_stop
+    finish!
+    build.sync!
+  end
+
   def after_pass
+    finish!
     build.sync!
   end
 
   def after_fail
+    finish!
     build.sync!
   end
 
   def finished?
     finished_at.present?
+  end
+
+  def finish!
+    finished_at = Time.now
+    duration = finished_at - started_at
+    self.update_attributes(finished_at: finished_at, duration: duration)
   end
 
   def sync!

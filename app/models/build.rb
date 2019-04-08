@@ -28,7 +28,7 @@ class Build < ApplicationRecord
       transitions from: :stopped, to: :running
     end
 
-    event :stop do
+    event :stop, after_commit: :after_pass_or_fail do
       transitions from: :running, to: :stopped
     end
 
@@ -41,25 +41,33 @@ class Build < ApplicationRecord
     end
   end
 
-  def after_pass_or_fail
-    notify(on: :finish)
+  def finish!
+    finished_at = Time.now
+    duration = finished_at - started_at
+    update_attributes(finished_at: finished_at, duration: duration)
+  end
 
-    status = passed? ? "success" : "failure"
-
-    repository.account.client.create_status(repository.integration_id.to_i, sha, status, {
-      context: "Discontinue Test",
+  def post_github_status!
+    status = passed? ? 'success' : 'failure'
+    repository.account.client.create_status(
+      repository.integration_id.to_i, sha, status,
+      context: 'Discontinue Test',
       target_url: url,
-      description: "[#{humanized_time}] Tests #{aasm_state}.",
-    })
+      description: "[#{humanized_time}] Tests #{aasm_state}."
+    )
+  end
+
+  def after_pass_or_fail
+    finish!
+
+    notify(on: :finish)
+    post_github_status!
   end
 
   def sync!
-    self.reload
-    if self.streams.all?(&:finished?)
-      finished_at = Time.now
-      duration = finished_at - started_at
-      self.update_attributes(finished_at: finished_at, duration: duration)
-      if self.streams.collect(&:passed?).all?
+    reload
+    if streams.all?(&:finished?)
+      if streams.collect(&:passed?).all?
         pass_build!
       else
         fail_build!
@@ -70,7 +78,7 @@ class Build < ApplicationRecord
   def self.queue(options = {})
     Build.transaction do
       options[:started_at] = Time.now
-      options[:finished_at] = nil 
+      options[:finished_at] = nil
       options[:config] = options[:build_request].repository.config
       build = Build.create! options
 
@@ -271,12 +279,12 @@ class Build < ApplicationRecord
     end
 
     self.repository.stream_configs.each_with_index do |config, index|
-      yaml = YAML.load config
+      stream_config = StreamConfig.new config: config
       stream = self.streams.create!(
         started_at: Time.now,
         build_stream_id: "#{self.id}-#{index}",
         config: config,
-        name: yaml['name']
+        name: stream_config.name
       )
 
       puts "STREAM #{stream.build_stream_id} created!"
