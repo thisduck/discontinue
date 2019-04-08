@@ -171,7 +171,7 @@ class Box < ApplicationRecord
   end
 
   def env_exports
-    environment_variables = stream.environment_variables.collect do |key, value|
+    environment_variables = stream.stream_config.environment_variables.collect do |key, value|
       %/#{key}="#{value.gsub('"', '\"')}"/
     end.join(' ')
     [
@@ -453,8 +453,8 @@ class Box < ApplicationRecord
       commands = [
         {visible: true, commands: pre_commands},
         {visible: false, commands: invisible_pre_commands},
-        {visible: true, commands: build.setup_commands},
-        {visible: true, commands: stream.build_commands},
+        {visible: true, commands: build.build_config.setup_commands},
+        {visible: true, commands: stream.stream_config.build_commands},
         {visible: true, commands: post_commands},
       ].flatten
 
@@ -487,7 +487,7 @@ class Box < ApplicationRecord
   end
 
   def setup_artifacts_yml!
-    artifacts = stream.artifacts
+    artifacts = stream.stream_config.artifacts
 
     artifact_file = File.join(Rails.root, "tmp", "artifact_file_#{id}")
     File.open(artifact_file, "wb") do |f|
@@ -502,7 +502,7 @@ class Box < ApplicationRecord
 
 
   def setup_cache_yml!
-    cache_dirs = stream.cache_dirs
+    cache_dirs = stream.stream_config.cache_dirs
 
     cache_file = File.join(Rails.root, "tmp", "cache_file_#{id}")
     File.open(cache_file, "wb") do |f|

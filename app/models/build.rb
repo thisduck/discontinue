@@ -88,36 +88,8 @@ class Build < ApplicationRecord
     end
   end
 
-  def yaml_config
-    YAML.load config
-  end
-
-  def environment_variables
-    yaml_config['environment'] || {}
-  end
-
-  def setup_commands
-    yaml_config['setup_commands']
-  end
-
-  def cache_dirs
-    yaml_config['cache_dirs'] || []
-  end
-
-  def artifacts
-    yaml_config['artifacts'] || []
-  end
-
-  def image_id
-    yaml_config['image_id']
-  end
-
-  def instance_type
-    yaml_config['instance_type']
-  end
-
-  def notification_options
-    repository.yaml_config['notifications'] || []
+  def build_config
+    @build_config ||= BuildConfig.new config: config
   end
 
   def artifact_listing(keys: [])
@@ -142,14 +114,16 @@ class Build < ApplicationRecord
     HumanizeSeconds.humanize(time_taken)
   end
 
-  def url
-    root_url = Rails.application.routes.url_helpers.url_for(
+  def root_url
+    @root_url ||= Rails.application.routes.url_helpers.url_for(
       controller: 'ember_cli/ember', 
       action: "index", 
       host: Rails.application.config.action_mailer.default_url_options[:host], 
       port: Rails.application.config.action_mailer.default_url_options[:port]
     )
+  end
 
+  def url
     "#{root_url}builds/#{id}"
   end
 
@@ -197,7 +171,19 @@ class Build < ApplicationRecord
         end
       end
 
-      if send 
+      if send
+        test_results_summary = self.test_results.group(:stream_id, :status).count.group_by{|x| x.first.first}
+
+        test_results_summary.each do |stream_id, info|
+          stream = self.streams.detect{ |x| x.id == stream_id }
+          stream_status =  "#{stream.aasm_state.humanize}"
+          extra.unshift({
+            title: "Stream: #{stream.name}",
+            value: "#{stream_status} in #{stream.humanized_time}. \n" + info.collect{|x| "<#{self.url}/stream/#{x.first.first}/test_results?status=#{x.first.last}|[#{x.second} #{x.first.last}]> \n"}.join(" "),
+            short: true
+          })
+        end
+
         pusher = hook_hash['pusher'] ? hook_hash['pusher']['name'] : '?'
         HTTParty.post(
           options['webhook'], 
@@ -213,17 +199,17 @@ class Build < ApplicationRecord
               },
               {
                 title: "Status",
-                value: status,
+                value: "#{status} in #{humanized_time}",
                 short: true
               },
               {
                 title: "Repository",
-                value: "<https://github.com/#{repository.name}|#{repository.name}>",
+                value: "<https://github.com/#{repository.full_name}|#{repository.full_name}>",
                 short: true
               },
               {
                 title: "Branch",
-                value: "<https://github.com/#{repository.name}/tree/#{branch}|#{branch}>",
+                value: "<https://github.com/#{repository.full_name}/tree/#{branch}|#{branch}>",
                 short: true
               },
               {
@@ -279,13 +265,13 @@ class Build < ApplicationRecord
     end
 
     self.repository.stream_configs.each_with_index do |config, index|
-      stream_config = StreamConfig.new config: config
-      stream = self.streams.create!(
+      stream = self.streams.build(
         started_at: Time.now,
         build_stream_id: "#{self.id}-#{index}",
         config: config,
-        name: stream_config.name
       )
+      stream.name = stream.stream_config.name
+      stream.save!
 
       puts "STREAM #{stream.build_stream_id} created!"
 

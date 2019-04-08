@@ -58,9 +58,6 @@ class Stream < ApplicationRecord
   def sync!
     self.reload
     if self.boxes.all?(&:finished?)
-      finished_at = Time.now
-      duration = finished_at - started_at
-      self.update_attributes(finished_at: finished_at, duration: duration)
       if self.boxes.collect(&:passed?).all?
         pass_stream!
       else
@@ -69,40 +66,8 @@ class Stream < ApplicationRecord
     end
   end
 
-  def yaml_config
-    YAML.load config
-  end
-
-  def build_commands
-    yaml_config['build_commands']
-  end
-
-  def environment_variables
-    build.environment_variables.merge(
-      yaml_config['environment'] || {}
-    )
-  end
-
-  def box_count
-    yaml_config['box_count'].to_i
-  end
-
-  def cache_dirs
-    build.cache_dirs +
-      ( yaml_config['cache_dirs'] || [])
-  end
-
-  def artifacts
-    build.artifacts +
-      ( yaml_config['artifacts'] || [])
-  end
-
-  def image_id
-    ( yaml_config['image_id'] || build.image_id)
-  end
-
-  def instance_type
-    ( yaml_config['instance_type'] || build.instance_type)
+  def stream_config
+    @stream_config ||= StreamConfig.new config: config, build_config: build.build_config
   end
 
   def artifact_listing(keys: [])
@@ -135,29 +100,40 @@ class Stream < ApplicationRecord
 
   private
   def start_stream
-    if self.box_count.blank? || self.box_count.zero?
-      self.fail_stream!
-      return
-    end
+    begin
+      box_count = stream_config.box_count
+      if box_count.blank? || box_count.zero?
+        self.fail_stream!
+        return
+      end
 
-    self.box_count.times do |index|
-      box = self.boxes.create(
-        box_number: index,
-        instance_type: instance_type,
-        started_at: Time.now,
-        finished_at: nil,
-        output: StringFile.create(body: 'hello', name: "output.txt"),
-      )
+      box_count.times do |index|
+        box = self.boxes.create(
+          box_number: index,
+          instance_type: stream_config.instance_type,
+          started_at: Time.now,
+          finished_at: nil,
+          output: StringFile.create(body: 'hello', name: "output.txt"),
+        )
 
-      box.write_to_log_file("Creating Machine Instance")
-    end
+        box.write_to_log_file("Creating Machine Instance")
+      end
 
-    instances = create_instances
-    boxes.each_with_index do |box, index|
-      instance = instances[index]
-      box.update_attributes(instance_id: instance.id)
-      Box.delay.connect(box.id)
-      BoxTimeoutJob.perform_later(box.id)
+      Rails.logger.info "Stream #{self.id}: Creating AWS instances"
+      instances = create_instances
+      Rails.logger.info "Stream #{self.id}: Created AWS instances"
+      boxes.each_with_index do |box, index|
+        instance = instances[index]
+        Rails.logger.info "Stream #{self.id}: Updating Box #{box.id} with Instance #{instance.id}"
+        box.update_attributes(instance_id: instance.id)
+        Box.delay.connect(box.id)
+        BoxTimeoutJob.perform_later(box.id)
+      end
+    rescue => e
+      puts "error in run_box"
+      puts e.message
+      puts e.backtrace.join("\n")
+      raise e
     end
   end
 
@@ -167,7 +143,7 @@ class Stream < ApplicationRecord
         region: 'us-east-1',
       )
 
-      puts "Creating instances for stream [#{id}]"
+      Rails.logger.info "Creating instances for stream [#{id}]"
 
       instances = ec2.create_instances({
         block_device_mappings: [
@@ -184,18 +160,15 @@ class Stream < ApplicationRecord
           market_type: "spot", # accepts spot
         },
 
-        image_id: image_id,
-        min_count: box_count,
-        max_count: box_count,
+        image_id: stream_config.image_id,
+        min_count: stream_config.box_count,
+        max_count: stream_config.box_count,
         security_group_ids: ['sg-0bbe8a0edf1c6ebbc'],
-        instance_type: instance_type,
-        # instance_type: 't3.2xlarge',
+        instance_type: stream_config.instance_type,
         subnet_id: 'subnet-9d1563d7',
       })
 
-      puts "Created instances for stream [#{id}]"
-
-
+      Rails.logger.info "Created instances for stream [#{id}]"
 
       instances
     rescue => e
