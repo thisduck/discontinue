@@ -71,10 +71,12 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
     t.datetime "started_at"
     t.datetime "finished_at"
     t.text "error_message"
+    t.bigint "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["build_request_id"], name: "index_builds_on_build_request_id"
     t.index ["repository_id"], name: "index_builds_on_repository_id"
+    t.index ["branch"], name: "index_builds_on_branch"
   end
 
   create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -117,6 +119,7 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
     t.datetime "started_at"
     t.datetime "finished_at"
     t.text "error_message"
+    t.bigint "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["build_id"], name: "index_streams_on_build_id"
@@ -139,6 +142,9 @@ ActiveRecord::Schema.define(version: 2018_10_06_221451) do
     t.index ["box_id"], name: "index_test_results_on_box_id"
     t.index ["build_id"], name: "index_test_results_on_build_id"
     t.index ["stream_id"], name: "index_test_results_on_stream_id"
+    t.index ["test_id"], name: "index_test_results_on_test_id"
+    t.index ["created_at"], name: "index_test_results_on_created_at"
+    t.index ["status"], name: "index_test_results_on_status"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

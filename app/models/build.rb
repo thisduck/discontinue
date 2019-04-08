@@ -56,7 +56,9 @@ class Build < ApplicationRecord
   def sync!
     self.reload
     if self.streams.all?(&:finished?)
-      self.update_attributes(finished_at: Time.now)
+      finished_at = Time.now
+      duration = finished_at - started_at
+      self.update_attributes(finished_at: finished_at, duration: duration)
       if self.streams.collect(&:passed?).all?
         pass_build!
       else

@@ -381,6 +381,7 @@ class Box < ApplicationRecord
 
     runner = Runner.new
     runner.run %@ssh -n -f #{machine.at_login} 'bash --login -c "gem install aws-sdk-s3 parallel mixlib-shellout redis rufus-scheduler httparty faraday &> output.txt"'@
+    # runner.run %@ssh -n -f #{machine.at_login} 'bash --login -c "gem update aws-sdk aws-sdk-core aws-sdk-s3 &>> output.txt"'@
 
     unless runner.success?
       crash!
