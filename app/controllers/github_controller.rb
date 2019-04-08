@@ -7,8 +7,18 @@ class GithubController < ApplicationController
 
   def webhook
     event = request.env['HTTP_X_GITHUB_EVENT']
-    event_handler = "GithubEvents::#{event.classify}".constantize.new(params.as_json)
-    event_handler.handle
+    event_handler_class = nil
+
+    begin
+      event_handler_class = "GithubEvents::#{event.classify}".constantize
+    rescue 
+      puts "No GithubEvent for #{event}"
+    end
+
+    if event_handler_class
+      event_handler = event_handler_class.new(params.as_json)
+      event_handler.handle
+    end
 
     render plain: ''
   end
