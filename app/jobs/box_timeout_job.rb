@@ -10,8 +10,9 @@ class BoxTimeoutJob < ApplicationJob
 
     last_updated = box.output_updated_at
     time_since_update = Time.now - last_updated
+    allowed_time_since_update = box.build.build_config.box_timeout&.to_f || ALLOWED_TIME_SINCE_UPDATE
 
-    if time_since_update >= ALLOWED_TIME_SINCE_UPDATE
+    if time_since_update >= allowed_time_since_update
       box.fail_box!
 
       File.open(box.output.path, "a") do |f|

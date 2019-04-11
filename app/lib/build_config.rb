@@ -36,6 +36,10 @@ class BuildConfig
   end
 
   def image_id
+    hash['box_timeout']
+  end
+
+  def image_id
     hash['image_id']
   end
 
