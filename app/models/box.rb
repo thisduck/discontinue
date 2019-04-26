@@ -434,7 +434,7 @@ class Box < ApplicationRecord
     end
 
     runner.ssh machine: machine.at_login, environment: env_exports, bash: false,
-      command: %^screen -dm bash -lc "~/scripts/discontinue_checker.rb >> checker.log 2>&1"^
+      command: %^screen -dm bash -lc "~/scripts/discontinue_checker.sh >> checker.log 2>&1"^
 
     unless runner.success?
       crash!
