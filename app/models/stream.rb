@@ -57,6 +57,7 @@ class Stream < ApplicationRecord
 
   def sync!
     self.reload
+    return if self.finished?
     if self.boxes.all?(&:finished?)
       if self.boxes.collect(&:passed?).all?
         pass_stream!
@@ -120,7 +121,7 @@ class Stream < ApplicationRecord
           output: StringFile.create(body: 'hello', name: "output.txt"),
         )
 
-        box.write_to_log_file "Creating Machine Instance", title: true
+        box.write_to_log_file "Creating Machine Instance [#{Time.now}]", title: true
       end
 
       Rails.logger.info "Stream #{self.id}: Creating AWS instances"
@@ -128,10 +129,10 @@ class Stream < ApplicationRecord
       Rails.logger.info "Stream #{self.id}: Created AWS instances"
       boxes.each_with_index do |box, index|
         instance = instances[index]
-        Rails.logger.info "Stream #{self.id}: Updating Box #{box.id} with Instance #{instance.id}"
+        box.write_to_log_file "[#{Time.now}] Updating Box #{box.id} with Instance #{instance.id}"
         box.update_attributes(instance_id: instance.id)
-        Box.delay.connect(box.id)
-        BoxTimeoutJob.perform_later(box.id)
+        Box.delay(run_at: (20 + index).seconds.from_now).connect(box.id)
+        BoxTimeoutJob.set(wait: BoxTimeoutJob.allowed_time_since_update(box)).perform_later(box.id)
       end
     rescue => e
       puts "error in run_box"

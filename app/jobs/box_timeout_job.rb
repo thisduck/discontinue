@@ -10,8 +10,8 @@ class BoxTimeoutJob < ApplicationJob
 
     last_updated = box.output_updated_at
     time_since_update = Time.now - last_updated
-    allowed_time_since_update = box.build.build_config.box_timeout&.to_f&.minutes || ALLOWED_TIME_SINCE_UPDATE
 
+    allowed_time_since_update = self.class.allowed_time_since_update(box)
     if time_since_update >= allowed_time_since_update
       box.fail_box!
 
@@ -22,5 +22,9 @@ class BoxTimeoutJob < ApplicationJob
     else
       BoxTimeoutJob.set(wait: ALLOWED_TIME_SINCE_UPDATE - time_since_update + 1.second).perform_later(box_id)
     end
+  end
+
+  def self.allowed_time_since_update(box)
+    box.build.build_config.box_timeout&.to_f&.minutes || ALLOWED_TIME_SINCE_UPDATE
   end
 end
