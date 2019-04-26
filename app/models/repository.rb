@@ -18,15 +18,17 @@ class Repository < ApplicationRecord
     @filter_branches ||= 
       begin
         branches = yaml_config['filter_branches'] || {}
+        branches['pull_request_only'] ||= false
         branches['exclude'] ||= []
         branches['include'] ||= ['*']
+        branches['always'] ||= []
         branches
       end
   end
 
-  def ssh_url
-    client = account.client
-    repo = client.repo(integration_id.to_i)
-    repo.ssh_url
-  end
+  # def url
+  #   client = account.client
+  #   repo = client.repo(integration_id.to_i)
+  #   repo.ssh_url
+  # end
 end

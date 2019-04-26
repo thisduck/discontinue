@@ -29,13 +29,23 @@ class BuildRequest < ApplicationRecord
 
   def ignore_build?
     return true if skip_ci_message?
+    return false if do_ci_message?
+
 
     # TODO: add ignore branches feature
     filter_branches = repository.filter_branches
+    return false if filter_branches['always'].any? {|filter| File.fnmatch(filter, branch) }
     return true if filter_branches['exclude'].any? {|filter| File.fnmatch(filter, branch) }
     return true if filter_branches['include'].none? {|filter| File.fnmatch(filter, branch) }
 
+    return true if filter_branches['pull_request_only'] && !open_pull_request?
+
     false
+  end
+
+  def open_pull_request?
+    pull_requests = repository.account.client.pull_requests repository.integration_id.to_i, head: "#{repository.account.name}:#{branch}"
+    pull_requests.collect{|x| x[:state] }.include?("open")
   end
 
   private
@@ -47,6 +57,18 @@ class BuildRequest < ApplicationRecord
       repository: repository,
       build_request: self
     )
+  end
+
+  def do_ci_message?
+    head_commit = hook_hash['head_commit']
+    return false if head_commit.blank?
+
+    case head_commit['message']
+    when /\[ci\]/
+      true
+    else
+      false
+    end
   end
 
   def skip_ci_message?
