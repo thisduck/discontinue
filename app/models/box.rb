@@ -644,6 +644,8 @@ class Box < ApplicationRecord
     end
 
     def destroy
+      # sir = instance.spot_instance_request_id
+      # if this is a spot instance we should cancel the spot request
       instance.terminate
     rescue Aws::EC2::Errors::InvalidInstanceIDNotFound
       puts "Machine Destroy: Instance ID not found. [#{instance_id}]"

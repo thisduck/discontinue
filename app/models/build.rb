@@ -41,6 +41,10 @@ class Build < ApplicationRecord
     end
   end
 
+  def finished?
+    finished_at.present?
+  end
+
   def finish!
     finished_at = Time.now
     duration = finished_at - started_at
@@ -66,6 +70,7 @@ class Build < ApplicationRecord
 
   def sync!
     reload
+    return if self.finished?
     if streams.all?(&:finished?)
       if streams.collect(&:passed?).all?
         pass_build!
@@ -182,8 +187,8 @@ class Build < ApplicationRecord
       if send
         test_results_summary = self.test_results.group(:stream_id, :status).count.group_by{|x| x.first.first}
 
-        test_results_summary.each do |stream_id, info|
-          stream = self.streams.detect{ |x| x.id == stream_id }
+        streams.each do |stream|
+          info = test_results_summary[stream.id] || []
           stream_status =  "#{stream.aasm_state.humanize}"
           extra.unshift({
             title: "Stream: #{stream.name}",
