@@ -18,7 +18,7 @@
 
 export default {
   sans: [
-    'Raleway',
+    'Lato',
     'system-ui',
     'BlinkMacSystemFont',
     '-apple-system',
@@ -45,7 +45,7 @@ export default {
     'serif'
   ],
   header: [
-    'Montserrat',
+    'Roboto',
     'Raleway',
     'sans-serif'
   ],

@@ -1,6 +1,8 @@
 class BuildConfig
   include ActiveModel::Validations
 
+  validates_presence_of :aws_access_key, :aws_access_secret, :aws_region, :aws_subnet_id, :aws_security_group_id, :aws_cache_bucket
+
   def initialize(config:)
     @config = config
   end
@@ -35,7 +37,7 @@ class BuildConfig
     hash['notifications'] || []
   end
 
-  def image_id
+  def box_timeout
     hash['box_timeout']
   end
 
@@ -45,5 +47,30 @@ class BuildConfig
 
   def instance_type
     hash['instance_type']
+  end
+
+  # required
+  def aws_access_key
+    hash['aws_access_key']
+  end
+
+  def aws_access_secret
+    hash['aws_access_secret']
+  end
+
+  def aws_region
+    hash['aws_region']
+  end
+
+  def aws_subnet_id
+    hash['aws_subnet_id']
+  end
+
+  def aws_security_group_id
+    hash['aws_security_group_id']
+  end
+
+  def aws_cache_bucket
+    hash['aws_cache_bucket']
   end
 end

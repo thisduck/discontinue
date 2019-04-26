@@ -24,9 +24,9 @@ class Repository < ApplicationRecord
       end
   end
 
-  # def url
-  #   client = account.client
-  #   repo = client.repo(integration_id.to_i)
-  #   repo.ssh_url
-  # end
+  def ssh_url
+    client = account.client
+    repo = client.repo(integration_id.to_i)
+    repo.ssh_url
+  end
 end

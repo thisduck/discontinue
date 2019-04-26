@@ -3,7 +3,7 @@
     Page {{page}} / {{pagination.last.number}}
   </span>
 
-  {{#if pagination.first}}
+  {{#if (and pagination.first (not-eq page pagination.first.number))}}
     {{link-to "first" route (query-params page=pagination.first.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
   {{else}}
     <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
@@ -27,7 +27,7 @@
     </span>
   {{/if}}
 
-  {{#if pagination.last}}
+  {{#if (and pagination.last (not-eq page pagination.last.number))}}
     {{link-to "last" route (query-params page=pagination.last.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block"}}
   {{else}}
     <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block">

@@ -79,9 +79,9 @@ class Stream < ApplicationRecord
     ] + keys).join('/')
 
     s3 = Aws::S3::Resource.new(
-      region: 'us-east-1'
+      aws_options
     )
-    s3_bucket = s3.bucket('continue-cache')
+    s3_bucket = s3.bucket(build.build_config.aws_cache_bucket)
     s3_bucket.objects(prefix: key).to_a
   end
 
@@ -96,6 +96,10 @@ class Stream < ApplicationRecord
 
   def humanized_time
     HumanizeSeconds.humanize(time_taken)
+  end
+
+  def aws_options
+    build.aws_options
   end
 
   private
@@ -116,7 +120,7 @@ class Stream < ApplicationRecord
           output: StringFile.create(body: 'hello', name: "output.txt"),
         )
 
-        box.write_to_log_file("Creating Machine Instance")
+        box.write_to_log_file "Creating Machine Instance", title: true
       end
 
       Rails.logger.info "Stream #{self.id}: Creating AWS instances"
@@ -139,9 +143,7 @@ class Stream < ApplicationRecord
 
   def create_instances
     begin
-      ec2 = Aws::EC2::Resource.new(
-        region: 'us-east-1',
-      )
+      ec2 = Aws::EC2::Resource.new(aws_options)
 
       Rails.logger.info "Creating instances for stream [#{id}]"
 
@@ -163,9 +165,9 @@ class Stream < ApplicationRecord
         image_id: stream_config.image_id,
         min_count: stream_config.box_count,
         max_count: stream_config.box_count,
-        security_group_ids: ['sg-0bbe8a0edf1c6ebbc'],
+        security_group_ids: [build.build_config.aws_security_group_id],
         instance_type: stream_config.instance_type,
-        subnet_id: 'subnet-9d1563d7',
+        subnet_id: build.build_config.aws_subnet_id
       })
 
       Rails.logger.info "Created instances for stream [#{id}]"

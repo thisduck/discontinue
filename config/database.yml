@@ -49,5 +49,6 @@ test:
 production:
   <<: *default
   database: discontinue_production
-  username: discontinue
-  password: <%= ENV['DISCONTINUE_DATABASE_PASSWORD'] %>
+  password: <%= ENV['MYSQL_PASSWORD'] %>
+  host: <%= ENV['MYSQL_HOST'] %>
+  username: dis_admin

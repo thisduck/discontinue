@@ -12,7 +12,7 @@ export default DS.Model.extend({
   finished_at: DS.attr('date'),
   humanized_time: DS.attr(),
 
-  active: computed('state', function() {
+  active: computed('build.active', 'state', function() {
     if (!this.get('build.active')) {
       return false;
     }

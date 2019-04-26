@@ -6,6 +6,7 @@ option = ARGV[0]
 key = ARGV[1]
 directory = ARGV[2]
 
+log "Entering discontinue cache with [#{option}]."
 
 if key && !directory
   raise "key passed without directory/file."

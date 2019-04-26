@@ -70,6 +70,7 @@ class Box < ApplicationRecord
 
   def self.connect(box_id)
     box = Box.find box_id
+    box.write_to_log_file "[#{Time.now}] Starting connection"
     box.connect!
   end
 
@@ -139,12 +140,12 @@ class Box < ApplicationRecord
 
   def sync_to_log_file
     runner = Runner.new
-    runner.run "rsync #{output.path} #{machine.at_login}:log_continue_#{id}.log"
+    runner.rsync "#{output.path} #{machine.at_login}:log_continue_#{id}.log"
   end
 
   def sync_log_file
     runner = Runner.new
-    runner.run "rsync #{machine.at_login}:log_continue_#{id}.log #{output.path}"
+    runner.rsync "#{machine.at_login}:log_continue_#{id}.log #{output.path}"
   end
 
   def finished?
@@ -162,7 +163,10 @@ class Box < ApplicationRecord
   def finish_post_processing!
     sync_log_file if machine.can_ssh?
     runner = Runner.new
-    runner.run %@ssh -n -f #{machine.at_login} 'echo "fini" > ~/post_finished'@
+    # runner.run %@ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -n -f #{machine.at_login} 'echo "fini" > ~/post_finished'@
+    runner.ssh machine: machine.at_login, bash: false,
+      options: '-o ConnectTimeout=4',
+      command: %@echo "fini" > ~/post_finished@
 
     unless runner.success?
       crash!
@@ -170,22 +174,52 @@ class Box < ApplicationRecord
 
   end
 
+  def public_env_vars
+    {
+      'TERM' => 'xterm',
+      'CI' => '1',
+      'CI_BUILD_ID' => build.id,
+      'CI_STREAM_ID' => stream.id,
+      'CI_BOX_ID' => id,
+      'CI_BUILD_STREAM_CONFIG' => stream.build_stream_id,
+      'CI_STREAM_CONFIG' => stream.build_stream_id.split('-').last,
+      'CI_REPO_NAME' => build.repository.name,
+      'CI_REPO' => build.repository.url,
+      'CI_BRANCH' => build.branch,
+      'CI_COMMIT_ID' => build.sha,
+    }
+  end
+
+  # these shouldn't be env vars at some point.
+  def private_env_vars
+    {
+      'DISCONTINUE_API' => "http://#{ENV['MACHINE_IP']}:8080",
+      'AWS_REGION' => build.build_config.aws_region,
+      'S3_BUCKET' => build.build_config.aws_cache_bucket,
+      'AWS_ACCESS_KEY_ID' => build.build_config.aws_access_key,
+      'AWS_SECRET_ACCESS_KEY' => build.build_config.aws_access_secret,
+    }
+  end
+
+  def env_vars
+    public_env_vars
+      .merge(private_env_vars)
+      .merge(stream.stream_config.environment_variables)
+  end
+
   def env_exports
-    environment_variables = stream.stream_config.environment_variables.collect do |key, value|
-      %/#{key}="#{value.gsub('"', '\"')}"/
+    environment_variables = env_vars.collect do |key, value|
+      value = value.to_s.gsub('"', '\"')
+      %/#{key}="#{value}"/
     end.join(' ')
-    [
-      "export TERM=xterm CI=1 CI_BUILD_ID=#{build.id} CI_STREAM_ID=#{stream.id} CI_BOX_ID=#{id} CI_BUILD_STREAM_CONFIG=#{stream.build_stream_id} CI_STREAM_CONFIG=#{stream.build_stream_id.split('-').last}" ,
-      "export CI_REPO_NAME='#{build.repository.name}' CI_REPO=#{build.repository.url}" ,
-      "export CI_BRANCH=#{build.branch} CI_COMMIT_ID=#{build.sha}" ,
-      "export DISCONTINUE_API='http://54.242.5.53:8080'" ,
-      ( "export #{environment_variables}" if environment_variables.present? ) ,
-    ].compact
+    "export #{environment_variables};"
   end
 
   def store_cache!
     runner = Runner.new
-    runner.run %@ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  bash -lc "cd ~/clone; ruby ~/scripts/continue_cache.rb cache >> ~/log_continue_#{id}.log 2>&1" '@
+    # should change this to not run as a long running backend task.
+    runner.ssh machine: machine.at_login, environment: env_exports, 
+      command: %^cd ~/clone; ~/scripts/discontinue_cache.sh cache >> ~/log_continue_#{id}.log 2>&1^
 
     unless runner.success?
       crash!
@@ -195,8 +229,8 @@ class Box < ApplicationRecord
 
   def store_artifacts!
     runner = Runner.new
-    # this should return immediately and run the script in the background on the remote machine.
-    runner.run %@ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  bash -lc "cd ~/clone; ruby ~/scripts/artifact.rb >> ~/log_continue_#{id}.log 2>&1" '@
+    runner.ssh machine: machine.at_login, environment: env_exports, 
+      command: "cd ~/clone; ~/scripts/discontinue_artifact.sh >> ~/log_continue_#{id}.log 2>&1"
 
     unless runner.success?
       crash!
@@ -245,15 +279,16 @@ class Box < ApplicationRecord
     ] + keys).join('/')
 
     s3 = Aws::S3::Resource.new(
-      region: 'us-east-1'
+      stream.aws_options
     )
-    s3_bucket = s3.bucket('continue-cache')
+    s3_bucket = s3.bucket(build.build_config.aws_cache_bucket)
     s3_bucket.objects(prefix: key).to_a
   end
 
-  def write_to_log_file(message)
+  def write_to_log_file(message, title: false)
     File.open(output.path, 'a') do |f|
-      f.puts "DISCONTINUE[#{Time.now}] #{message}"
+      message = "DISCONTINUE[#{Time.now}] #{message}" if title
+      f.puts message
     end
   end
 
@@ -271,15 +306,14 @@ class Box < ApplicationRecord
   end
 
   def retry_connection
-    can_ssh = machine.can_ssh?
-    puts '*' * 10
-    puts "Retrying connection: #{id} #{machine.ip_address}"
-    puts "Machine running: #{machine.running?}"
-    puts "Machine can ssh: #{can_ssh}"
-    puts '*' * 10
+    machine.set_tags(self)
+    running = machine.running?
+    can_ssh = running && machine.can_ssh?
+    write_to_log_file "[#{Time.now}] Retrying connection: #{id} #{machine.ip_address}"
+    write_to_log_file "[#{Time.now}] Machine running: #{machine.running?}"
+    write_to_log_file "[#{Time.now}] Machine can ssh: #{can_ssh}"
     if can_ssh
       sync_to_log_file
-      machine.set_tags(self)
       run!
       return
     end
@@ -321,7 +355,7 @@ class Box < ApplicationRecord
       ].each do |command|
         puts "Running #{command} on Box #{id}"
         sync_log_file
-        write_to_log_file command.to_s.humanize
+        write_to_log_file command.to_s.humanize, title: true
         sync_to_log_file
         send(command)
         puts "Done #{command} on Box #{id}"
@@ -350,7 +384,7 @@ class Box < ApplicationRecord
         :setup_build_script!,
       ].each do |command|
         puts "Running #{command} on Box #{id}"
-        write_to_log_file command.to_s.humanize
+        write_to_log_file command.to_s.humanize, title: true
         send(command)
         puts "Done #{command} on Box #{id}"
       end
@@ -369,7 +403,7 @@ class Box < ApplicationRecord
   end
 
   def machine
-    @machine ||= Machine.new(instance_id)
+    @machine ||= Machine.new(instance_id, aws_options: stream.aws_options)
   end
 
   def execute_build_script!
@@ -380,8 +414,9 @@ class Box < ApplicationRecord
     sync_to_log_file
 
     runner = Runner.new
-    runner.run %@ssh -n -f #{machine.at_login} 'bash --login -c "gem install aws-sdk-s3 parallel mixlib-shellout redis rufus-scheduler httparty faraday &> output.txt"'@
-    # runner.run %@ssh -n -f #{machine.at_login} 'bash --login -c "gem update aws-sdk aws-sdk-core aws-sdk-s3 &>> output.txt"'@
+
+    runner.ssh machine: machine.at_login, command: "ssh -o StrictHostKeyChecking=no git@github.com"
+    runner.ssh machine: machine.at_login, bash: false, command: "sudo yum install screen -y"
 
     unless runner.success?
       crash!
@@ -389,14 +424,17 @@ class Box < ApplicationRecord
     end
 
     # this should return immediately and run the script in the background on the remote machine.
-    runner.run "ssh -n -f #{machine.at_login} '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};  nohup bash --login ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1 &'"
+    # and thus uses screen.
+    runner.ssh machine: machine.at_login, environment: env_exports, bash: false,
+      command: %^screen -dm bash -lc "bash ./#{BUILD_SCRIPT_PREFIX}_#{id}.sh >> log_continue_#{id}.log 2>&1"^
 
     unless runner.success?
       crash!
       return
     end
 
-    runner.run %@ssh -n -f #{machine.at_login} "nohup bash --login -c '#{env_exports.join("; ")}; export S3_BUCKET=continue-cache AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']};    ruby ~/scripts/discontinue_checker.rb' >> checker.log 2>&1 &"@
+    runner.ssh machine: machine.at_login, environment: env_exports, bash: false,
+      command: %^screen -dm bash -lc "~/scripts/discontinue_checker.rb >> checker.log 2>&1"^
 
     unless runner.success?
       crash!
@@ -415,19 +453,23 @@ class Box < ApplicationRecord
       - end_number=`echo "(\${CI_BOX_NUMBER} + 1) * \${CI_CPU_COUNT} + 1" | bc`
       - range=''
       - while [ \\$start_number -lt \\$end_number ]; do range+="\\${start_number},"; let start_number=start_number+1; done
-      - export CI_BOX_RANGE=\${range::-1}
     COMMANDS
 
     pre_commands = YAML.load <<~COMMANDS
       ---
-      - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.box_count}
+      - export CI_BOX_NUMBER=#{box_number} CI_BOX_COUNT=#{stream.stream_config.box_count}
       - export CI_CPU_COUNT=`cat /proc/cpuinfo | grep '^processor' | wc -l` 
       - export CI_TOTAL_CPUS=`echo "\${CI_BOX_COUNT} * \${CI_CPU_COUNT}" | bc`
 
+    COMMANDS
+
+    pre_setup_commands = YAML.load <<~COMMANDS
+      ---
+      - export CI_BOX_RANGE=\${range::-1}
       - git clone --branch '#{build.branch}' --depth 20 #{build.repository.url} ~/clone
       - cd ~/clone
       - git checkout -qf #{build.sha}
-      - ruby ~/scripts/continue_cache.rb fetch
+      - ~/scripts/discontinue_cache.sh fetch
       - cp ~/scripts/*.rb ~/clone/.
     COMMANDS
 
@@ -453,8 +495,9 @@ class Box < ApplicationRecord
       commands = [
         {visible: true, commands: pre_commands},
         {visible: false, commands: invisible_pre_commands},
-        {visible: true, commands: build.build_config.setup_commands},
-        {visible: true, commands: stream.stream_config.build_commands},
+        {visible: true, commands: pre_setup_commands},
+        {visible: true, commands: build.build_config.setup_commands || []},
+        {visible: true, commands: stream.stream_config.build_commands || []},
         {visible: true, commands: post_commands},
       ].flatten
 
@@ -470,20 +513,36 @@ class Box < ApplicationRecord
       end
     end
 
+    # write environment to tmp file.
+    # the machine needs /etc/ssh/sshd_config
+    # to have 
+    # PermitUserEnvironment yes
+    env_file = File.join(Rails.root, "tmp", "env_#{BUILD_SCRIPT_PREFIX}_#{id}.sh")
+    File.open(env_file, "wb") do |f|
+      environment_variables = env_vars.collect do |key, value|
+        %/#{key}=#{value}/
+      end.join("\n")
+      f.puts environment_variables
+    end
+
     # move ssh keys to ssh location
     runner = Runner.new
-    runner.run "scp ~/.ssh/config ~/.ssh/id_rsa ~/.ssh/id_rsa.pub #{machine.at_login}:~/.ssh/. "
+    runner.scp from: "~/.ssh/config ~/.ssh/id_rsa ~/.ssh/id_rsa.pub", to: "#{machine.at_login}:~/.ssh/."
 
     # move file to ssh location
     runner = Runner.new
-    runner.run "scp #{build_file} #{machine.at_login}:. "
+    runner.scp from: build_file, to: "#{machine.at_login}:."
+    runner.scp from: env_file, to: "#{machine.at_login}:.ssh/environment"
 
     File.unlink build_file
+    File.unlink env_file
   end
 
   def setup_scripts!
     runner = Runner.new
-    runner.run "scp -r scripts #{machine.at_login}:."
+    runner.scp options: "-r", from: "scripts", to: "#{machine.at_login}:."
+    runner.ssh machine: machine.at_login,
+      command: "cd ~/scripts; bundle install -j `cat /proc/cpuinfo | grep '^processor' | wc -l`"
   end
 
   def setup_artifacts_yml!
@@ -495,7 +554,7 @@ class Box < ApplicationRecord
     end
 
     runner = Runner.new
-    runner.run "scp #{artifact_file} #{machine.at_login}:~/artifacts.yml"
+    runner.scp from: artifact_file, to: "#{machine.at_login}:~/artifacts.yml"
 
     File.unlink artifact_file
   end
@@ -510,7 +569,7 @@ class Box < ApplicationRecord
     end
 
     runner = Runner.new
-    runner.run "scp #{cache_file} #{machine.at_login}:~/cache_file.yml"
+    runner.scp from: cache_file, to: "#{machine.at_login}:~/cache_file.yml"
 
     File.unlink cache_file
   end
@@ -526,20 +585,17 @@ class Box < ApplicationRecord
   end
 
   class Machine
-    attr_reader :instance_id
+    attr_reader :instance_id, :aws_options
 
-    def initialize(instance_id)
+    def initialize(instance_id, aws_options:)
       @instance_id = instance_id
-    end
-
-    def ec2
-      Aws::EC2::Resource.new( region: 'us-east-1',)
+      @aws_options = aws_options
     end
 
     def instance
       @instance ||= Aws::EC2::Instance.new(
         instance_id,
-        region: 'us-east-1',
+        aws_options
       )
     end
 
@@ -560,7 +616,7 @@ class Box < ApplicationRecord
       return false if ip_address.blank?
       begin
         runner = Runner.new
-        runner.run "ssh #{at_login} 'ls' "
+        runner.ssh machine: at_login, bash: false, options: "-o ConnectTimeout=4", command: "ls"
 
         runner.success?
       rescue => e
@@ -573,7 +629,7 @@ class Box < ApplicationRecord
       return true unless can_ssh?
 
       runner = Runner.new
-      runner.run "ssh -t #{at_login} 'cat ~/post_finished'"
+      runner.ssh machine: machine.at_login, bash: false, options: "-o ConnectTimeout=4", command: "cat ~/post_finished"
 
       runner.success?
     end
@@ -582,7 +638,7 @@ class Box < ApplicationRecord
       return false unless can_ssh?
 
       runner = Runner.new
-      runner.run "ssh -t #{at_login} 'ps aux | grep -v grep | grep #{Box::BUILD_SCRIPT_PREFIX}_'"
+      runner.ssh machine: machine.at_login, bash: false, options: "-o ConnectTimeout=4", command: "ps aux | grep -v grep | grep #{Box::BUILD_SCRIPT_PREFIX}_"
 
       runner.success?
     end
@@ -596,7 +652,8 @@ class Box < ApplicationRecord
     def set_tags(box)
       instance.create_tags({ tags: [
         { key: 'Name', value: "Discontinue Box #{box.id}" },
-        { key: 'Group', value: "Discontinue Build #{box.build.id}, Stream #{box.stream.id} #{box.stream.name}" }
+        { key: 'Group', value: "Discontinue Build #{box.build.id}, Stream #{box.stream.id} #{box.stream.name}" },
+        { key: 'Discontinue', value: "true" }
       ]})
     end
   end

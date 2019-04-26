@@ -1,11 +1,11 @@
-<tr class="{{concat 'bg-' (if (eq result.status 'passed') 'success' (if (eq result.status 'skipped') 'warning' 'danger')) '-lightest'}}" {{action 'toggleMore'}}>
+<tr class="{{concat 'bg-' (if (eq result.status 'passed') 'success' (if (eq result.status 'failed') 'danger' 'warning')) '-lightest'}}" {{action 'toggleMore'}}>
   {{#if showBuild}}
     <td data-label="Build">{{link-to result.build_id 'authenticated.builds.show' result.stream.build.id}}</td>
   {{/if}}
   <td data-label="Box">{{link-to result.box.id 'authenticated.builds.show.stream.show.box' result.stream.build.id result.stream.id result.box.id}}</td>
   <td data-label="Description">{{link-to result.description 'authenticated.test_results' (query-params test_id=result.test_id)}}</td>
   <td data-label="Test Type">{{result.test_type}}</td>
-  <td style="    word-wrap: break-word; " data-label="Location">{{result.file_path}}:{{result.line_number}}</td>
+  <td class="break-words" data-label="Location">{{result.file_path}}:{{result.line_number}}</td>
   <td data-label="Duration">{{result.duration}}</td>
 </tr>
 {{#if showMore}}

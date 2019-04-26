@@ -30,6 +30,7 @@ module GithubEvents
 
       repository.update_attributes({
         name: repo['name'],
+        # url: repository.ssh_url,
         full_name: repo['full_name'],
         private_repo: repo['private'],
         active: true,

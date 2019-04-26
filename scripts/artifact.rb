@@ -5,6 +5,7 @@ artifacts = expand_yaml('~/artifacts.yml')
 
 # repo/build/stream/box
 
+log "Entering discontinue artifact."
 
 def artifact_key(file)
   key = [

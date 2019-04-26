@@ -100,10 +100,18 @@ class Build < ApplicationRecord
     ] + keys).join('/')
 
     s3 = Aws::S3::Resource.new(
-      region: 'us-east-1'
+      aws_options
     )
-    s3_bucket = s3.bucket('continue-cache')
+    s3_bucket = s3.bucket(build_config.aws_cache_bucket)
     s3_bucket.objects(prefix: key).to_a
+  end
+
+  def aws_options
+    {
+      region: build_config.aws_region,
+      access_key_id: build_config.aws_access_key,
+      secret_access_key: build_config.aws_access_secret,
+    }
   end
 
   def time_taken
@@ -129,7 +137,7 @@ class Build < ApplicationRecord
 
   def notify(on:)
     # just for slack for now
-    notification_options.each do |options|
+    build_config.notification_options.each do |options|
       next if options['type'] != 'slack'
       next if options['branches'].none? {|filter| File.fnmatch(filter, branch) }
 
