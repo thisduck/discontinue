@@ -6,7 +6,19 @@ module GithubEvents
       @params = params
     end
 
+    def log(hash)
+      dir = "#{Rails.root}/tmp/push"
+      filename = "#{dir}/#{Time.now.to_s.parameterize}-#{rand(1000)}.json"
+      FileUtils.mkdir_p dir
+
+      File.open(filename, "w") do |f|
+        f.puts hash.to_json if hash
+      end
+    end
+
     def handle
+      log(params['github'])
+
       hook = GithubPushHook.new(params['github'])
       repo = Repository.where(
         integration_type: 'github',
