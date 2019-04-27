@@ -1,0 +1,8 @@
+<button class="
+        text-{{this.textColor}} hover:text-{{this.hoverTextColor}}
+        bg-{{this.bgColor}} hover:bg-{{this.hoverBgColor}}
+        {{if this.border 'border'}} border-{{this.style}}-8 
+        px-3 py-2 
+        inline-block rounded" {{action @action}}>
+{{yield}}
+</button>

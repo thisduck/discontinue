@@ -1,0 +1,27 @@
+<Header>{{model.name}}</Header>
+
+<div class="ui form">
+  <div class="mb-4">
+    <label for="" class="mb-2 inline-block text-grey-darker font-bold">Config</label>
+    {{ember-ace lines=20 value=(if model.config model.config '') mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action (mut model.config)) }}
+  </div>
+
+  <Header @level=3>Stream Configurations</Header>
+  {{#each model.streamConfigs as |config index|}}
+    <div class="mb-4">
+      <label for="" class="mb-2 inline-block text-grey-darker font-bold">Stream Config</label> <Button @skin="link" @style="danger" @action={{action this.removeStreamConfig config}}> <Icon @name="close" /> Remove </Button>
+      {{ember-ace lines=20 value=config mode='ace/mode/yaml' theme='ace/theme/tomorrow_night' update=(action this.updateStreamConfig index) }}
+    </div>
+  {{/each}}
+
+  <div class="mb-4">
+    <Button @action={{this.addStreamConfig}} @skin="secondary">
+      <Icon @name="add"/>
+      Add Stream Configuration
+    </Button>
+  </div>
+
+  <div class="mb-4">
+    <Button @action={{this.save}}>Save</Button>
+  </div>
+</div>

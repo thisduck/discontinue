@@ -13,6 +13,9 @@ Router.map(function() {
   this.route('authenticated', { path: '' }, function() {
     this.route('index', { path: '/none' });
 
+    this.route('repositories', function() {
+      this.route('show', { path: '/:repository_id' });
+    });
   })
 });
 

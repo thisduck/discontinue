@@ -1,0 +1,16 @@
+<Header>Repositories</Header>
+
+{{#each model as |repo|}}
+  <Card>
+    <div class="text-grey-darker">
+      <!-- {{fa-icon 'code' size='lg'}} -->
+      {{repo.name}}
+    </div>
+    <div>
+    <!-- {{#link-to 'authenticated.repositories.branches' repo.id class="mr-2"}} Branches {{/link-to}} -->
+    <!-- {{#link-to 'authenticated.repositories.pull_requests' repo.id class="mr-2"}} Pull Requests {{/link-to}} -->
+    {{#link-to 'authenticated.repositories.show' repo.id class=""}} Settings {{/link-to}}
+    </div>
+  </Card>
+{{/each}}
+
