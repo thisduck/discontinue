@@ -70,7 +70,7 @@ class SessionController < ApplicationController
         email: user.email,
       },
       sub: user.id.to_s,
-      exp: 2.weeks.from_now.to_i
+      exp: 2.months.from_now.to_i
     }
 
     JWT.encode payload, ENV['JWT_SECRET'], 'HS512'
