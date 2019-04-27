@@ -4,9 +4,12 @@ import { inject as service } from '@ember/service';
 
 export default Route.extend(ApplicationRouteMixin, {
   currentUser: service('current-user'),
+  session: service(),
 
   beforeModel() {
     this._super(...arguments);
-    this.get("currentUser").load();
+    if (this.get('session.isAuthenticated')) {
+      this.get("currentUser").load();
+    }
   },
 });
