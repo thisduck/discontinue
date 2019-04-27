@@ -18,8 +18,8 @@ export default Component.extend(ClickOutsideMixin, {
 
     selectItem(item) {
       this.set("show", false);
-      if (this.get("itemSelected")) {
-        this.get("itemSelected")(item);
+      if (this.itemSelected) {
+        this.itemSelected(item);
       }
     }
   },

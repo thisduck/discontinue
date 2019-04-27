@@ -6,8 +6,8 @@ export default DS.Model.extend({
 
   display: computed('results', function() {
     let results = []
-    this.get('results').forEach((result) => {
-      result.stream = this.get("store").findRecord("stream", result.stream_id);
+    this.results.forEach((result) => {
+      result.stream = this.store.findRecord("stream", result.stream_id);
       results.push(result)
     })
 

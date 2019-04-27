@@ -6,7 +6,7 @@ export default Component.extend({
   tagName: '',
   didReceiveAttrs () {
     this._super(...arguments);
-    let t = this.get('toggles')[this.get('index')];
+    let t = this.toggles[this.index];
     this.set("toggle", t);
   },
   ansi_lines: computed('command.lines', function() {
@@ -26,7 +26,7 @@ export default Component.extend({
     return 'red';
   }),
   activeClass: computed('toggle', function () {
-    if (this.get('toggle')) {
+    if (this.toggle) {
       return 'active';
     }
 
@@ -34,7 +34,7 @@ export default Component.extend({
   }),
   actions: {
     toggleCommand() {
-      this.onToggle(this.get('index'), (toggle) => {
+      this.onToggle(this.index, (toggle) => {
         this.set('toggle', toggle);
       });
     }

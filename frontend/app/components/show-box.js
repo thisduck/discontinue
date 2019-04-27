@@ -20,7 +20,7 @@ export default Component.extend({
       yield timeout(5000);
       this.get('box.commands').reload();
       if (!this.get('box.active')) {
-        let build = this.get('store').peekRecord('build', this.get('box.stream.buildId'));
+        let build = this.store.peekRecord('build', this.get('box.stream.buildId'));
         build.reloadSummary();
         break;
       }
@@ -29,7 +29,7 @@ export default Component.extend({
 
   actions: {
     onToggle(index, f) {
-      let t = this.get('toggles');
+      let t = this.toggles;
       t[index] = !t[index];
       this.set('toggles', t)
       f(t[index]);

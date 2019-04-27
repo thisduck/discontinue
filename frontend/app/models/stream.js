@@ -17,7 +17,7 @@ export default DS.Model.extend({
       return false;
     }
 
-    if (this.get('state').endsWith('ing')) {
+    if (this.state.endsWith('ing')) {
       return true;
     }
 
@@ -25,7 +25,7 @@ export default DS.Model.extend({
   }),
 
   passed: computed('state', function() {
-    if (this.get('state') == 'passed') {
+    if (this.state == 'passed') {
       return true;
     }
 

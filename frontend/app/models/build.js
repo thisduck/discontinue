@@ -19,7 +19,7 @@ export default DS.Model.extend({
   startedAt: DS.attr('datetime'),
 
   active: computed('state', function() {
-    if (this.get('state').endsWith('ing')) {
+    if (this.state.endsWith('ing')) {
       return true;
     }
 
@@ -27,7 +27,7 @@ export default DS.Model.extend({
   }),
 
   passed: computed('state', function() {
-    if (this.get('state') == 'passed') {
+    if (this.state == 'passed') {
       return true;
     }
 
@@ -49,12 +49,12 @@ export default DS.Model.extend({
   }),
 
   shortSha: computed('sha', function() {
-    return this.get('sha').slice(0, 8)
+    return this.sha.slice(0, 8);
   }),
 
   reloadSummary() {
-    this.get('buildSummary').reload();
-    this.get('buildTiming').reload();
-    this.get('profileSummary').reload();
+    this.buildSummary.reload();
+    this.buildTiming.reload();
+    this.profileSummary.reload();
   }
 });

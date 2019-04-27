@@ -7,7 +7,7 @@ export default Helper.extend({
   router:  service(),
 
   compute(params) {
-    return this.get('router').isActive(...params);
+    return this.router.isActive(...params);
   },
 
   onURLChange: observer('router.currentURL', function() {

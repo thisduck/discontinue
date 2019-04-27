@@ -31,7 +31,7 @@ export default DS.Model.extend({
   }),
 
   shortSha: computed('sha', function() {
-    return this.get('sha').slice(0, 8)
+    return this.sha.slice(0, 8);
   }),
 
 });

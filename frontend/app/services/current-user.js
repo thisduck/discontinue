@@ -4,12 +4,12 @@ export default Service.extend({
   session: service(),
   store: service(),
   load() {
-    this.get('store').findRecord('user', 'current')
+    this.store.findRecord('user', 'current')
       .then((user) => {
         this.set('user', user);
       })
       .catch(() => {
-        this.get('session').invalidate();
+        this.session.invalidate();
       })
   }
 });

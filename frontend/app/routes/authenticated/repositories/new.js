@@ -6,12 +6,12 @@ export default Route.extend({
   store: service(),
 
   model() {
-    return this.get('ajax').request('/github/repositories');
+    return this.ajax.request('/github/repositories');
   },
 
   actions: {
     create({id, full_name, ssh_url}) {
-      let repository = this.get('store').createRecord('repository', {
+      let repository = this.store.createRecord('repository', {
         name: full_name,
         github_id: id,
         github_url: ssh_url

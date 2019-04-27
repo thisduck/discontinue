@@ -8,7 +8,7 @@ export default Route.extend({
 
   model({ repository_id }) {
     return RSVP.hash({
-      branches: this.get('ajax').request('/github/branches?repository_id=' + repository_id),
+      branches: this.ajax.request('/github/branches?repository_id=' + repository_id),
       repository_id: repository_id
     });
 
@@ -16,7 +16,7 @@ export default Route.extend({
 
   actions: {
     build(branch, repository_id) {
-      let build = this.get("store").createRecord('build-request', {});
+      let build = this.store.createRecord('build-request', {});
       build.buildFromBranch({repository_id: repository_id, branch: branch.name}).then((data) => {
         this.transitionTo('authenticated.builds.show', data.build.id);
       });

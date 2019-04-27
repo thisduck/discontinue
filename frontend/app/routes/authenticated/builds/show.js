@@ -13,7 +13,7 @@ export default Route.extend({
     this._super(...arguments);
 
     if (model.get('active')) {
-      this.get('poll').perform(model.id);
+      this.poll.perform(model.id);
     }
   },
 

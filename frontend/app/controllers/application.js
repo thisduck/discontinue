@@ -7,11 +7,11 @@ export default Controller.extend({
 
   actions: {
     logout() {
-      this.get('session').invalidate();
+      this.session.invalidate();
     },
 
     login() {
-      this.get('session').authenticate('authenticator:torii', 'github');
+      this.session.authenticate('authenticator:torii', 'github');
     }
   }
 

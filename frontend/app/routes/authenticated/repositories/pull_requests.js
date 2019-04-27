@@ -8,14 +8,14 @@ export default Route.extend({
 
   model({ repository_id }) {
     return RSVP.hash({
-      pull_requests: this.get('ajax').request('/github/pull_requests?repository_id=' + repository_id),
+      pull_requests: this.ajax.request('/github/pull_requests?repository_id=' + repository_id),
       repository_id: repository_id
     });
   },
 
   actions: {
     build(pull, repository_id) {
-      let build = this.get("store").createRecord('build-request', {});
+      let build = this.store.createRecord('build-request', {});
       build.buildFromPull({repository_id: repository_id, number: pull.number}).then((data) => {
         this.transitionTo('authenticated.builds.show', data.build.id);
       });

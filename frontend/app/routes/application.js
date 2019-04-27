@@ -9,7 +9,7 @@ export default Route.extend(ApplicationRouteMixin, {
   beforeModel() {
     this._super(...arguments);
     if (this.get('session.isAuthenticated')) {
-      this.get("currentUser").load();
+      this.currentUser.load();
     }
   },
 });

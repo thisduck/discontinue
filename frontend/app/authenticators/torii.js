@@ -8,8 +8,8 @@ export default ToriiAuthenticator.extend({
 
   authenticate() {
     return this._super(...arguments).then((data) => {
-      return this.get('session').authenticate('authenticator:token', {code: data.authorizationCode}).then(() => {
-        this.get('currentUser').load();
+      return this.session.authenticate('authenticator:token', {code: data.authorizationCode}).then(() => {
+        this.currentUser.load();
         return this.get('session.data.authenticated');
       });
     });
