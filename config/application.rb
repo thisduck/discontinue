@@ -21,6 +21,8 @@ module Discontinue
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
+    # to redirect 404 to ember app
+    config.exceptions_app = self.routes
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
@@ -31,15 +33,15 @@ module Discontinue
     config.generators.system_tests = nil
     config.active_job.queue_adapter = :delayed_job
 
-    config.middleware.use(
-      ExceptionNotification::Rack,
-      :email => {
-        # :deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
-        :email_prefix => "[Discontinue Exception #{Rails.env}] ",
-        :sender_address => %{"notifier" <notifier@example.com>},
-        :exception_recipients => %w{adnan.ali@gmail.com}
-      }
-    )
+    # config.middleware.use(
+    #   ExceptionNotification::Rack,
+    #   :email => {
+    #     # :deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
+    #     :email_prefix => "[Discontinue Exception #{Rails.env}] ",
+    #     :sender_address => %{"notifier" <notifier@example.com>},
+    #     :exception_recipients => %w{adnan.ali@gmail.com}
+    #   }
+    # )
 
   end
 end

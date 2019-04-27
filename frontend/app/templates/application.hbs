@@ -1,1 +1,41 @@
-Hello.
+<div class="bg-white shadow px-6 py-1 sticky pin-t pin-r w-full flex justify-between h-12 items-center z-50">
+  <ul class="list-reset flex">
+    <li class="px-3">
+      {{#link-to 'index' class='font-header no-underline font-bold text-black'}}Discontinue{{/link-to}}
+    </li>
+      <li class="px-3">
+        {{#link-to 'index' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Repositories{{/link-to}}
+      </li>
+      <li class="px-3">
+        {{#link-to 'index' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Builds{{/link-to}}
+      </li>
+      <li class="px-3">
+        {{#link-to 'index' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Build Requests{{/link-to}}
+      </li>
+      <li class="px-3">
+        {{#link-to 'login' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Login{{/link-to}}
+      </li>
+  </ul>
+
+  <ul class="list-reset flex items-center">
+    {{#if session.isAuthenticated}}
+      <li class="item flex items-center px-3 text-grey-8">
+        <img src={{currentUser.user.avatar_url}} class="h-8 w-8 mr-2 rounded-full" >
+        <span>
+          {{currentUser.user.integrationLogin}}
+        </span>
+      </li>
+      <li class="px-3">
+        <a class="no-underline text-grey-8" href="#" onclick={{action "logout"}}>Log Out</a>
+      </li>
+    {{else}}
+      <li class="px-3">
+        <a class="no-underline text-grey-8" href="#" onclick={{action "login"}}>Github Login</a>
+      </li>
+    {{/if}}
+  </ul>
+</div>
+
+<div class="mt-6 mx-6 px-3">
+  {{outlet}}
+</div>

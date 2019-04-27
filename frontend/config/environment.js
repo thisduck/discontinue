@@ -26,7 +26,25 @@ module.exports = function(environment) {
     APP: {
       // Here you can pass flags/options to your application instance
       // when it is created
-    }
+    },
+
+    torii: {
+      sessionServiceName: 'session',
+      remoteServiceName: 'iframe',
+      providers: {
+        'github-oauth2': {
+          apiKey: process.env.GITHUB_APP_CLIENT_ID,
+          scope: 'repo repo:status read:user read:org user:email',
+        }
+      }
+    },
+
+    'ember-simple-auth-token': {
+      serverTokenEndpoint: '/session',
+      refreshAccessTokens: false,
+      authorizationHeaderName: 'Authorization', // Header name added to each API request
+      authorizationPrefix: 'Bearer ', // Prefix added to each API request
+    },
   };
 
   if (environment === 'development') {

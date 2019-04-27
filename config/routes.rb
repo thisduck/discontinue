@@ -42,5 +42,5 @@ Rails.application.routes.draw do
     jsonapi_resources :test_results
   end
 
-  match "/404", to: "ember#index", via: :all
+  get "404", to: "ember#index"
 end
