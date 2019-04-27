@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 
 export default class ApplicationController extends Controller {
   @service session;
+  @service currentUser;
 
   @action
   logout() {
