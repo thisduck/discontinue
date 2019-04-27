@@ -4,33 +4,33 @@
   </span>
 
   {{#if (and pagination.first (not-eq page pagination.first.number))}}
-    {{link-to "first" route (query-params page=pagination.first.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
+    {{link-to "first" route (query-params page=pagination.first.number) class="bg-white text-sm text-primary-6 border border-primary-6 px-3 py-2 hover:border-primary-8 hover:text-primary-8 inline-block mr-3 rounded"}}
   {{else}}
-    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
+    <span class="bg-white text-sm text-grey-4 border border-grey-4 px-3 py-2 inline-block mr-3 rounded">
       first
     </span>
   {{/if}}
 
   {{#if pagination.prev}}
-    {{link-to "prev" route (query-params page=pagination.prev.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
+    {{link-to "prev" route (query-params page=pagination.prev.number) class="bg-white text-sm text-primary-6 border border-primary-6 px-3 py-2 hover:border-primary-8 hover:text-primary-8 inline-block mr-3 rounded"}}
   {{else}}
-    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
+    <span class="bg-white text-sm text-grey-4 border border-grey-4 px-3 py-2 inline-block mr-3 rounded">
       prev
     </span>
   {{/if}}
 
   {{#if pagination.next}}
-    {{link-to "next" route (query-params page=pagination.next.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block mr-3"}}
+    {{link-to "next" route (query-params page=pagination.next.number) class="bg-white text-sm text-primary-6 border border-primary-6 px-3 py-2 hover:border-primary-8 hover:text-primary-8 inline-block mr-3 rounded"}}
   {{else}}
-    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block mr-3">
+    <span class="bg-white text-sm text-grey-4 border border-grey-4 px-3 py-2 inline-block mr-3 rounded">
       next
     </span>
   {{/if}}
 
   {{#if (and pagination.last (not-eq page pagination.last.number))}}
-    {{link-to "last" route (query-params page=pagination.last.number) class="bg-white text-sm text-primary border border-primary px-3 py-2 hover:bp-primary-dark inline-block"}}
+    {{link-to "last" route (query-params page=pagination.last.number) class="bg-white text-sm text-primary-6 border border-primary-6 px-3 py-2 hover:border-primary-8 hover:text-primary-8 inline-block rounded"}}
   {{else}}
-    <span class="bg-white text-sm text-grey border border-grey px-3 py-2 inline-block">
+    <span class="bg-white text-sm text-grey-4 border border-grey-4 px-3 py-2 inline-block rounded">
       last
     </span>
   {{/if}}

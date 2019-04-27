@@ -18,6 +18,14 @@ export default DS.Model.extend({
   streams: DS.hasMany('streams'),
   startedAt: DS.attr('datetime'),
 
+  running: computed('state', function() {
+    if (this.state.endsWith('ing')) {
+      return true;
+    }
+
+    return false;
+  }),
+
   active: computed('state', function() {
     if (this.state.endsWith('ing')) {
       return true;

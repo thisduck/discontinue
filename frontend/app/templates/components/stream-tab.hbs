@@ -1,8 +1,11 @@
-<li class="p-2 {{if (is-url-active 'authenticated.builds.show.stream' stream.build.id stream.id) (concat 'font-bold border-b-2 border-' tabClass)}} text-{{tabClass}} flex">
+<li class="p-2 {{if (is-url-active 'authenticated.builds.show.stream' stream.build.id stream.id) (concat 'border-b-2 border-' tabClass '-5' ' text-' tabClass '-8')}} text-{{tabClass}}-8 flex">
   {{#if stream.active}}
     {{fa-icon 'spinner' spin=true class="mr-2"}}
   {{/if}}
-  {{#link-to 'authenticated.builds.show.stream' stream.build.id stream.id class=(concat 'text-' tabClass)}}
+  {{#link-to 'authenticated.builds.show.stream' stream.build.id stream.id class='mr-1 pb-2'
+    inactiveClass=(concat 'text-' tabClass '-5')
+    activeClass=(concat 'text-' tabClass '-8')
+  }}
     {{stream.name}}
     <br>
     <span class="text-xs">

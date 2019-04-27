@@ -4,10 +4,10 @@
   </button>
 
   {{#if show}}
-  <ul class="list-reset absolute pin-r py-1 shadow border bg-white z-10">
+  <ul class="list-reset absolute pin-r py-1 shadow-md border-grey-3 bg-grey-5 z-10 rounded text-grey-2 text-sm">
     {{#each items as |item|}}
-      <li class="py-2 px-4 hover:bg-grey-light hover:text-white" {{action 'selectItem' item}}>
-        <button class="hover:bg-grey-light hover:text-white">
+      <li>
+        <button class="w-full py-2 px-4 text-grey-1 text-sm hover:bg-grey-3 hover:text-grey-8" {{action 'selectItem' item}}>
           {{item}}
         </button>
       </li>

@@ -5,31 +5,31 @@
     </li>
     {{#if session.isAuthenticated}}
       <li class="px-3">
-        {{#link-to 'authenticated.repositories' class='no-underline text-grey-darkest'}}Repositories{{/link-to}}
+        {{#link-to 'authenticated.repositories' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Repositories{{/link-to}}
       </li>
       <li class="px-3">
-        {{#link-to 'authenticated.builds' class='no-underline text-grey-darkest'}}Builds{{/link-to}}
+        {{#link-to 'authenticated.builds' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Builds{{/link-to}}
       </li>
       <li class="px-3">
-        {{#link-to 'authenticated.build_requests' class='no-underline text-grey-darkest'}}Build Requests{{/link-to}}
+        {{#link-to 'authenticated.build_requests' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Build Requests{{/link-to}}
       </li>
     {{/if}}
   </ul>
 
   <ul class="list-reset flex items-center">
     {{#if session.isAuthenticated}}
-      <li class="item flex items-center px-3 text-grey-darkest">
+      <li class="item flex items-center px-3 text-grey-8">
         <img src={{currentUser.user.avatar_url}} class="h-8 w-8 mr-2 rounded-full" >
         <span>
           {{currentUser.user.integrationLogin}}
         </span>
       </li>
       <li class="px-3">
-        <a class="no-underline text-grey-darkest" href="#" onclick={{action "logout"}}>Log Out</a>
+        <a class="no-underline text-grey-8" href="#" onclick={{action "logout"}}>Log Out</a>
       </li>
     {{else}}
       <li class="px-3">
-        <a class="no-underline text-grey-darkest" href="#" onclick={{action "login"}}>Github Login</a>
+        <a class="no-underline text-grey-8" href="#" onclick={{action "login"}}>Github Login</a>
       </li>
     {{/if}}
   </ul>

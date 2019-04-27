@@ -7,8 +7,10 @@ export default Component.extend({
 
     if (this.get('build.state') == "passed") {
       return 'success'
+    } else if (this.get('build.running')) {
+      return 'accent';
     } else if (this.get('build.active')) {
-      return 'info';
+      return 'primary';
     }
 
     return 'danger';

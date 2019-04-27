@@ -5,7 +5,7 @@ export default Component.extend({
   tagName: '',
   tabClass: computed('box.{passed,active}', function() {
     if (this.get('box.active')) {
-      return 'info';
+      return 'accent';
     }
 
     if (this.get('box.passed')) {

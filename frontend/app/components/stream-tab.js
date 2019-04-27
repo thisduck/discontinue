@@ -5,7 +5,7 @@ export default Component.extend({
   tagName: '',
   tabClass: computed('stream.{passed,active}', function() {
     if (this.get('stream.active')) {
-      return 'info';
+      return 'accent';
     }
 
     if (this.get('stream.passed')) {
