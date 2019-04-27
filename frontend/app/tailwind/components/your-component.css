@@ -26,7 +26,7 @@ a {
 }
 
 .table thead tr th {
-  @apply .text-grey-darker .border-0;
+  @apply .border-0;
 }
 
 .table th, .table td {
