@@ -1,0 +1,44 @@
+<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0>
+  <div class="w-3/4">
+    <div class="mb-3">
+      <div class="mr-3 inline-block">
+        {{#if @showLink}}
+          {{#link-to 'authenticated.builds.show' @build.id class="no-underline inline-block"}}
+            <span class="border border-{{color}}-5 bg-{{color}}-5 text-grey-1 p-1 text-center rounded inline-block flex items-center">
+              <b class="text-grey-1">#{{@build.id}}</b> <span class="text-sm ml-2">{{@build.state}}</span>
+            </span>
+
+          {{/link-to}}
+        {{else}}
+          <span class="border border-{{color}}-5 bg-{{color}}-5 text-grey-1 p-1 text-center rounded inline-block flex items-center">
+            <b class="text-grey-1">#{{@build.id}}</b> <span class="text-sm ml-2">{{@build.state}}</span>
+          </span>
+        {{/if}}
+      </div>
+
+      <span class="mr-3">
+        <Icon @name="bookmarks" /> <span class="middle-align"> {{@build.repository.name}} </span>
+      </span>
+
+      <span class="mr-3">
+        <Icon @name="git-branch" /> <strong class="align-middle"> {{@build.branch}} </strong>
+      </span>
+
+      <a href="{{@build.commitUrl}}" target="_blank" class="mr-3 no-underline">
+        <span class="text-xs text-grey-6 font-mono">
+          <Icon @name="git-commit" />
+        <span class="align-middle">{{@build.shortSha}}</span>
+        </span>
+      </a>
+
+      <span class="text-grey-6 text-sm">
+        <Icon @name="person" /> 
+        <span class="align-middle">{{@build.author}}</span>
+      </span>
+    </div>
+
+    <div class="text-sm text-grey-5">
+      <pre>{{@build.commitMessage}}</pre>
+    </div>
+  </div>
+</Card>

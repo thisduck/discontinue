@@ -16,6 +16,10 @@ Router.map(function() {
     this.route('repositories', function() {
       this.route('show', { path: '/:repository_id' });
     });
+    this.route('builds', function() {
+      this.route('show', { path: '/:build_id' });
+    });
+    this.route('build_requests', function() {});
   })
 });
 
