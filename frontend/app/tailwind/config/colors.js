@@ -87,5 +87,4 @@ export default {
   'purple-2': "#CFBCF2",
   'purple-1': "#EAE2F8",
 
-  'info': '#17A2B8',
 };
