@@ -665,8 +665,6 @@ GEM
     builder (3.2.3)
     byebug (10.0.2)
     climate_control (0.2.0)
-    cocaine (0.5.8)
-      climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.2)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
@@ -688,12 +686,6 @@ GEM
     elasticsearch-transport (6.1.0)
       faraday
       multi_json
-    ember-cli-rails (0.10.0)
-      cocaine (~> 0.5.8)
-      ember-cli-rails-assets (~> 0.6.2)
-      html_page (~> 0.1.0)
-      railties (>= 3.2)
-    ember-cli-rails-assets (0.6.2)
     erubi (1.7.1)
     exception_notification (4.2.2)
       actionmailer (>= 4.0, < 6)
@@ -707,7 +699,6 @@ GEM
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     hashie (3.6.0)
-    html_page (0.1.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httparty (0.16.2)
@@ -879,7 +870,6 @@ DEPENDENCIES
   daemons
   delayed_job!
   delayed_job_active_record!
-  ember-cli-rails
   exception_notification
   figaro
   hashie

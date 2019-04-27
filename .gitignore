@@ -25,6 +25,7 @@
 /yarn-error.log
 
 /public/assets
+/public
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
@@ -35,3 +36,4 @@ tags
 # Ignore application configuration
 /config/application.yml
 files
+

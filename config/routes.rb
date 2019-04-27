@@ -42,6 +42,5 @@ Rails.application.routes.draw do
     jsonapi_resources :test_results
   end
 
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  mount_ember_app :frontend, to: "/"
+  match "/404", to: "ember#index", via: :all
 end
