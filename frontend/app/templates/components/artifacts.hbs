@@ -1,0 +1,22 @@
+<table class="w-full border border-collapse border-grey-2 border-collapse table-fixed font-mono text-sm">
+  <tbody>
+    {{#each @artifacts as |artifact|}}
+      <tr class="border border-grey-2">
+        <td class="break-words p-2 ">
+          <div class="flex">
+            <Icon @name="document"  class="mr-2" />
+            <a href="{{artifact.presignedUrl}}" target="_blank" class="break-words no-underline text-accent-5">
+              {{artifact.filename}}
+            </a>
+          </div>
+        </td>
+        <td class="w-24">
+          {{artifact.extension}}
+        </td>
+        <td class="w-24">
+          {{artifact.size}}
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

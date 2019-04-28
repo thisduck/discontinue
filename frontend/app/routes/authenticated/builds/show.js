@@ -4,7 +4,7 @@ import { timeout } from 'ember-concurrency';
 
 export default class AuthenticatedBuildsShowRoute extends Route {
   model(params) {
-    return this.store.findRecord('build', params.build_id, { include: 'streams' })
+    return this.store.findRecord('build', params.build_id, { include: 'streams.boxes' })
   }
 
   setupController(controller, model) {

@@ -1,1 +1,28 @@
-{{outlet}}
+<Header @level=4>Artifacts</Header>
+
+<div class="ui bottom attached tab segment active">
+  <ul class="list-reset">
+    {{#each model.streams as |stream|}}
+      <li class="item p-1">
+        <div class="inline-block my-2">
+          <Icon @name='folder' /> {{stream.name}}
+        </div>
+        <ul class="list-reset ml-6">
+          {{#each stream.boxes as |box|}}
+            <li class="item">
+              <div class="inline-block my-2">
+                <Icon @name='folder' /> Box {{box.box_number}}
+              </div>
+              <div class="content">
+                <div class="header">
+                </div>
+                <Artifacts @artifacts={{box.artifacts}} />
+              </div>
+            </li>
+          {{/each}}
+        </ul>
+      </li>
+    {{/each}}
+  </ul>
+</div>
+

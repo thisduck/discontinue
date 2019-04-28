@@ -11,8 +11,8 @@ export default class BoxModel extends Model {
   @belongsTo('stream') stream;
 
   @hasMany('command') commands;
+  @hasMany('artifact') artifacts;
   // testResults: DS.hasMany('test-result'),
-  // artifacts: DS.hasMany('artifact'),
 
   get active() {
     // if (!this.get('build.active')) {
