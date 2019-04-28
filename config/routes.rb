@@ -42,5 +42,6 @@ Rails.application.routes.draw do
     jsonapi_resources :test_results
   end
 
+  root to: 'ember#index'
   get "404", to: "ember#index"
 end

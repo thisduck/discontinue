@@ -9,6 +9,10 @@ export default class CardComponent extends Component {
     return this.args.borderTop || "";
   }
 
+  get flexDirection() {
+    return this.args.flexDirection || "row";
+  }
+
   get border() {
     return (this.args.border ? `-${this.args.border}` : null) || "";
   }

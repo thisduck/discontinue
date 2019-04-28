@@ -6,6 +6,7 @@ export default class CommandModel extends Model {
   @attr() lines;
   @attr() state;
   @attr() humanized_time;
+  @attr() return_code;
   @attr('date') started_at;
   @attr('date') finished_at;
 

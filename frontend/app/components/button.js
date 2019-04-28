@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { action } from '@ember/object';
 
 export default class ButtonComponent extends Component {
 
@@ -15,6 +16,10 @@ export default class ButtonComponent extends Component {
       return false;
     }
     return true;
+  }
+
+  get textSize() {
+    return this.args.size || "";
   }
 
   get textColor() {
@@ -55,5 +60,9 @@ export default class ButtonComponent extends Component {
     }
 
     return `${this.style}-5`;
+  }
+
+  get doAction() {
+    return this.args.action || action(() => {});
   }
 }

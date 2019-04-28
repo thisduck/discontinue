@@ -1,7 +1,7 @@
 class Command
   include ActiveModel::Model
 
-  attr_reader :id, :command, :lines, :started_at, :box_id, :finished_at, :state, :humanized_time
+  attr_reader :id, :command, :lines, :started_at, :box_id, :finished_at, :state, :humanized_time, :return_code
 
   def initialize(args, box)
     @command = args[:command]
@@ -10,6 +10,7 @@ class Command
     @finished_at = args[:finished_at]
     @state = args[:state]
     @humanized_time = args[:humanized_time]
+    @return_code = args[:return_code]
     @id = args[:id]
     @box_id = box.id
   end

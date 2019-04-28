@@ -94,6 +94,10 @@ class Box < ApplicationRecord
 
     commands = output_content.split("DISCONTINUE[").map do |split|
       lines = split.split("\n")
+      lines.last =~ /DISRESULT\[(.*)\]/
+      return_code = $1
+      lines.pop if return_code
+
       lines.first =~ /(.*?)\](.*)/
       time = $1
 
@@ -104,6 +108,7 @@ class Box < ApplicationRecord
         {
           command: command,
           started_at: Time.parse(time),
+          return_code: return_code,
           lines: lines.join("\n")
         }
       end
@@ -485,7 +490,7 @@ class Box < ApplicationRecord
       f.puts "source ~/.bashrc"
       f.puts 'tstamp() { date "+[%Y-%m-%d %T %z]"; }'
       # f.puts %/exe() { echo "CONTINUE$(tstamp)\$ $@" ; "$@" ; }/
-      f.puts %#exe() { echo "DISCONTINUE$(tstamp)\$ ${@/eval/}" ; "$@" ; rc=$?; if [[ $rc != 0  ]]; then exit $rc; fi }#
+      f.puts %#exe() { echo "DISCONTINUE$(tstamp)\$ ${@/eval/}" ; "$@" ; rc=$?; echo "DISRESULT[$rc]"; if [[ $rc != 0  ]]; then exit $rc; fi }#
 
       f.puts "if ! mkdir /tmp/#{BUILD_SCRIPT_PREFIX}_#{id}.lock 2>/dev/null; then"
       f.puts '  echo "build is already running." >&2'

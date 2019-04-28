@@ -128,9 +128,7 @@ class Build < ApplicationRecord
   end
 
   def root_url
-    @root_url ||= Rails.application.routes.url_helpers.url_for(
-      controller: 'ember_cli/ember', 
-      action: "index", 
+    @root_url ||= Rails.application.routes.url_helpers.root_url(
       host: Rails.application.config.action_mailer.default_url_options[:host], 
       port: Rails.application.config.action_mailer.default_url_options[:port]
     )

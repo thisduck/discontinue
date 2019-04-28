@@ -10,3 +10,5 @@
 /* .skew-45 {
   transform: skewY(45deg);
 } */
+
+.spin { -webkit-animation: spin 1s infinite linear; -moz-animation: spin 1s infinite linear; -o-animation: spin 1s infinite linear; animation: spin 1s infinite linear; }

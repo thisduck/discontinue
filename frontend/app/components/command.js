@@ -11,6 +11,19 @@ export default class CommandComponent extends Component {
     this.toggle = t;
   }
 
+  get returnStyle() {
+    const { command } = this.args;
+
+    const return_code = parseInt(command.return_code, 10);
+    if (return_code  > 0) {
+      return 'danger-6'
+    } else if (return_code == 0) {
+      return 'success-6'
+    }
+
+    return 'grey-4';
+  }
+
   get color() {
     if (this.args.command.state == "passed") {
       return 'green'
