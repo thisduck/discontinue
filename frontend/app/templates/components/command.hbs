@@ -1,0 +1,13 @@
+<div class="p-2">
+  <div class="title" {{action this.toggleCommand}}>
+    <div class="w-16 inline-block text-xs text-grey-4 text-right mr-2">[{{@command.humanized_time}}]</div> 
+    <span class="font-mono text-sm text-grey-8">
+      {{ @command.command }}
+    </span>
+  </div>
+  {{#if this.toggle}}
+    <div class="content {{activeClass}} mt-2 text-sm">
+      <ShellOutput @output={{@command.lines}} />
+    </div>
+  {{/if}}
+</div>

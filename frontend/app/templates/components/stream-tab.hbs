@@ -1,0 +1,15 @@
+<li class="p-2 text-{{style}}-8 flex">
+  {{#if @stream.active}}
+    <Icon @name="wifi" class="mr-2" />
+  {{/if}}
+  {{#link-to 'authenticated.builds.show.stream' @stream.build.id @stream.id class='mr-1 pb-2'
+    inactiveClass=(concat 'text-' style '-5')
+    activeClass=(concat 'text-' style '-8')
+  }}
+    {{@stream.name}}
+    <br>
+    <span class="text-xs">
+      [{{@stream.humanized_time}}]
+    </span>
+  {{/link-to}}
+</li>

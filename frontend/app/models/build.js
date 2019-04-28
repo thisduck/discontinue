@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-const { Model, attr, belongsTo } = DS;
+const { Model, attr, belongsTo, hasMany } = DS;
 
 export default class BuildModel extends Model {
   @attr() branch;
@@ -11,12 +11,14 @@ export default class BuildModel extends Model {
   @attr('date') createdAt;
 
   @belongsTo('repository') repository;
-  // repository: DS.belongsTo('repository'),
+
+
+  @hasMany('streams') streams;
+
   // buildSummary: DS.belongsTo('build-summary'),
   // buildTiming: DS.belongsTo('build-timing'),
   // profileSummary: DS.belongsTo('profile-summary'),
   // buildRequest: DS.belongsTo('build-request'),
-  // streams: DS.hasMany('streams'),
 
   // triggerEvent: memberAction({ path: 'trigger_event' }),
   get shortSha() {

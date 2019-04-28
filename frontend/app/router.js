@@ -17,7 +17,15 @@ Router.map(function() {
       this.route('show', { path: '/:repository_id' });
     });
     this.route('builds', function() {
-      this.route('show', { path: '/:build_id' });
+      this.route('show', { path: '/:build_id' }, function() {
+        this.route('summary');
+        this.route('artifacts');
+        this.route('stream', { path: '/stream/:stream_id' }, function() {
+          this.route('show', { path: '/' }, function() {
+            this.route('box', { path: '/box/:box_id' });
+          });
+        });
+      });
     });
     this.route('build_requests', function() {});
   })

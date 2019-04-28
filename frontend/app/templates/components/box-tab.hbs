@@ -1,0 +1,11 @@
+<li class="p-2 text-{{style}}-8 flex">
+  {{#if @box.active}}
+    <Icon @name="wifi" class="mr-2" />
+  {{/if}}
+  {{#link-to 'authenticated.builds.show.stream.show.box' @build.id @stream.id @box.id class=(concat 'text-' style '-8')}}
+    {{@index}} 
+    <span class="text-xs">
+      [{{@box.humanized_time}}]
+    </span>
+  {{/link-to}}
+</li>
