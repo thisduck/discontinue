@@ -2,15 +2,12 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
-
-
-
 export default class CommandComponent extends Component {
   @tracked toggle;
 
   didReceiveAttrs () {
     this._super(...arguments);
-    let t = this.args.toggles[this.index];
+    let t = this.args.toggles[this.args.index];
     this.toggle = t;
   }
 
