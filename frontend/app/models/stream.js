@@ -6,8 +6,8 @@ export default class StreamModel extends Model {
   @attr() state;
   @attr() buildId;
   @attr() humanized_time;
-  @attr('date') started_at;
-  @attr('date') finished_at;
+  @attr('date') startedAt;
+  @attr('date') finishedAt;
 
   @belongsTo('build') build;
 

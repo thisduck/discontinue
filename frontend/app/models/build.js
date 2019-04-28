@@ -1,5 +1,6 @@
 import DS from 'ember-data';
 const { Model, attr, belongsTo, hasMany } = DS;
+import { memberAction } from 'ember-api-actions';
 
 export default class BuildModel extends Model {
   @attr() branch;
@@ -9,8 +10,18 @@ export default class BuildModel extends Model {
   @attr() events;
   @attr() duration;
   @attr('date') createdAt;
+  @attr('date') startedAt;
+  @attr('date') finishedAt;
 
   @belongsTo('repository') repository;
+
+  triggerEvent(params) {
+    const modelName = this.constructor.modelName;
+    const adapter = this.store.adapterFor(this.constructor.modelName);
+    const url = adapter.buildURL(modelName, this.id) + "/trigger_event";
+
+    return adapter.ajax(url, "PUT", {data: params})
+  }
 
 
   @hasMany('streams') streams;

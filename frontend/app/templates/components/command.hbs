@@ -1,6 +1,6 @@
 <div class="px-2 py-3 border-b border-grey-2">
   <div class="title" {{on-click this.toggleCommand}}>
-    <div class="w-16 inline-block text-xs text-{{this.returnStyle}} text-right mr-2">[{{@command.humanized_time}}]</div> 
+    <div class="w-16 inline-block text-xs text-{{this.returnStyle}} text-right mr-2">[{{human-date-diff start=@command.startedAt finish=@command.finishedAt}}]</div> 
     <span class="font-mono text-sm text-grey-8">
       {{ @command.command }}
     </span>

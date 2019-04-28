@@ -7,8 +7,8 @@ export default class CommandModel extends Model {
   @attr() state;
   @attr() humanized_time;
   @attr() return_code;
-  @attr('date') started_at;
-  @attr('date') finished_at;
+  @attr('date') startedAt;
+  @attr('date') finishedAt;
 
   @belongsTo('box') box;
 

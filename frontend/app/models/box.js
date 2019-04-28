@@ -5,8 +5,8 @@ export default class BoxModel extends Model {
   @attr() state;
   @attr() humanized_time;
   @attr() box_number;
-  @attr('date') started_at;
-  @attr('date') finished_at;
+  @attr('date') startedAt;
+  @attr('date') finishedAt;
 
   @belongsTo('stream') stream;
 

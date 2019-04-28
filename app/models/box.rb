@@ -124,9 +124,8 @@ class Box < ApplicationRecord
       if commands[index + 1].present?
         command[:finished_at] = commands[index + 1][:started_at]
       else
-        command[:finished_at] = (finished_at || Time.now)
+        command[:finished_at] = active? ? nil : (finished_at || Time.now)
       end
-      command[:humanized_time] = HumanizeSeconds.humanize(command[:finished_at] - command[:started_at])
     end
 
     commands

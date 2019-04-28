@@ -41,4 +41,12 @@
       <pre>{{@build.commitMessage}}</pre>
     </div>
   </div>
+
+  <div class="w-1/4">
+    {{#each @build.events as |event|}}
+      <Button @skin="link" @size="sm" @style="accent" @action={{action this.triggerEvent event}}>
+        {{event}}
+      </Button>
+    {{/each}}
+  </div>
 </Card>

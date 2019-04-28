@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { action } from '@ember/object';
 
 export default class BuildComponent extends Component {
   get color() {
@@ -12,5 +13,19 @@ export default class BuildComponent extends Component {
     }
 
     return 'danger';
+  }
+
+  @action
+  triggerEvent(event) {
+    const { build } = this.args; 
+    build.triggerEvent({event: event}).then(() => {
+      build.reload().then(() => {
+        build.eachRelationship((name, {kind}) => {
+          if (build[kind](name).value()) {
+            build.get(name).reload();
+          }
+        })
+      });
+    });
   }
 }

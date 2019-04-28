@@ -2,7 +2,7 @@ require 'humanize_seconds'
 class Api::BuildResource < JSONAPI::Resource
   include BuildResourceConcern
 
-  attributes :build_request_id
+  attributes :build_request_id, :started_at, :finished_at
 
   belongs_to :build_request
 

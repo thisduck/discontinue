@@ -12,6 +12,14 @@ export default class BuildRequestModel extends Model {
 
   @belongsTo('repository') repository;
 
+  triggerEvent(params) {
+    const modelName = this.constructor.modelName;
+    const adapter = this.store.adapterFor(this.constructor.modelName);
+    const url = adapter.buildURL(modelName, this.id) + "/trigger_event";
+
+    return adapter.ajax(url, "PUT", {data: params})
+  }
+
   get active() {
     return true;
   }
