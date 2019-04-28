@@ -1,6 +1,5 @@
 import DS from 'ember-data';
 const { Model, attr, belongsTo, hasMany } = DS;
-import { memberAction } from 'ember-api-actions';
 
 export default class BuildModel extends Model {
   @attr() branch;

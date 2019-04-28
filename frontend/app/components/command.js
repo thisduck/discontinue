@@ -14,10 +14,14 @@ export default class CommandComponent extends Component {
   get returnStyle() {
     const { command } = this.args;
 
+    if (command.state == "active") {
+      return "accent-6";
+    }
+
     const return_code = parseInt(command.return_code, 10);
     if (return_code  > 0) {
       return 'danger-6'
-    } else if (return_code == 0) {
+    } else if (return_code == 0 || command.state == "passed") {
       return 'success-6'
     }
 

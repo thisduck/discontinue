@@ -10,6 +10,10 @@ export default class StreamTabComponent extends Component {
       'failed': 'danger',
     }
 
-    return style[stream.get('status')];
+    return style[stream.status];
+  }
+
+  get active() {
+    return this.args.stream.active;
   }
 }

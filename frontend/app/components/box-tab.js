@@ -11,4 +11,8 @@ export default class BoxTabComponent extends Component {
 
     return style[box.get('status')];
   }
+
+  get active() {
+    return this.args.box.active;
+  }
 }

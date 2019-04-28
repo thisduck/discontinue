@@ -1,5 +1,5 @@
 <li class="p-2 text-{{style}}-8 flex">
-  {{#if @box.active}}
+  {{#if this.active}}
     <Icon @name="wifi" @spin=true class="mr-2" />
   {{/if}}
   {{#link-to 'authenticated.builds.show.stream.show.box' @build.id @stream.id @box.id class=(concat 'text-' style '-8')}}

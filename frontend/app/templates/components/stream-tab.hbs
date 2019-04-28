@@ -1,7 +1,8 @@
 <li class="p-2 text-{{style}}-8 flex">
-  {{#if @stream.active}}
+  {{#if this.active}}
     <Icon @name="wifi" @spin=true class="mr-2" />
   {{/if}}
+
   {{#link-to 'authenticated.builds.show.stream' @stream.build.id @stream.id class='mr-1 pb-2'
     inactiveClass=(concat 'text-' style '-5')
     activeClass=(concat 'text-' style '-8')
