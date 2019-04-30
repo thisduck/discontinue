@@ -26,7 +26,7 @@ module GithubEvents
 
       return unless build_request 
 
-      build_request.store_pull_request
+      build_request.store_pull_requests
       build_request.save!
 
       if build_request.queued?

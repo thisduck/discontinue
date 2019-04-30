@@ -7,7 +7,7 @@ class BuildRequest < ApplicationRecord
 
   validates_presence_of :branch, :repository, :aasm_state
 
-  before_create :store_pull_request
+  before_create :store_pull_requests
 
   include AASM
 
@@ -46,7 +46,7 @@ class BuildRequest < ApplicationRecord
   end
 
   def open_pull_request?
-    pull_requests.collect{|x| x[:state] }.include?("open")
+    (pull_request || '').split(',').any?
   end
 
   def fetch_pull_requests
