@@ -1,0 +1,35 @@
+<tr class="border border-grey-2 bg-{{this.style}}-2" {{on-click this.toggleMore}}>
+  <td class="p-2 cursor-pointer" onclick={{action this.toggleMore}} >
+    <Icon @name={{this.moreIcon}} />
+  </td>
+  {{#if showBuild}}
+    <td data-label="Build">{{link-to @result.build_id 'authenticated.builds.show' @result.stream.build.id}}</td>
+  {{/if}}
+  <td data-label="Box" class="p-2">{{link-to @result.box.id 'authenticated.builds.show.stream.show.box' @result.stream.build.id @result.stream.id @result.box.id}}</td>
+  <!-- <td data-label="Description">{{link-to @result.description 'authenticated.test_results' (query-params test_id=@result.test_id)}}</td> -->
+  <td data-label="Description" class="p-2">{{ @result.description }}</td>
+  <td data-label="Test Type" class="p-2">{{@result.test_type}}</td>
+  <td class="inline-block break-words" data-label="Location" class="p-2 break-words">{{@result.file_path}}:{{@result.line_number}}</td>
+  <td data-label="Duration" class="p-2">{{@result.duration}}</td>
+</tr>
+{{#if this.showMore}}
+  {{#if @result.exception.message}}
+    <tr>
+      <td colspan='6'>
+        <ShellOutput>
+          {{~@result.exception.message~}}
+          <div>
+            {{#each @result.exception.backtrace as |line|}}
+              {{line}}
+            {{/each}}
+          </div>
+        </ShellOutput>
+      </td>
+    </tr>
+  {{/if}}
+  <tr>
+    <td colspan='6'>
+      <Artifacts @artifacts={{@result.artifacts}} />
+    </td>
+  </tr>
+{{/if}}

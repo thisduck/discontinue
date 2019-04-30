@@ -13,6 +13,8 @@ export default class BuildModel extends Model {
   @attr('date') finishedAt;
 
   @belongsTo('repository') repository;
+  @belongsTo('build-request') buildRequest;
+  @belongsTo('build-summary') buildSummary;
 
   triggerEvent(params) {
     const modelName = this.constructor.modelName;
@@ -25,10 +27,8 @@ export default class BuildModel extends Model {
 
   @hasMany('streams') streams;
 
-  // buildSummary: DS.belongsTo('build-summary'),
   // buildTiming: DS.belongsTo('build-timing'),
   // profileSummary: DS.belongsTo('profile-summary'),
-  // buildRequest: DS.belongsTo('build-request'),
 
   // triggerEvent: memberAction({ path: 'trigger_event' }),
   get shortSha() {

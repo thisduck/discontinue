@@ -1,1 +1,7 @@
-<pre class="p-2 bg-grey-10 text-grey-3 whitespace-pre-wrap break-words">{{{ansi_output}}}</pre>
+<pre class="p-2 bg-grey-10 text-grey-3 whitespace-pre-wrap break-words">
+{{#if (has-block)}}
+{{yield}}
+{{else}}
+{{{ansi_output}}}
+{{/if}}
+</pre>

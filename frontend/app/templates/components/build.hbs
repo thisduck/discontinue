@@ -1,5 +1,5 @@
-<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0>
-  <div class="w-3/4">
+<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0 class="justify-between">
+  <div class="w-4/5">
     <div class="mb-3">
       <div class="mr-3 inline-block">
         {{#if @showLink}}
@@ -21,7 +21,7 @@
       </span>
 
       <span class="mr-3">
-        <Icon @name="git-branch" /> <strong class="align-middle"> {{@build.branch}} </strong>
+        <Icon @name="git-branch" /> <strong class="align-middle truncate max-w-64 inline-block" title={{@build.branch}}> {{@build.branch}} </strong>
       </span>
 
       <a href="{{@build.commitUrl}}" target="_blank" class="mr-3 no-underline">
@@ -31,18 +31,37 @@
         </span>
       </a>
 
-      <span class="text-grey-6 text-sm">
+      <span class="text-grey-6 text-sm mr-3">
         <Icon @name="person" /> 
         <span class="align-middle">{{@build.author}}</span>
       </span>
+
+      {{#if @build.startedAt}}
+        <span class="text-xs">
+          <Icon @name="stopwatch" /> 
+          <span class="align-middle">
+          {{human-date-diff start=@build.startedAt finish=@build.finishedAt}}
+          </span>
+        </span>
+      {{/if}}
     </div>
 
     <div class="text-sm text-grey-5">
-      <pre>{{@build.commitMessage}}</pre>
+      <pre class="whitespace-pre-wrap break-words">{{@build.commitMessage}}</pre>
     </div>
   </div>
+  <div class="p-2">
 
-  <div class="w-1/4">
+  {{#if @lastBuild}}
+    <div class="content text-sm">
+      {{#link-to 'authenticated.builds.show' @lastBuild.id}}
+        Last Build #{{@lastBuild.id}}
+      {{/link-to}}
+    </div>
+  {{/if}}
+  </div>
+
+  <div class="">
     {{#each @build.events as |event|}}
       <Button @skin="link" @size="sm" @style="accent" @action={{action this.triggerEvent event}}>
         {{event}}

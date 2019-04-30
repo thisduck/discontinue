@@ -4,6 +4,7 @@ class Api::StreamResource < JSONAPI::Resource
   belongs_to :build
   has_many :boxes
   has_many :test_results
+  has_one :stream_summary
 
   def state
     @model.aasm_state

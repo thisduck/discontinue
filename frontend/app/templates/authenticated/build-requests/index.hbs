@@ -1,3 +1,16 @@
+<Header @level=2>Builds Requests</Header>
+
+<div class="mb-4">
+  <label class="flex items-center">
+    <Icon @name="search" class="z-10 pl-3 mt-px" />
+    {{input name="query" value=query class='-ml-6 w-full px-10 py-2 border border-grey-2 hover:border-accent-3 focus:border-accent-3 focus:outline-none rounded'}}
+  </label>
+</div>
+
+<Pagination @pagination={{model.meta.pagination}} @route="authenticated.build_requests.index" @page={{page}} />
+
 {{#each model as |request|}}
   <Build @build={{request}} @lastBuild={{request.lastBuild}} />
 {{/each}}
+
+<Pagination @pagination={{model.meta.pagination}} @route="authenticated.build_requests.index" @page={{page}} />

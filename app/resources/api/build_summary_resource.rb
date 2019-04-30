@@ -9,6 +9,7 @@ class Api::BuildSummaryResource < JSONAPI::Resource
     counts.each do |key, count|
       stream_id, test_type, status = key
       results << {
+        build_id: @model.id,
         stream_id: stream_id,
         test_type: test_type,
         status: status,
@@ -16,6 +17,6 @@ class Api::BuildSummaryResource < JSONAPI::Resource
       }
     end
 
-    results
+    results.group_by{|x| x[:stream_id] }
   end
 end

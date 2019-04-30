@@ -56,37 +56,49 @@ when "cache"
   end
 
   cache_directories.each do |directory|
-    tar_file = tar_file_name(directory)
-    log "tarring #{directory}."
-    if File.exist?(directory)
-      `tar czf #{tar_file} #{directory}`
-      log "tarring #{directory} complete."
-      log "uploading #{tar_file} to S3."
-      s3_upload_file(
-        cache_key(tar_file, branch: branch),
-        tar_file,
-      )
-      log "uploading #{tar_file} to S3 complete."
-    else
-      log "#{directory} does not exist."
+    begin
+      tar_file = tar_file_name(directory)
+      log "tarring #{directory}."
+      if File.exist?(directory)
+        `tar czf #{tar_file} #{directory}`
+        log "tarring #{directory} complete."
+        log "uploading #{tar_file} to S3."
+        s3_upload_file(
+          cache_key(tar_file, branch: branch),
+          tar_file,
+        )
+        log "uploading #{tar_file} to S3 complete."
+      else
+        log "#{directory} does not exist."
+      end
+    rescue => e
+      puts "error in fetch [#{directory}]"
+      puts e.message
+      puts e.backtrace.join("\n")
     end
   end
 when "fetch"
   cache_directories.each do |directory|
-    tar_file = tar_file_name(directory)
-    obj = s3_bucket.object(cache_key(tar_file, branch: branch))
-    log "checking #{tar_file} in S3."
-    unless obj.exists?
-      log "checking #{tar_file} on master in S3."
-      obj = s3_bucket.object(cache_key(tar_file, branch: "master"))
-    end
-    if obj.exists?
-      log "downloading #{tar_file} from S3."
-      obj.download_file(tar_file)
-      log "downloading #{tar_file} from S3 complete."
-      log "untarring #{tar_file}."
-      `tar xzf #{tar_file}`
-      log "untarring #{tar_file} complete."
+    begin
+      tar_file = tar_file_name(directory)
+      obj = s3_bucket.object(cache_key(tar_file, branch: branch))
+      log "checking #{tar_file} in S3."
+      unless obj.exists?
+        log "checking #{tar_file} on master in S3."
+        obj = s3_bucket.object(cache_key(tar_file, branch: "master"))
+      end
+      if obj.exists?
+        log "downloading #{tar_file} from S3."
+        obj.download_file(tar_file)
+        log "downloading #{tar_file} from S3 complete."
+        log "untarring #{tar_file}."
+        `tar xzf #{tar_file}`
+        log "untarring #{tar_file} complete."
+      end
+    rescue => e
+      puts "error in fetch [#{directory}]"
+      puts e.message
+      puts e.backtrace.join("\n")
     end
   end
 end

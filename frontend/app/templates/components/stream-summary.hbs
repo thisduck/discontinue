@@ -1,0 +1,9 @@
+<div class="p-3 mb-3 border border-t- border-{{this.style}}-2 shadow bg-white flex flex-col inline-block w-1/4 rounded mr-3">
+  <Header @level=5 @style={{this.style}}><StatusIcon @status={{@stream.status}} /> {{@stream.name}} {{@stream.state}}</Header>
+  <div class="text-xs border-b border-grey-3 p-2">
+    <Icon @name="stopwatch" /> {{human-date-diff start=@stream.startedAt finish=@stream.finishedAt}}
+  </div>
+  {{#each this.summary as |result|}}
+    <StreamSummaryRow @result={{result}} />
+  {{/each}}
+</div>

@@ -103,6 +103,10 @@ class Stream < ApplicationRecord
     build.aws_options
   end
 
+  def stream_summary
+    self
+  end
+
   private
   def start_stream
     begin

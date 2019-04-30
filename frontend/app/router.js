@@ -23,6 +23,7 @@ Router.map(function() {
         this.route('stream', { path: '/stream/:stream_id' }, function() {
           this.route('show', { path: '/' }, function() {
             this.route('box', { path: '/box/:box_id' });
+            this.route('test_results', { path: '/test_results' });
           });
         });
       });

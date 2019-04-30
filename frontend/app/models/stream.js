@@ -10,6 +10,7 @@ export default class StreamModel extends Model {
   @attr('date') finishedAt;
 
   @belongsTo('build') build;
+  @belongsTo('stream-summary') streamSummary;
 
   @hasMany('box') boxes;
   // testResults: DS.hasMany('test-result'),

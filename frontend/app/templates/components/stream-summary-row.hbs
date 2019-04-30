@@ -1,0 +1,10 @@
+<div class="text-xs border-b border-grey-3 p-2 text-{{this.style}}-10">
+  {{#link-to 'authenticated.builds.show.stream.show.test_results' @result.build_id @result.stream_id (query-params status=@result.status) class=(concat 'text-' this.style '-10 hover:text-' this.style '-5')}}
+  <div class="flex flex-row justify-between">
+    <div>
+      <StatusIcon @status={{@result.status}} /> {{@result.count}} {{@result.test_type}} {{@result.status}}
+    </div> 
+    <Icon @name="arrow-dropright" />
+  </div> 
+  {{/link-to}}
+</div>

@@ -7,7 +7,7 @@ export default LinkComponent.extend({
 
   defaultClasses: computed(
     function() {
-      return 'no-underline text-primary-4';
+      return 'no-underline text-primary-8';
     }
   ),
 

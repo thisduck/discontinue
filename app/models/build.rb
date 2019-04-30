@@ -24,10 +24,6 @@ class Build < ApplicationRecord
       transitions from: :waiting, to: :running
     end
 
-    event :restart do
-      transitions from: :stopped, to: :running
-    end
-
     event :stop, after_commit: :after_pass_or_fail do
       transitions from: :running, to: :stopped
     end

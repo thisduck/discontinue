@@ -1,11 +1,18 @@
-<li class="p-2 text-{{style}}-8 flex">
-  {{#if this.active}}
-    <Icon @name="wifi" @spin=true class="mr-2" />
-  {{/if}}
-  {{#link-to 'authenticated.builds.show.stream.show.box' @build.id @stream.id @box.id class=(concat 'text-' style '-8')}}
-    {{@index}} 
-    <span class="text-xs">
-      [{{human-date-diff start=@box.startedAt finish=@box.finishedAt}}]
-    </span>
+<li class="p-2 text-{{style}}-4 hover:text-{{style}}-8 flex">
+  {{#link-to 'authenticated.builds.show.stream.show.box' @build.id @stream.id @box.id 
+    inactiveClass=(concat 'text-' style '-5')
+    activeClass=(concat 'text-' style '-8')
+  }}
+    <div class="flex">
+      {{#if this.active}}
+        <StatusIcon @status={{@box.status}} class="mr-2"/>
+      {{/if}}
+      <div>
+      {{@index}} 
+      <span class="text-xs">
+        [{{human-date-diff start=@box.startedAt finish=@box.finishedAt}}]
+      </span>
+      </div>
+    </div>
   {{/link-to}}
 </li>

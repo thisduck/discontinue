@@ -11,6 +11,7 @@ export default class BuildRequestModel extends Model {
   @attr('date') createdAt;
 
   @belongsTo('repository') repository;
+  @belongsTo('build') lastBuild;
 
   triggerEvent(params) {
     const modelName = this.constructor.modelName;

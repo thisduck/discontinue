@@ -2,13 +2,15 @@
   <tbody>
     {{#each @artifacts as |artifact|}}
       <tr class="border border-grey-2">
-        <td class="break-words p-2 ">
-          <div class="flex">
-            <Icon @name="document"  class="mr-2" />
-            <a href="{{artifact.presignedUrl}}" target="_blank" class="break-words no-underline text-accent-5">
-              {{artifact.filename}}
-            </a>
-          </div>
+        <td class="break-words p-2 inline-block w-5/6">
+            <div class="flex">
+              <span class="mr-2">
+                <Icon @name="document"  class="mr-2" />
+              </span>
+              <a href="{{artifact.presignedUrl}}" target="_blank" class="break-words no-underline text-accent-8 min-w-0">
+                {{artifact.filename}}
+              </a>
+            </div>
         </td>
         <td class="w-24">
           {{artifact.extension}}
