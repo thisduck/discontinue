@@ -1,7 +1,7 @@
-<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0 class="justify-between">
-<div class="flex flex-row w-5/6">
-  <div class="w-3/5 pr-3 border-r border-grey-2 flex-none">
-    <div class="mb-3">
+<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0 class="md:justify-between">
+<div class="flex  md:flex-row flex-wrap md:w-5/6 w-full">
+  <div class="md:w-3/5 md:pr-3 md:border-r border-b md:border-b-0 pb-3 border-grey-2 flex-none w-full mb-3 md:mb-0">
+    <div class="mb-3 flex items-center">
       <div class="mr-3 inline-block">
         {{#if @showLink}}
           {{#link-to 'authenticated.builds.show' @build.id class="no-underline inline-block"}}
@@ -17,15 +17,13 @@
         {{/if}}
       </div>
 
-      <span class="mr-3">
-        <Icon @name="bookmarks" /> <span class="middle-align"> {{@build.repository.name}} </span>
+      <span class="mr-3 flex items-center">
+        <Icon @name="bookmarks" class="mr-2"/> <span class="middle-align"> {{@build.repository.name}} </span>
       </span>
 
-      <span class="mr-3">
-        <Icon @name="git-branch" /> <strong class="align-middle truncate w-64 inline-block" title={{@build.branch}}> {{@build.branch}} </strong>
+      <span class="mr-3 flex items-center">
+        <Icon @name="git-branch" class="mr-2"/> <strong class="align-middle truncate md:w-64 w-32 inline-block" title={{@build.branch}}> {{@build.branch}} </strong>
       </span>
-
-
 
     </div>
 
@@ -33,7 +31,7 @@
       <pre class="whitespace-pre-wrap break-words">{{@build.commitMessage}}</pre>
     </div>
   </div>
-  <div class="w-1/6 px-3 border-r border-grey-2 flex-none mt-1">
+  <div class="md:w-1/6 w-1/2 px-3 border-r border-grey-2 flex-none pt-1">
     <a href="{{@build.commitUrl}}" target="_blank" class="mr-3 no-underline block mb-3 text-xs text-grey-6">
       <Icon @name="git-commit" />
       <span class="align-middle font-mono inline-block">{{@build.shortSha}}</span>
@@ -51,7 +49,7 @@
       <span class="align-middle">{{@build.author}}</span>
     </span>
   </div>
-  <div class="w-1/6 px-3 border-r border-grey-2 flex-none mt-1">
+  <div class="md:w-1/6 w-1/2 px-3 md:border-r border-grey-2 flex-none pt-1">
     {{#if @build.startedAt}}
       <span class="text-xs mb-3 block">
         <Icon @name="stopwatch" /> 

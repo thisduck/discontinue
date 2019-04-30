@@ -2,7 +2,7 @@
 
 <!-- <div class="flex flex-col mt-6 bg-white border w-full border-primary-2 shadow rounded"> -->
 <Card @flexDirection="col">
-  <ul class="list-reset px-3 flex flex-none">
+  <ul class="list-reset px-3 flex flex-none flex-wrap">
     {{#each model.streams as |stream|}}
       <StreamTab @stream={{stream}} />
     {{/each}}
@@ -18,7 +18,7 @@
     </li>
   </ul>
 
-  <div class="p-3 pt-4">
+  <div class="md:p-3 pt-4">
     {{outlet}}
   </div>
 </Card>

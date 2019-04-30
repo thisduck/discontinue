@@ -1,6 +1,6 @@
 <Header @level=4>Summary</Header>
 
-<div class="flex flex-row flex-wrap ">
+<div class="flex flex-col md:flex-row flex-wrap ">
   {{#each model.build.streams as |stream|}}
     <StreamSummary @stream={{stream}} />
   {{/each}}

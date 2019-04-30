@@ -1,6 +1,6 @@
 <Header @level=4>{{model.name}}</Header>
 
-<ul class="flex list-reset mb-3">
+<ul class="flex flex-wrap list-reset mb-3">
   {{#each model.boxes as |box index|}}
     <BoxTab @box={{box}} @stream={{model}} @build={{model.build}} @index={{index}} />
   {{/each}}
