@@ -8,6 +8,7 @@ export default class BuildRequestModel extends Model {
   @attr() hookHash;
   @attr() events;
   @attr() duration;
+  @attr() pullRequest;
   @attr('date') createdAt;
 
   @belongsTo('repository') repository;
@@ -43,5 +44,13 @@ export default class BuildRequestModel extends Model {
   get commitMessage() {
     return this.get('hookHash.head_commit.message') ||
     this.get('hookHash.head_commit.commit.message');
+  }
+
+  get pullRequests() {
+    if (this.pullRequest) {
+      return this.pullRequest.split(',');
+    }
+
+    return [];
   }
 }

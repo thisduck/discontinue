@@ -2,7 +2,7 @@ module BuildResourceConcern
   extend ActiveSupport::Concern
 
   included do
-    attributes :branch, :created_at, :events, :hook_hash, :repository_id, :sha, :state
+    attributes :branch, :created_at, :events, :hook_hash, :repository_id, :sha, :state, :pull_request
     has_one :repository
     paginator :paged
 

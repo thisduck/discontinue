@@ -7,6 +7,8 @@ class BuildRequest < ApplicationRecord
 
   validates_presence_of :branch, :repository, :aasm_state
 
+  before_create :store_pull_request
+
   include AASM
 
   aasm do
@@ -44,14 +46,28 @@ class BuildRequest < ApplicationRecord
   end
 
   def open_pull_request?
-    pull_requests = repository.account.client.pull_requests repository.integration_id.to_i, head: "#{repository.account.name}:#{branch}"
     pull_requests.collect{|x| x[:state] }.include?("open")
+  end
+
+  def fetch_pull_requests
+    repository.account.client.pull_requests repository.integration_id.to_i, head: "#{repository.account.name}:#{branch}"
+  end
+
+  def store_pull_requests
+    prs = fetch_pull_requests
+    selected_prs = prs.select{|x| x[:state] == "open" }
+    if selected_prs.none?
+      selected_prs = prs.last
+    end
+
+    self.pull_request = selected_prs.collect{|x| x[:number] }.join(",") if selected_prs
   end
 
   private
   def queue_request
     Build.queue(
       branch: branch,
+      pull_request: pull_request,
       sha: sha,
       hook_hash: hook_hash,
       repository: repository,

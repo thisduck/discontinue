@@ -25,7 +25,14 @@ module GithubEvents
       build_request = BuildRequest.where(sha: sha).first
 
       return unless build_request 
-      return if build_request.queued?
+
+      build_request.store_pull_request
+      build_request.save!
+
+      if build_request.queued?
+        build_request.builds.update_all(pull_request: build_request.pull_request)
+        return
+      end
 
       build_request.queue! unless build_request.ignore_build?
     end

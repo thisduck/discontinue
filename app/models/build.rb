@@ -191,6 +191,15 @@ class Build < ApplicationRecord
           })
         end
 
+        prs = (pull_request || '').split(',')
+        if prs.any?
+          extra.unshift({
+            title: "Pull Request",
+            value: prs.collect{|pr| "<https://github.com/#{repository.full_name}/pull/#{pr}|##{pr}>"}.join(' '),
+            short: true
+          })
+        end
+
         pusher = hook_hash['pusher'] ? hook_hash['pusher']['name'] : '?'
         HTTParty.post(
           options['webhook'], 

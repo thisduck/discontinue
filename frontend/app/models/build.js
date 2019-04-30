@@ -8,6 +8,7 @@ export default class BuildModel extends Model {
   @attr() hookHash;
   @attr() events;
   @attr() duration;
+  @attr() pullRequest;
   @attr('date') createdAt;
   @attr('date') startedAt;
   @attr('date') finishedAt;
@@ -61,5 +62,13 @@ export default class BuildModel extends Model {
 
   get passed() {
     return this.state == 'passed';
+  }
+
+  get pullRequests() {
+    if (this.pullRequest) {
+      return this.pullRequest.split(',');
+    }
+
+    return [];
   }
 }
