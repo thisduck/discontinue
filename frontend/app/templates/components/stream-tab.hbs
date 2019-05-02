@@ -1,16 +1,16 @@
-<li class="p-2 text-{{style}}-8 flex">
+{{#link-to 'authenticated.builds.show.stream' @stream.build.id @stream.id 
+  class='mr-1 p-2 flex'
+  inactiveClass=(concat 'text-' style '-5')
+  activeClass=(concat 'text-' style '-8 border-b-2 border-' style '-8')
+}}
   {{#if this.active}}
     <Icon @name="wifi" @spin=true class="mr-2" />
   {{/if}}
-
-  {{#link-to 'authenticated.builds.show.stream' @stream.build.id @stream.id class='mr-1 pb-2'
-    inactiveClass=(concat 'text-' style '-5')
-    activeClass=(concat 'text-' style '-8')
-  }}
+  <div>
     {{@stream.name}}
     <br>
     <span class="text-xs">
       [{{human-date-diff start=@stream.startedAt finish=@stream.finishedAt}}]
     </span>
-  {{/link-to}}
-</li>
+  </div>
+{{/link-to}}

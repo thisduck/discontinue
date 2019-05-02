@@ -4,7 +4,7 @@ class Api::BuildResource < JSONAPI::Resource
 
   attributes :build_request_id, :started_at, :finished_at
 
-  belongs_to :build_request
+  belongs_to :build_request, always_include_linkage_data: true
 
   has_many :streams
   has_one :build_summary

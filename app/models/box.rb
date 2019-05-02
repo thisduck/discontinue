@@ -341,7 +341,7 @@ class Box < ApplicationRecord
   def clear_box
     m = machine if instance_id
     self.update_attributes(finished_at: Time.now, instance_id: nil)
-    stream.sync!
+    stream.sync!(resync: true)
   ensure
     m&.destroy
   end

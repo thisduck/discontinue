@@ -1,35 +1,73 @@
-<tr class="border border-grey-2 bg-{{this.style}}-2" {{on-click this.toggleMore}}>
-  <td class="p-2 cursor-pointer" onclick={{action this.toggleMore}} >
-    <Icon @name={{this.moreIcon}} />
-  </td>
-  {{#if showBuild}}
-    <td data-label="Build">{{link-to @result.build_id 'authenticated.builds.show' @result.stream.build.id}}</td>
+<Card class="bg-{{this.style}}-1 border-{{this.style}}-3" @flexDirection="col" @borderColor={{this.style}}>
+  <div class="w-full flex lg:flex-row flex-wrap ">
+    <div class="w-full lg:w-3/5 border-r border-grey-2 pr-3 mb-2 lg:mb-0">
+      <span class="block mb-3 break-words min-w-0">
+        <strong>
+          {{ @result.description }}
+        </strong>
+      </span>
+      <span class="block text-grey-8 mb-1 break-words min-w-0">
+        {{@result.file_path}}:{{@result.line_number}}
+      </span>
+      {{#if (or @result.exception.message @result.artifacts)}}
+        <span class="text-grey-8 hidden lg:block">
+          <Button @skin="link" @size="sm" @action={{action this.toggleMore}}>
+            <Icon @name={{this.moreIcon}} /> more info
+          </Button>
+        </span>
+      {{/if}}
+    </div>
+    <div class="lg:w-1/6 w-1/2 px-3 border-r border-grey-2 flex-none pt-1">
+      <span class="text-grey-8 text-xs mr-3 mb-3 block flex-none flex">
+        <StatusIcon @status={{@result.status}} class="mr-2" /> 
+        <span class="align-middle">{{@result.status}}</span>
+      </span>
+      <span class="text-grey-8 text-xs mr-3 mb-3 block flex-none flex">
+        <Icon @name="information-circle-outline" class="mr-2" /> 
+        <span class="align-middle">{{@result.test_type}}</span>
+      </span>
+      <span class="text-grey-8 text-xs mr-3 mb-3 block flex-none flex">
+        <Icon @name="stopwatch" class="mr-2" /> 
+        <span class="align-middle">{{@result.duration}}s</span>
+      </span>
+    </div>
+    <div class="lg:w-1/6 w-1/2 px-3 border-grey-2 flex-none pt-1">
+      <span class="text-grey-8 text-xs mr-3 mb-3 block flex-none flex">
+        <Icon @name="square" class="mr-2" /> 
+        <span class="align-middle">{{#link-to 'authenticated.builds.show.stream.show.box' @result.stream.build.id @result.stream.id @result.box.id}}  Box #{{@result.box.id}} {{/link-to}}</span>
+        </span>
+        <span class="text-grey-8 text-xs mr-3 mb-3 block flex-none flex">
+          <Icon @name="build" class="mr-2" /> 
+          <span class="align-middle">{{#link-to  'authenticated.builds.show' @result.stream.build.id}} Build #{{@result.build.id}} {{/link-to}}</span>
+          </span>
+          <span class="text-grey-8 text-xs mr-3 mb-3 block flex-none flex">
+            <Icon @name="git-branch" class="mr-2" /> 
+            <span class="align-middle">{{@result.build.branch}}</span>
+          </span>
+    </div>
+    {{#if (or @result.exception.message @result.artifacts)}}
+      <span class="text-grey-8 lg:hidden block">
+        <Button @skin="link" @size="sm" @action={{action this.toggleMore}}>
+          <Icon @name={{this.moreIcon}} /> more info
+        </Button>
+      </span>
+    {{/if}}
+  </div>
+  {{#if this.showMore}}
+    <div class="pt-3">
+      {{#if @result.exception.message}}
+            <ShellOutput>
+            {{~@result.exception.message~}}
+            <div>
+              {{#each @result.exception.backtrace as |line|}}
+                {{line}}
+              {{/each}}
+            </div>
+            </ShellOutput>
+      {{/if}}
+      <div>
+        <Artifacts @artifacts={{@result.artifacts}} />
+      </div>
+    </div>
   {{/if}}
-  <td data-label="Box" class="p-2">{{link-to @result.box.id 'authenticated.builds.show.stream.show.box' @result.stream.build.id @result.stream.id @result.box.id}}</td>
-  <!-- <td data-label="Description">{{link-to @result.description 'authenticated.test_results' (query-params test_id=@result.test_id)}}</td> -->
-  <td data-label="Description" class="p-2">{{ @result.description }}</td>
-  <td data-label="Test Type" class="p-2">{{@result.test_type}}</td>
-  <td class="inline-block break-words" data-label="Location" class="p-2 break-words">{{@result.file_path}}:{{@result.line_number}}</td>
-  <td data-label="Duration" class="p-2">{{@result.duration}}</td>
-</tr>
-{{#if this.showMore}}
-  {{#if @result.exception.message}}
-    <tr>
-      <td colspan='6'>
-        <ShellOutput>
-          {{~@result.exception.message~}}
-          <div>
-            {{#each @result.exception.backtrace as |line|}}
-              {{line}}
-            {{/each}}
-          </div>
-        </ShellOutput>
-      </td>
-    </tr>
-  {{/if}}
-  <tr>
-    <td colspan='6'>
-      <Artifacts @artifacts={{@result.artifacts}} />
-    </td>
-  </tr>
-{{/if}}
+</Card>

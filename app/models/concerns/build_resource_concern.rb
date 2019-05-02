@@ -3,7 +3,7 @@ module BuildResourceConcern
 
   included do
     attributes :branch, :created_at, :events, :hook_hash, :repository_id, :sha, :state, :pull_request
-    has_one :repository
+    has_one :repository, always_include_linkage_data: true
     paginator :paged
 
     filter :query, apply: ->(records, value, options) {

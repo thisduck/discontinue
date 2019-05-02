@@ -2,23 +2,27 @@
 
 <!-- <div class="flex flex-col mt-6 bg-white border w-full border-primary-2 shadow rounded"> -->
 <Card @flexDirection="col">
-  <ul class="list-reset px-3 flex flex-none flex-wrap">
+  <div class="list-reset px-3 flex flex-none flex-wrap pb-2">
     {{#each model.streams as |stream|}}
       <StreamTab @stream={{stream}} />
     {{/each}}
-    <li class="mr-1 p-2">
-      {{#link-to 'authenticated.builds.show.summary' model.id inactiveClass="text-grey-5" activeClass="text-grey-10" class="pb-2"}}
-        Summary
-      {{/link-to}}
-    </li>
-    <li class="mr-1 p-2">
-      {{#link-to 'authenticated.builds.show.artifacts' model.id inactiveClass="text-grey-5" activeClass="text-grey-10" class="pb-2"}}
-        Artifacts
-      {{/link-to}}
-    </li>
-  </ul>
+    {{#link-to 'authenticated.builds.show.summary' model.id 
+      inactiveClass="text-grey-5" 
+      activeClass="text-grey-10 border-b-2 border-grey-10" 
+      class="block p-2"
+      }}
+      Summary
+    {{/link-to}}
+    {{#link-to 'authenticated.builds.show.artifacts' model.id 
+      inactiveClass="text-grey-5" 
+      activeClass="text-grey-10 border-b-2 border-grey-10" 
+      class="block p-2"
+      }}
+      Artifacts
+    {{/link-to}}
+  </div>
 
-  <div class="md:p-3 pt-4">
+  <div class="lg:p-3 pt-4">
     {{outlet}}
   </div>
 </Card>

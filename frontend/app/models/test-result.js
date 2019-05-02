@@ -14,5 +14,6 @@ export default class TestResultModel extends Model {
 
   @belongsTo('stream') stream;
   @belongsTo('box') box;
+  @belongsTo('build') build;
   @hasMany('artifact') artifacts;
 }

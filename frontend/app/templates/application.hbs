@@ -1,24 +1,24 @@
-<div class="bg-white shadow px-6 py-1 sticky pin-t pin-r w-full flex justify-between h-12 items-center z-50 text-xs md:text-base">
+<div class="bg-white shadow px-6 py-1 sticky pin-t pin-r w-full flex justify-between h-12 items-center z-50 text-xs lg:text-base">
   <ul class="list-reset flex items-center">
-    <li class="px-1 md:px-3">
+    <li class="px-1 lg:px-3">
       {{#link-to 'index' class='font-header no-underline font-bold text-black'}}Discontinue{{/link-to}}
     </li>
     {{#if session.isAuthenticated}}
-      <li class="px-1 md:px-3">
+      <li class="px-1 lg:px-3">
         {{#link-to 'authenticated.repositories' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Repositories{{/link-to}}
       </li>
-      <li class="px-1 md:px-3">
+      <li class="px-1 lg:px-3">
         {{#link-to 'authenticated.builds' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Builds{{/link-to}}
       </li>
-      <li class="px-1 md:px-3">
+      <li class="px-1 lg:px-3">
         {{#link-to 'authenticated.build_requests' class='no-underline' inactiveClass='text-grey-8' activeClass="text-grey-10"}}Build Requests{{/link-to}}
       </li>
     {{/if}}
   </ul>
 
-  <ul class="list-reset flex items-center text-xs md:text-sm">
+  <ul class="list-reset flex items-center text-xs lg:text-sm">
     {{#if session.isAuthenticated}}
-      <li class="item flex items-center px-1 md:px-3 text-grey-8">
+      <li class="item flex items-center px-1 lg:px-3 text-grey-8">
         <img src={{currentUser.user.avatar_url}} class="h-8 w-8 mr-2 rounded-full" >
         <span>
           {{currentUser.user.integrationLogin}}
@@ -35,6 +35,6 @@
   </ul>
 </div>
 
-<div class="md:mt-6 mt-2 md:mx-6 mx-1 md:px-3 px-1">
+<div class="lg:mt-6 mt-2 lg:mx-6 mx-1 lg:px-3 px-1">
   {{outlet}}
 </div>

@@ -1,7 +1,11 @@
 class Api::BuildSummaryResource < JSONAPI::Resource
-  attributes :results
+  attributes :results, :build_id
 
-  belongs_to :build
+  belongs_to :build, always_include_linkage_data: true
+
+  def build_id
+    @model.id
+  end
 
   def results
     results = []

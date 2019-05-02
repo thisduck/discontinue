@@ -32,17 +32,17 @@ class Stream < ApplicationRecord
 
   def after_stop
     finish!
-    build.sync!
+    build.sync!(resync: true)
   end
 
   def after_pass
     finish!
-    build.sync!
+    build.sync!(resync: true)
   end
 
   def after_fail
     finish!
-    build.sync!
+    build.sync!(resync: true)
   end
 
   def finished?
@@ -55,7 +55,12 @@ class Stream < ApplicationRecord
     self.update_attributes(finished_at: finished_at, duration: duration)
   end
 
-  def sync!
+  def self.sync!(stream_id)
+    stream = Stream.find stream_id
+    stream.sync!
+  end
+
+  def sync!(resync: false)
     self.reload
     return if self.finished?
     if self.boxes.all?(&:finished?)
@@ -64,6 +69,8 @@ class Stream < ApplicationRecord
       else
         fail_stream!
       end
+    elsif resync
+      Stream.delay(run_at: 3.seconds.from_now).sync!(id)
     end
   end
 

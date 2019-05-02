@@ -1,20 +1,4 @@
-<div class="ui bottom attached tab segment active" >
-  <table class="w-full border border-collapse border-grey-2 border-collapse  text-sm">
-    <thead>
-      <tr class="bg-grey-2 text-grey-7">
-        <th></th>
-        <th>Box</th>
-        <th>Description</th>
-        <th class="whitespace-no-wrap p-2">Test Type</th>
-        <th>Location</th>
-        <th>Duration</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each model as |result|}}
-        <TestResult @result={{result}} />
-      {{/each}}
-    </tbody>
-  </table>
-</div>
-
+<Header @level="5">Test Results</Header>
+{{#each model as |result|}}
+  <TestResult @result={{result}} />
+{{/each}}

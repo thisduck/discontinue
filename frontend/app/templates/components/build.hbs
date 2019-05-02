@@ -1,6 +1,6 @@
-<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0 class="md:justify-between">
-<div class="flex  md:flex-row flex-wrap md:w-5/6 w-full">
-  <div class="md:w-3/5 md:pr-3 md:border-r border-b md:border-b-0 pb-3 border-grey-2 flex-none w-full mb-3 md:mb-0">
+<Card @borderColor={{concat color '-5'}} @borderTop=2 @border=0 class="lg:justify-between">
+<div class="flex  lg:flex-row flex-wrap lg:w-5/6 w-full">
+  <div class="lg:w-3/5 lg:pr-3 lg:border-r border-b lg:border-b-0 pb-3 border-grey-2 flex-none w-full mb-3 lg:mb-0">
     <div class="mb-3 flex items-center">
       <div class="mr-3 inline-block">
         {{#if @showLink}}
@@ -22,7 +22,7 @@
       </span>
 
       <span class="mr-3 flex items-center">
-        <Icon @name="git-branch" class="mr-2"/> <strong class="align-middle truncate md:w-64 w-32 inline-block" title={{@build.branch}}> {{@build.branch}} </strong>
+        <Icon @name="git-branch" class="mr-2"/> <strong class="align-middle truncate lg:w-64 w-32 inline-block" title={{@build.branch}}> {{@build.branch}} </strong>
       </span>
 
     </div>
@@ -31,42 +31,42 @@
       <pre class="whitespace-pre-wrap break-words">{{@build.commitMessage}}</pre>
     </div>
   </div>
-  <div class="md:w-1/6 w-1/2 px-3 border-r border-grey-2 flex-none pt-1">
-    <a href="{{@build.commitUrl}}" target="_blank" class="mr-3 no-underline block mb-3 text-xs text-grey-6">
-      <Icon @name="git-commit" />
+  <div class="lg:w-1/6 w-1/2 px-3 border-r border-grey-2 flex-none pt-1">
+    <a href="{{@build.commitUrl}}" target="_blank" class="mr-3 no-underline block mb-3 text-xs text-grey-6 flex">
+      <Icon @name="git-commit" class="mr-2" />
       <span class="align-middle font-mono inline-block">{{@build.shortSha}}</span>
     </a>
 
     {{#each @build.pullRequests as |pullRequest|}}
-      <a href="https://github.com/{{@build.repository.fullName}}/pull/{{pullRequest}}" target="_blank" class="mr-3 no-underline block mb-3 text-xs text-grey-6">
-        <Icon @name="git-pull-request" />
+      <a href="https://github.com/{{@build.repository.fullName}}/pull/{{pullRequest}}" target="_blank" class="mr-3 no-underline block mb-3 text-xs text-grey-6 flex">
+        <Icon @name="git-pull-request" class="mr-2" />
         <span class="align-middle font-mono inline-block">#{{pullRequest}}</span>
       </a>
     {{/each}}
 
-    <span class="text-grey-6 text-xs mr-3 block flex-none">
-      <Icon @name="person" /> 
+    <span class="text-grey-6 text-xs mr-3 block flex-none flex">
+      <Icon @name="person" class="mr-2" /> 
       <span class="align-middle">{{@build.author}}</span>
     </span>
   </div>
-  <div class="md:w-1/6 w-1/2 px-3 md:border-r border-grey-2 flex-none pt-1">
+  <div class="lg:w-1/6 w-1/2 px-3 lg:border-r border-grey-2 flex-none pt-1">
     {{#if @build.startedAt}}
-      <span class="text-xs mb-3 block">
-        <Icon @name="stopwatch" /> 
+      <span class="text-xs mb-3 block flex">
+        <Icon @name="stopwatch" class="mr-2" /> 
         <span class="align-middle">
           {{human-date-diff start=@build.startedAt finish=@build.finishedAt}}
         </span>
       </span>
     {{/if}}
-    <span class="text-xs block mb-3">
-      <Icon @name="time" /> 
+    <span class="text-xs block mb-3 flex">
+      <Icon @name="time" class="mr-2" /> 
       <span class="align-middle" title={{@build.createdAt}}>
         {{date-from-now @build.createdAt addSuffix=true}}
       </span>
     </span>
     {{#if @lastBuild}}
-      <span class="text-xs block">
-        <Icon @name="build" /> 
+      <span class="text-xs block flex">
+        <Icon @name="build" class="mr-2" /> 
         {{#link-to 'authenticated.builds.show' @lastBuild.id}}
           Last Build #{{@lastBuild.id}}
         {{/link-to}}

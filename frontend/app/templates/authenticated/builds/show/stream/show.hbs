@@ -4,6 +4,15 @@
   {{#each model.boxes as |box index|}}
     <BoxTab @box={{box}} @stream={{model}} @build={{model.build}} @index={{index}} />
   {{/each}}
+  <li class="text-{{style}}-4 hover:text-{{style}}-8 flex">
+    {{#link-to 'authenticated.builds.show.stream.show.test_results' model.build model
+      inactiveClass='text-grey-5'
+      activeClass='text-grey-10 border-b-2 border-grey-10'
+      class="block p-2"
+    }}
+      Test Results
+    {{/link-to}}
+  </li>
 </ul>
 
 <div class="w-full">

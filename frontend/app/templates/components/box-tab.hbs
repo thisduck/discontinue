@@ -1,7 +1,8 @@
-<li class="p-2 text-{{style}}-4 hover:text-{{style}}-8 flex">
+<li class="text-{{style}}-4 hover:text-{{style}}-8 flex">
   {{#link-to 'authenticated.builds.show.stream.show.box' @build.id @stream.id @box.id 
     inactiveClass=(concat 'text-' style '-5')
-    activeClass=(concat 'text-' style '-8')
+    activeClass=(concat 'text-' style '-8 border-b-2 border-' style '-8' )
+    class="block p-2"
   }}
     <div class="flex">
       {{#if this.active}}

@@ -4,11 +4,11 @@ require 'faraday'
 
 option = ARGV[0]
 key = ARGV[1]
-directory = ARGV[2]
+directories = ARGV[2..-1]
 
 log "Entering discontinue cache with [#{option}]."
 
-if key && !directory
+if key && !directories
   raise "key passed without directory/file."
 end
 
@@ -37,7 +37,7 @@ end
 branch = ENV['CI_BRANCH']
 
 if key
-  cache_directories = [directory]
+  cache_directories = directories
   branch = key
 end
 

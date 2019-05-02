@@ -64,7 +64,12 @@ class Build < ApplicationRecord
     post_github_status!
   end
 
-  def sync!
+  def self.sync!(stream_id)
+    build = Build.find build_id
+    build.sync!
+  end
+
+  def sync!(resync: false)
     reload
     return if self.finished?
     if streams.all?(&:finished?)
@@ -73,6 +78,8 @@ class Build < ApplicationRecord
       else
         fail_build!
       end
+    elsif resync
+      Build.delay(run_at: 3.seconds.from_now).sync!(id)
     end
   end
 
@@ -93,6 +100,32 @@ class Build < ApplicationRecord
     @build_config ||= BuildConfig.new config: config
   end
 
+  def s3_bucket
+    s3 = Aws::S3::Resource.new(
+      aws_options
+    )
+    s3_bucket = s3.bucket(build_config.aws_cache_bucket)
+  end
+
+  def cache_key(keys: [])
+    ([
+      repository.name,
+      "cache",
+      branch
+    ] + keys).join('/')
+  end
+
+  def cache_listing(keys: [])
+    s3_bucket.objects(prefix: cache_key(keys: keys)).to_a
+  end
+
+  def delete_cache
+    deleted = [1]
+    while deleted.any?
+      deleted = cache_listing.each &:delete
+    end
+  end
+
   def artifact_listing(keys: [])
     key = ([
       repository.name,
@@ -100,10 +133,6 @@ class Build < ApplicationRecord
       "build_#{id}"
     ] + keys).join('/')
 
-    s3 = Aws::S3::Resource.new(
-      aws_options
-    )
-    s3_bucket = s3.bucket(build_config.aws_cache_bucket)
     s3_bucket.objects(prefix: key).to_a
   end
 

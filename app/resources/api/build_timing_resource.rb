@@ -1,7 +1,7 @@
 class Api::BuildTimingResource < JSONAPI::Resource
   attributes :results
 
-  belongs_to :build
+  belongs_to :build, always_include_linkage_data: true
 
   def results
     results = []

@@ -4,5 +4,5 @@ class Api::CommandResource < JSONAPI::Resource
 
   key_type :uuid
 
-  belongs_to :box
+  belongs_to :box, always_include_linkage_data: true
 end

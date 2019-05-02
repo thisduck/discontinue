@@ -3,4 +3,6 @@ JSONAPI.configure do |config|
 
   config.default_page_size = 10
   config.maximum_page_size = 50
+
+  # config.always_include_to_one_linkage_data = true
 end
