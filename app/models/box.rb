@@ -257,6 +257,7 @@ class Box < ApplicationRecord
       test['build_id'] = build.id
       test['stream_id'] = stream.id
       test['box_id'] = id
+      test['branch'] = build.branch
       TestResult.new(test.symbolize_keys)
     end
 

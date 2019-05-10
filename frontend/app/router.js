@@ -31,6 +31,7 @@ Router.map(function() {
       });
     });
     this.route('build_requests', function() {});
+    this.route('test_results');
   })
 });
 

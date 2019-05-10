@@ -8,6 +8,12 @@ Rails.application.routes.draw do
 
   get 'api/users/current' => 'session#current'
   namespace :api do
+    resources :reports do
+      collection do
+        get :build_status
+        get :most_failed
+      end
+    end
     jsonapi_resources :repositories
     jsonapi_resources :build_requests do
       jsonapi_relationships

@@ -329,4 +329,48 @@ class Build < ApplicationRecord
       stream.stop! if stream.may_stop?
     end
   end
+
+  class Reports
+    def self.status(branch: "master", range: 5.days.ago..Time.now)
+      results = Build.search "*", body_options: {aggs: {
+        state: {
+          terms: {
+            field: :aasm_state
+          },
+          aggs: {
+            per_day: {
+              date_histogram: {
+                field: :created_at,
+                interval: :day
+              },
+            }
+          }
+        }
+      }},
+      limit: 0,
+      where: {
+        created_at: {gte: range.first, lte: range.last},
+        branch: branch
+      }
+
+      colors = {
+        "passed" => "#3EBD93",
+        "failed" => "#EF4E4E",
+        "stopped" => "#F7C948",
+      }
+
+      results.aggregations.dig("state", "buckets").collect do |bucket|
+        {
+          name: bucket["key"],
+          x: bucket.dig("per_day", "buckets").collect{|x| x["key_as_string"].to_date },
+          y: bucket.dig("per_day", "buckets").collect{|x| x["doc_count"] },
+          type: "bar",
+          marker: {
+            color: colors[bucket["key"]]
+          }
+
+        }
+      end
+    end
+  end
 end

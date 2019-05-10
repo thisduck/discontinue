@@ -9,6 +9,10 @@ export default class CardComponent extends Component {
     return this.args.borderTop || "";
   }
 
+  get width() {
+    return this.args.width || "full";
+  }
+
   get flexDirection() {
     return this.args.flexDirection || "row";
   }

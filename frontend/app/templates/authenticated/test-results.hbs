@@ -1,0 +1,9 @@
+<Header @level="4">Test Results</Header>
+
+<Pagination @pagination={{model.meta.pagination}} @route="authenticated.test_results" @page={{page}} />
+
+{{#each model as |result|}}
+  <TestResult @result={{result}} />
+{{/each}}
+
+<Pagination @pagination={{model.meta.pagination}} @route="authenticated.test_results" @page={{page}} />

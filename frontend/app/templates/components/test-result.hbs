@@ -3,10 +3,20 @@
     <div class="w-full lg:w-3/5 border-r border-grey-2 pr-3 mb-2 lg:mb-0">
       <span class="block mb-3 break-words min-w-0">
         <strong>
+          {{#link-to 'authenticated.test_results' (query-params page=1 test_id=@result.test_id)}}
+            <Icon @name="filing" class="mr-2" /> 
+          {{/link-to}}
+
           {{ @result.description }}
         </strong>
       </span>
       <span class="block text-grey-8 mb-1 break-words min-w-0">
+        {{#copy-button
+          clipboardText=(concat @result.file_path ':' @result.line_number)
+          }}
+          <Icon @name="clipboard" class="mr-2 text-primary-8" /> 
+        {{/copy-button}}
+
         {{@result.file_path}}:{{@result.line_number}}
       </span>
       {{#if (or @result.exception.message @result.artifacts)}}

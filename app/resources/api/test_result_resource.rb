@@ -12,6 +12,7 @@ class Api::TestResultResource < JSONAPI::Resource
   filter :stream_id
   filter :test_id
   filter :box_id
+  filter :branch
 
   def duration
     @model.duration / 1_000_000_000.0

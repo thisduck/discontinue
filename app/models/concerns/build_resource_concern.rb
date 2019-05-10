@@ -10,7 +10,7 @@ module BuildResourceConcern
 
       params = {
         match: :word_start,
-        fields: ["branch^10", "all"],
+        fields: ["branch^30", "all"],
         where: {
           account_id: options[:context][:current_user].accounts.pluck(:id)
         }

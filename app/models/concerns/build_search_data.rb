@@ -18,7 +18,7 @@ module BuildSearchData
       hook_hash.dig("head_commit", "author", "name"),
       hook_hash.dig("head_commit", "author", "email"),
       hook_hash.dig("head_commit", "author", "username"),
-      hook_hash.dig("head_commit", "message"),
+      # hook_hash.dig("head_commit", "message"),
       repository.name
     ].compact.join(" ")
     json[:account_id] = repository.account_id

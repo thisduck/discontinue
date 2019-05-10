@@ -89,3 +89,4 @@ gem 'searchkick'
 
 gem 'exception_notification'
 
+gem 'oj'

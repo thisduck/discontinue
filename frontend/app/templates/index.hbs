@@ -1,1 +1,38 @@
-Index Page.
+<div class="w-full mb-4">
+  {{plot-ly
+    chartData=model.buildStatus
+    chartConfig=config
+    chartLayout=layout
+  }}
+</div>
+
+Intermittent Test Fails
+<div class="w-full">
+  <table class="border table-fixed ">
+    <tr class="border p-2 bg-grey-2">
+      <th class="p-2">
+        Description
+      </th>
+      <th class="p-2">
+        File
+      </th>
+      <th class="p-2">
+        Fail Count
+      </th>
+    </tr>
+    {{#each model.mostFailed as |failed|}}
+      <tr class="border p-2 bg-white">
+        <td class="p-2">
+          {{link-to failed.test.description 'authenticated.test_results' (query-params page=1 branch="master" test_id=failed.test.test_id)}}
+        </td>
+        <td class="p-2">
+          {{failed.test.file_path}}:{{failed.test.line_number}}
+        </td>
+        <td class="p-2">
+          {{failed.count}}
+        </td>
+      </tr>
+
+    {{/each}}
+  </table>
+</div>
