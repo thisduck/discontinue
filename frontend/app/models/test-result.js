@@ -11,6 +11,7 @@ export default class TestResultModel extends Model {
   @attr() exception;
   @attr() duration;
   @attr() build_id;
+  @attr() createdAt;
 
   @belongsTo('stream') stream;
   @belongsTo('box') box;

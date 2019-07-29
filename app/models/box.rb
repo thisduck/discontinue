@@ -262,6 +262,7 @@ class Box < ApplicationRecord
     end
 
     TestResult.import results
+    # TestResultIndexJob.perform_later(self.class, self.id)
   end
 
   def report_data
@@ -547,7 +548,9 @@ class Box < ApplicationRecord
     runner = Runner.new
     runner.scp options: "-r", from: "scripts", to: "#{machine.at_login}:."
     runner.ssh machine: machine.at_login,
-      command: "cd ~/scripts; bundle install -j `cat /proc/cpuinfo | grep '^processor' | wc -l`"
+      command: "gem install bundler rake"
+    runner.ssh machine: machine.at_login,
+      command: "cd ~/scripts; bundle install -j `cat /proc/cpuinfo | grep '^processor' | wc -l` &> ~/bundle_logs"
   end
 
   def setup_artifacts_yml!
