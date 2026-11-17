@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'up' => 'rails/health#show'
   post 'session' => 'session#create'
 
   get 'github/repositories'

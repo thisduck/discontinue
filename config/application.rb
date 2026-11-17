@@ -21,6 +21,7 @@ module Discontinue
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
+    config.x.demo_mode = Rails.env.development? && ENV['DISCONTINUE_DEMO'] == '1'
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
@@ -39,7 +40,7 @@ module Discontinue
         :sender_address => %{"notifier" <notifier@example.com>},
         :exception_recipients => %w{adnan.ali@gmail.com}
       }
-    )
+    ) if Rails.env.production?
 
   end
 end

@@ -8,6 +8,9 @@ class Build < ApplicationRecord
   has_many :streams, dependent: :destroy
   has_many :boxes, through: :streams
   has_many :test_results
+  has_one :build_summary, class_name: 'Build', foreign_key: :id
+  has_one :build_timing, class_name: 'Build', foreign_key: :id
+  has_one :profile_summary, class_name: 'Build', foreign_key: :id
 
   validates_presence_of :branch, :aasm_state, :build_request
 
@@ -48,7 +51,7 @@ class Build < ApplicationRecord
   def finish!
     finished_at = Time.now
     duration = finished_at - started_at
-    update_attributes(finished_at: finished_at, duration: duration)
+    update(finished_at: finished_at, duration: duration)
   end
 
   def post_github_status!
@@ -243,19 +246,6 @@ class Build < ApplicationRecord
     end
   end
 
-  # TODO: make these belong to stream
-  # in proper manner
-  def build_summary
-    self
-  end
-
-  def build_timing
-    self
-  end
-
-  def profile_summary
-    self
-  end
 
   private
 

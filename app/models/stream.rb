@@ -52,7 +52,7 @@ class Stream < ApplicationRecord
   def finish!
     finished_at = Time.now
     duration = finished_at - started_at
-    self.update_attributes(finished_at: finished_at, duration: duration)
+    update(finished_at: finished_at, duration: duration)
   end
 
   def sync!
@@ -130,7 +130,7 @@ class Stream < ApplicationRecord
       boxes.each_with_index do |box, index|
         instance = instances[index]
         box.write_to_log_file "[#{Time.now}] Updating Box #{box.id} with Instance #{instance.id}"
-        box.update_attributes(instance_id: instance.id)
+        box.update(instance_id: instance.id)
         Box.delay(run_at: (20 + index).seconds.from_now).connect(box.id)
         BoxTimeoutJob.set(wait: BoxTimeoutJob.allowed_time_since_update(box)).perform_later(box.id)
       end

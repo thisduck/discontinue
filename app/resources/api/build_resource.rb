@@ -4,12 +4,12 @@ class Api::BuildResource < JSONAPI::Resource
 
   attributes :build_request_id
 
-  belongs_to :build_request
+  has_one :build_request
 
   has_many :streams
-  has_one :build_summary
-  has_one :build_timing
-  has_one :profile_summary
+  has_one :build_summary, foreign_key: :id, foreign_key_on: :related
+  has_one :build_timing, foreign_key: :id, foreign_key_on: :related
+  has_one :profile_summary, foreign_key: :id, foreign_key_on: :related
 
   def self.records(options = {})
     context = options[:context]

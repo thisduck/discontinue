@@ -10,6 +10,8 @@ Rails.application.configure do
 
   # Show full error reports.
   config.consider_all_requests_local = true
+  config.hosts << ENV['RAILS_DEVELOPMENT_HOST'] if ENV['RAILS_DEVELOPMENT_HOST'].present?
+  config.active_record.dump_schema_after_migration = false
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
@@ -58,9 +60,7 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # for devise
-  config.action_mailer.default_url_options = { host: 'ec2-54-242-5-53.compute-1.amazonaws.com', port: 8080 }
-
-  config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default_url_options = { host: ENV.fetch('RAILS_DEVELOPMENT_HOST', 'localhost:3000') }
+  config.action_mailer.delivery_method = :test
+  config.action_mailer.perform_deliveries = false
 end

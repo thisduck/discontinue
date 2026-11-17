@@ -28,7 +28,7 @@ module GithubEvents
         integration_id: repo['id'].to_s,
       ).first_or_create
 
-      repository.update_attributes({
+      repository.update({
         name: repo['name'],
         # url: repository.ssh_url,
         full_name: repo['full_name'],
@@ -47,7 +47,7 @@ module GithubEvents
         integration_id: account_params['id']
       ).first_or_create
 
-      account.update_attributes(
+      account.update(
         integration_installation_id: installation_params['id'],
         integration_account_type: account_params['type'],
         name: account_params['login']
@@ -62,7 +62,7 @@ module GithubEvents
         integration_id: sender_params['id']
       ).first_or_create
 
-      user.update_attributes({
+      user.update({
         integration_login: sender_params['login'],
         avatar_url: sender_params['avatar_url'],
       })

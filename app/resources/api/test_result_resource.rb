@@ -3,8 +3,8 @@ class Api::TestResultResource < JSONAPI::Resource
     :description, :status, :file_path, :line_number, :exception, :duration,
     :created_at, :box_id
 
-  belongs_to :stream
-  belongs_to :box
+  has_one   :stream
+  has_one   :box
   has_many   :artifacts
   paginator :paged
   filter :status

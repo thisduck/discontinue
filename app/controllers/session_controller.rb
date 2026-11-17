@@ -7,7 +7,13 @@ class SessionController < ApplicationController
 
   def create
     begin
-      user = find_user(params[:code])
+      user = if Rails.configuration.x.demo_mode
+        return head :unauthorized unless params[:demo] == true
+
+        User.find_by!(integration_type: 'demo', integration_id: 'local')
+      else
+        find_user(params[:code])
+      end
       token = make_token(user)
 
       render json: { token: token }
@@ -20,7 +26,7 @@ class SessionController < ApplicationController
 
   def current
     serializer = JSONAPI::ResourceSerializer.new(Api::UserResource)
-    render json: serializer.serialize_to_hash(Api::UserResource.new(@user, nil))
+    render json: { data: serializer.object_hash(Api::UserResource.new(@user, nil), {}) }
   end
 
   protected
@@ -35,7 +41,7 @@ class SessionController < ApplicationController
       integration_id: github_user.id
     ).first_or_create
 
-    user.update_attributes({
+    user.update({
       email: github_user.email,
       access_token: access_token,
       integration_login: github_user.login,
@@ -73,6 +79,6 @@ class SessionController < ApplicationController
       exp: 2.months.from_now.to_i
     }
 
-    JWT.encode payload, ENV['JWT_SECRET'], 'HS512'
+    JWT.encode payload, jwt_secret, 'HS512'
   end
 end

@@ -1,7 +1,8 @@
 class Api::BuildTimingResource < JSONAPI::Resource
+  model_name 'Build'
   attributes :results
 
-  belongs_to :build
+  has_one :build
 
   def results
     results = []

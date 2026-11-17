@@ -75,6 +75,8 @@ class Box < ApplicationRecord
   end
 
   def output_content_without_encoding
+    return '' unless output.exists?
+
     Paperclip.io_adapters.for(output).read
   end
 
@@ -270,6 +272,8 @@ class Box < ApplicationRecord
   end
 
   def artifact_listing(keys: [])
+    return [] if Rails.configuration.x.demo_mode
+
     key = ([
       build.repository.name,
       "artifacts",
@@ -336,7 +340,7 @@ class Box < ApplicationRecord
 
   def clear_box
     m = machine if instance_id
-    self.update_attributes(finished_at: Time.now, instance_id: nil)
+    update(finished_at: Time.now, instance_id: nil)
     stream.sync!
   ensure
     m&.destroy
