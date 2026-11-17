@@ -6,10 +6,14 @@ module AuthenticationHelper
     @current_user
   end
 
+  def jwt_secret
+    Rails.configuration.x.demo_mode ? Rails.application.secret_key_base : ENV.fetch('JWT_SECRET')
+  end
+
   def authenticate
     authenticate_or_request_with_http_token do |token, _options|
       begin
-        verified_token = JWT.decode token, ENV['JWT_SECRET'], true, {
+        verified_token = JWT.decode token, jwt_secret, true, {
           algorithm: 'HS512'
         }
         user_id = verified_token.first['sub']

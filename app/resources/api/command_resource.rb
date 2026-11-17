@@ -4,5 +4,5 @@ class Api::CommandResource < JSONAPI::Resource
 
   key_type :uuid
 
-  belongs_to :box
+  has_one :box
 end

@@ -1,1 +1,5 @@
-<button onclick={{action "login"}}>Log in to GitHub</button>
+{{#if demoMode}}
+  <button type="button" onclick={{action "loginDemo"}}>Open sample workspace</button>
+{{else}}
+  <button type="button" onclick={{action "login"}}>Log in to GitHub</button>
+{{/if}}

@@ -1,7 +1,7 @@
 require 'github_push_hook'
 
 class GithubController < ApplicationController
-  GITHUB_WEBHOOK_SECRET_TOKEN = "CoolBeansAreSoCoool"
+  prepend_before_action :disable_github_in_demo
   skip_before_action :authenticate, only: [:webhook]
   before_action :verify_github_webhook, only: [:webhook]
 
@@ -39,10 +39,17 @@ class GithubController < ApplicationController
 
   protected
 
+  def disable_github_in_demo
+    head :forbidden if Rails.configuration.x.demo_mode
+  end
+
   def verify_github_webhook
     payload_body = request.body.read
-    hub_signature = request.env['HTTP_X_HUB_SIGNATURE']
-    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), GITHUB_WEBHOOK_SECRET_TOKEN, payload_body)
+    secret = ENV['GITHUB_WEBHOOK_SECRET']
+    return head :unauthorized if secret.blank?
+
+    hub_signature = request.headers['X-Hub-Signature-256'].to_s
+    signature = 'sha256=' + OpenSSL::HMAC.hexdigest('SHA256', secret, payload_body)
 
     unless Rack::Utils.secure_compare(signature, hub_signature)
       render json: {}, status: :unauthorized

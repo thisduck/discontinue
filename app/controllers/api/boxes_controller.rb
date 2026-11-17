@@ -1,7 +1,7 @@
 class Api::BoxesController < ApiController
   # TODO: authenticate these requests
   skips = [:save_log_file, :update_log_file, :post_process, :cached, :acquire_populate_lock, :populate_queue, :wait_for_queue, :pop_queue]
-  skip_before_action :verify_authenticity_token, only: skips
+  skip_before_action :verify_authenticity_token, only: skips, raise: false
   skip_before_action :authenticate, only: skips
 
   def save_log_file

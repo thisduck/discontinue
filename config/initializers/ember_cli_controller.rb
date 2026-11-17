@@ -1,5 +1,3 @@
-require 'ember_cli/ember_controller'
-
-class EmberCli::EmberController
-  skip_before_action :authenticate
+Rails.application.config.to_prepare do
+  EmberCli::EmberController.skip_before_action :authenticate, raise: false
 end

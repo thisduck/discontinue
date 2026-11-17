@@ -22,7 +22,7 @@ module.exports = function(environment) {
       sessionServiceName: 'session',
       providers: {
         'github-oauth2': {
-          apiKey: 'Iv1.700b34a31c99963f',
+          apiKey: process.env.GITHUB_APP_CLIENT_ID,
           scope: 'repo repo:status read:user read:org user:email',
         }
       }
@@ -36,6 +36,7 @@ module.exports = function(environment) {
     },
 
     APP: {
+      demoMode: environment === 'development' && process.env.DISCONTINUE_DEMO === '1',
       // Here you can pass flags/options to your application instance
       // when it is created
     }
